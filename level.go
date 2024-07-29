@@ -88,15 +88,17 @@ func (level *Level) GenerateLevelTiles() {
 	gd := NewGameData()
 	tiles := level.createTiles()
 	level.Tiles = tiles
+	containsRooms := false
 
 	for idx := 0; idx < MAX_ROOMS; idx++ {
 		w := GetRandomBetween(MIN_SIZE, MAX_SIZE)
 		h := GetRandomBetween(MIN_SIZE, MAX_SIZE)
-		x := GetDiceRoll(gd.ScreenWidth-w-1) - 1
-		y := GetDiceRoll(gd.ScreenHeight-h-1) - 1
+		x := GetDiceRoll(gd.ScreenWidth - w - 1)
+		y := GetDiceRoll(gd.ScreenHeight - h - 1)
 
 		newRoom := NewRect(x, y, w, h)
 		okToAdd := true
+
 		for _, otherRoom := range level.Rooms {
 			if newRoom.Intersect(otherRoom) {
 				okToAdd = false
@@ -105,10 +107,57 @@ func (level *Level) GenerateLevelTiles() {
 		}
 		if okToAdd {
 			level.createRoom(newRoom)
+
+			if containsRooms {
+				newX, newY := newRoom.Center()
+				prevX, prevY := level.Rooms[len(level.Rooms)-1].Center()
+
+				coinflip := GetDiceRoll(2)
+
+				if coinflip == 2 {
+					level.createHorizontalTunnel(prevX, newX, prevY)
+					level.createVerticalTunnel(prevY, newY, newX)
+				} else {
+					level.createHorizontalTunnel(prevX, newX, newY)
+					level.createVerticalTunnel(prevY, newY, prevX)
+				}
+			}
 			level.Rooms = append(level.Rooms, newRoom)
+			containsRooms = true
+
 		}
 	}
+}
 
+func (level *Level) createHorizontalTunnel(x1 int, x2 int, y int) {
+	gd := NewGameData()
+	for x := min(x1, x2); x < max(x1, x2)+1; x++ {
+		index := level.GetIndexFromXY(x, y)
+		if index > 0 && index < gd.ScreenWidth*gd.ScreenHeight {
+			level.Tiles[index].Blocked = false
+			floor, _, err := ebitenutil.NewImageFromFile("assets/floor.png")
+			if err != nil {
+				log.Fatal(err)
+			}
+			level.Tiles[index].Image = floor
+		}
+	}
+}
+
+func (level *Level) createVerticalTunnel(y1 int, y2 int, x int) {
+	gd := NewGameData()
+	for y := min(y1, y2); y < max(y1, y2)+1; y++ {
+		index := level.GetIndexFromXY(x, y)
+
+		if index > 0 && index < gd.ScreenWidth*gd.ScreenHeight {
+			level.Tiles[index].Blocked = false
+			floor, _, err := ebitenutil.NewImageFromFile("assets/floor.png")
+			if err != nil {
+				log.Fatal(err)
+			}
+			level.Tiles[index].Image = floor
+		}
+	}
 }
 
 func NewLevel() Level {
@@ -118,4 +167,20 @@ func NewLevel() Level {
 	level.GenerateLevelTiles()
 
 	return level
+}
+
+// Returns the larger of x or y.
+func max(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
+}
+
+// Returns the smaller of x or y.
+func min(x, y int) int {
+	if x > y {
+		return y
+	}
+	return x
 }
