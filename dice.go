@@ -16,3 +16,15 @@ func GetDiceRoll(num int) int {
 	x, _ := rand.Int(rand.Reader, big.NewInt(int64(num)))
 	return int(x.Int64()) + 1
 }
+
+// Returns a number between low and high, inclusive.
+func GetRandomBetween(low, high int) int {
+	var random = -1
+	for {
+		random = GetDiceRoll(high)
+		if random >= low {
+			break
+		}
+	}
+	return random
+}
