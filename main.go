@@ -28,15 +28,15 @@ func NewGame() *Game {
 
 // Called each tick (game loop).
 func (g *Game) Update() error {
-
+	TryPlayerMove(g)
 	return nil
-
 }
 
 // Called each draw cycle in the game loop.
 func (g *Game) Draw(screen *ebiten.Image) {
 	level := g.Map.Dungeons[0].Levels[0]
 	level.DrawLevel(screen)
+	ProcessRenderables(g, level, screen)
 }
 
 // Returns the screen dimensions.
