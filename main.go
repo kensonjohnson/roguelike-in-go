@@ -4,18 +4,24 @@ import (
 	_ "image/png"
 	"log"
 
+	"github.com/bytearena/ecs"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Holds all data the entire game will need.
 type Game struct {
-	Map GameMap
+	Map       GameMap
+	World     *ecs.Manager
+	WorldTags map[string]ecs.Tag
 }
 
 // Creates a new Game Object and initializes the data.
 func NewGame() *Game {
 	g := &Game{}
+	world, tags := InitializeWorld()
 	g.Map = NewGameMap()
+	g.World = world
+	g.WorldTags = tags
 	return g
 
 }
@@ -29,17 +35,8 @@ func (g *Game) Update() error {
 
 // Called each draw cycle in the game loop.
 func (g *Game) Draw(screen *ebiten.Image) {
-	gd := NewGameData()
 	level := g.Map.Dungeons[0].Levels[0]
-	for x := 0; x < gd.ScreenWidth; x++ {
-		for y := 0; y < gd.ScreenHeight; y++ {
-			tile := level.Tiles[level.GetIndexFromXY(x, y)]
-			op := &ebiten.DrawImageOptions{}
-
-			op.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
-			screen.DrawImage(tile.Image, op)
-		}
-	}
+	level.DrawLevel(screen)
 }
 
 // Returns the screen dimensions.

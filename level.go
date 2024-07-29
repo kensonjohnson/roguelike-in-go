@@ -66,6 +66,18 @@ func (level *Level) CreateTiles() []MapTile {
 	return tiles
 }
 
+func (level *Level) DrawLevel(screen *ebiten.Image) {
+	gd := NewGameData()
+	for x := 0; x < gd.ScreenWidth; x++ {
+		for y := 0; y < gd.ScreenHeight; y++ {
+			tile := level.Tiles[level.GetIndexFromXY(x, y)]
+			options := &ebiten.DrawImageOptions{}
+			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+			screen.DrawImage(tile.Image, options)
+		}
+	}
+}
+
 func NewLevel() Level {
 	level := Level{}
 	tiles := level.CreateTiles()
