@@ -10,9 +10,11 @@ import (
 
 // Holds all data the entire game will need.
 type Game struct {
-	Map       GameMap
-	World     *ecs.Manager
-	WorldTags map[string]ecs.Tag
+	Map         GameMap
+	World       *ecs.Manager
+	WorldTags   map[string]ecs.Tag
+	Turn        TurnState
+	TurnCounter int
 }
 
 // Creates a new Game Object and initializes the data.
@@ -22,13 +24,20 @@ func NewGame() *Game {
 	world, tags := InitializeWorld(g.Map.CurrentLevel)
 	g.World = world
 	g.WorldTags = tags
+	g.Turn = PlayerTurn
+	g.TurnCounter = 0
 	return g
 
 }
 
 // Called each tick (game loop).
 func (g *Game) Update() error {
-	TryPlayerMove(g)
+	g.TurnCounter++
+	if g.Turn == PlayerTurn && g.TurnCounter > 8 {
+		TryPlayerMove(g)
+	}
+
+	g.Turn = PlayerTurn
 	return nil
 }
 
