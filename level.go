@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/norendren/go-fov/fov"
 )
 
 type MapTile struct {
@@ -15,8 +16,19 @@ type MapTile struct {
 }
 
 type Level struct {
-	Tiles []MapTile
-	Rooms []Rect
+	Tiles         []MapTile
+	Rooms         []Rect
+	PlayerVisible *fov.View
+}
+
+func NewLevel() Level {
+	level := Level{}
+	rooms := make([]Rect, 0)
+	level.Rooms = rooms
+	level.GenerateLevelTiles()
+	level.PlayerVisible = fov.New()
+
+	return level
 }
 
 // Gets the index of the map array from a given X,Y TILE coordinate.
@@ -57,10 +69,12 @@ func (level *Level) DrawLevel(screen *ebiten.Image) {
 	gd := NewGameData()
 	for x := 0; x < gd.ScreenWidth; x++ {
 		for y := 0; y < gd.ScreenHeight; y++ {
-			tile := level.Tiles[level.GetIndexFromXY(x, y)]
-			options := &ebiten.DrawImageOptions{}
-			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
-			screen.DrawImage(tile.Image, options)
+			if level.PlayerVisible.IsVisible(x, y) {
+				tile := level.Tiles[level.GetIndexFromXY(x, y)]
+				options := &ebiten.DrawImageOptions{}
+				options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+				screen.DrawImage(tile.Image, options)
+			}
 		}
 	}
 }
@@ -160,13 +174,17 @@ func (level *Level) createVerticalTunnel(y1 int, y2 int, x int) {
 	}
 }
 
-func NewLevel() Level {
-	level := Level{}
-	rooms := make([]Rect, 0)
-	level.Rooms = rooms
-	level.GenerateLevelTiles()
+func (level Level) InBounds(x, y int) bool {
+	gd := NewGameData()
+	if x < 0 || x > gd.ScreenWidth || y < 0 || y > gd.ScreenHeight {
+		return false
+	}
+	return true
+}
 
-	return level
+func (level Level) IsOpaque(x, y int) bool {
+	idx := level.GetIndexFromXY(x, y)
+	return level.Tiles[idx].Blocked
 }
 
 // Returns the larger of x or y.
