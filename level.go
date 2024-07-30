@@ -25,7 +25,7 @@ const (
 )
 
 type Level struct {
-	Tiles         []MapTile
+	Tiles         []*MapTile
 	Rooms         []Rect
 	PlayerVisible *fov.View
 }
@@ -48,9 +48,9 @@ func (level *Level) GetIndexFromXY(x int, y int) int {
 }
 
 // Creates a map of all tiles as a baseline to carve out a level.
-func (level *Level) createTiles() []MapTile {
+func (level *Level) createTiles() []*MapTile {
 	gd := NewGameData()
-	tiles := make([]MapTile, gd.ScreenWidth*gd.ScreenHeight)
+	tiles := make([]*MapTile, gd.ScreenWidth*gd.ScreenHeight)
 	index := 0
 
 	for x := 0; x < gd.ScreenWidth; x++ {
@@ -69,7 +69,7 @@ func (level *Level) createTiles() []MapTile {
 				TileType:   WALL,
 			}
 
-			tiles[index] = tile
+			tiles[index] = &tile
 
 		}
 	}
