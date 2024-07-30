@@ -34,7 +34,7 @@ func NewGame() *Game {
 func (g *Game) Update() error {
 	g.TurnCounter++
 	if g.Turn == PlayerTurn && g.TurnCounter > 8 {
-		TryMovePlayer(g)
+		TakePlayerAction(g)
 	}
 	if g.Turn == MonsterTurn {
 		UpdateMonster(g)
