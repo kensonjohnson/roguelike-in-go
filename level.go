@@ -14,7 +14,15 @@ type MapTile struct {
 	Blocked    bool
 	Image      *ebiten.Image
 	IsRevealed bool
+	TileType   TileType
 }
+
+type TileType int
+
+const (
+	WALL TileType = iota
+	FLOOR
+)
 
 type Level struct {
 	Tiles         []MapTile
@@ -58,6 +66,7 @@ func (level *Level) createTiles() []MapTile {
 				Blocked:    true,
 				Image:      wall,
 				IsRevealed: false,
+				TileType:   WALL,
 			}
 
 			tiles[index] = tile
@@ -95,6 +104,7 @@ func (level *Level) createRoom(room Rect) {
 		for x := room.X1 + 1; x < room.X2; x++ {
 			index := level.GetIndexFromXY(x, y)
 			level.Tiles[index].Blocked = false
+			level.Tiles[index].TileType = FLOOR
 			floor, _, err := ebitenutil.NewImageFromFile("assets/floor.png")
 			if err != nil {
 				log.Fatal(err)
@@ -160,6 +170,7 @@ func (level *Level) createHorizontalTunnel(x1 int, x2 int, y int) {
 		index := level.GetIndexFromXY(x, y)
 		if index > 0 && index < gd.ScreenWidth*gd.ScreenHeight {
 			level.Tiles[index].Blocked = false
+			level.Tiles[index].TileType = FLOOR
 			floor, _, err := ebitenutil.NewImageFromFile("assets/floor.png")
 			if err != nil {
 				log.Fatal(err)
@@ -176,6 +187,7 @@ func (level *Level) createVerticalTunnel(y1 int, y2 int, x int) {
 
 		if index > 0 && index < gd.ScreenWidth*gd.ScreenHeight {
 			level.Tiles[index].Blocked = false
+			level.Tiles[index].TileType = FLOOR
 			floor, _, err := ebitenutil.NewImageFromFile("assets/floor.png")
 			if err != nil {
 				log.Fatal(err)
@@ -195,7 +207,7 @@ func (level Level) InBounds(x, y int) bool {
 
 func (level Level) IsOpaque(x, y int) bool {
 	idx := level.GetIndexFromXY(x, y)
-	return level.Tiles[idx].Blocked
+	return level.Tiles[idx].TileType == WALL
 }
 
 // Returns the larger of x or y.
