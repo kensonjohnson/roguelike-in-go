@@ -22,22 +22,24 @@ func NewGame() *Game {
 	g := &Game{}
 	g.Map = NewGameMap()
 	world, tags := InitializeWorld(g.Map.CurrentLevel)
-	g.World = world
+
 	g.WorldTags = tags
+	g.World = world
 	g.Turn = PlayerTurn
 	g.TurnCounter = 0
 	return g
-
 }
 
 // Called each tick (game loop).
 func (g *Game) Update() error {
 	g.TurnCounter++
 	if g.Turn == PlayerTurn && g.TurnCounter > 8 {
-		TryPlayerMove(g)
+		TryMovePlayer(g)
+	}
+	if g.Turn == MonsterTurn {
+		UpdateMonster(g)
 	}
 
-	g.Turn = PlayerTurn
 	return nil
 }
 

@@ -2,7 +2,7 @@ package main
 
 import "github.com/hajimehoshi/ebiten/v2"
 
-func TryPlayerMove(g *Game) {
+func TryMovePlayer(g *Game) {
 	players := g.WorldTags["players"]
 	x := 0
 	y := 0
