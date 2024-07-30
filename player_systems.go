@@ -40,7 +40,7 @@ func TakePlayerAction(g *Game) {
 			level.PlayerVisible.Compute(level, pos.X, pos.Y, 8)
 		} else if x != 0 || y != 0 {
 			if level.Tiles[index].TileType != WALL {
-				monsterPosition := Position{X: pos.X, Y: pos.Y}
+				monsterPosition := Position{X: pos.X + x, Y: pos.Y + y}
 				AttackSystem(g, pos, &monsterPosition)
 			}
 		}
