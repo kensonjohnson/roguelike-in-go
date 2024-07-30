@@ -19,12 +19,5 @@ func GetDiceRoll(num int) int {
 
 // Returns a number between low and high, inclusive.
 func GetRandomBetween(low, high int) int {
-	var random = -1
-	for {
-		random = GetDiceRoll(high)
-		if random >= low {
-			break
-		}
-	}
-	return random
+	return GetDiceRoll(high-low) + high
 }
