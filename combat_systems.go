@@ -42,6 +42,10 @@ func AttackSystem(g *Game, attackerPosition, defenderPosition *Position) {
 	attackerName := attacker.Components[name].(*Name)
 	attackerMessage := attacker.Components[userMessage].(*UserMessage)
 
+	if attacker.Components[health].(*Health).CurrentHealth <= 0 {
+		return
+	}
+
 	// Roll a d10 to hit
 	toHitRoll := GetDiceRoll(10)
 
