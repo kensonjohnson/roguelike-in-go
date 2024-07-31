@@ -20,7 +20,12 @@ var (
 
 func ProcessHUD(g *Game, screen *ebiten.Image) {
 	if hudImg == nil {
-		hudImg, _, hudErr = ebitenutil.NewImageFromFile("assets/UIPanel.png")
+		imgSource, err := assets.ReadFile("assets/UIPanel.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		hudImg, _, hudErr = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 		if hudErr != nil {
 			log.Fatal(hudErr)
 		}

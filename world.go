@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 
 	"github.com/bytearena/ecs"
@@ -22,17 +23,32 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 	manager := ecs.NewManager()
 	tags := make(map[string]ecs.Tag)
 
-	playerImage, _, err := ebitenutil.NewImageFromFile("assets/player.png")
+	imgSource, err := assets.ReadFile("assets/player.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	skellyImg, _, err := ebitenutil.NewImageFromFile("assets/skelly.png")
+	playerImage, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	orcImg, _, err := ebitenutil.NewImageFromFile("assets/orc.png")
+	imgSource, err = assets.ReadFile("assets/skelly.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	skellyImg, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	imgSource, err = assets.ReadFile("assets/orc.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	orcImg, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 	if err != nil {
 		log.Fatal(err)
 	}

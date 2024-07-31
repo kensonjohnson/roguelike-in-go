@@ -13,7 +13,6 @@ import (
 
 var (
 	userLogImg      *ebiten.Image    = nil
-	err             error            = nil
 	mplusNormalFont *text.GoTextFace = nil
 	lastText        []string         = make([]string, 0, 5)
 )
@@ -22,7 +21,13 @@ const FONT_SIZE = 16
 
 func ProcessUserLog(g *Game, screen *ebiten.Image) {
 	if userLogImg == nil {
-		userLogImg, _, err = ebitenutil.NewImageFromFile("assets/UIPanel.png")
+
+		imgSource, err := assets.ReadFile("assets/UIPanel.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		userLogImg, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -30,14 +31,22 @@ func loadTileImages() {
 		return
 	}
 
-	var err error
-
-	floor, _, err = ebitenutil.NewImageFromFile("assets/floor.png")
+	imgSource, err := assets.ReadFile("assets/floor.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	wall, _, err = ebitenutil.NewImageFromFile("assets/wall.png")
+	floor, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	imgSource, err = assets.ReadFile("assets/wall.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	wall, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 	if err != nil {
 		log.Fatal(err)
 	}
