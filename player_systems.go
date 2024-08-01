@@ -1,6 +1,9 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kensonjohnson/roguelike-game-go/components"
+)
 
 func TakePlayerAction(g *Game) {
 	turnTaken := false
@@ -27,7 +30,7 @@ func TakePlayerAction(g *Game) {
 	level := g.Map.CurrentLevel
 
 	for _, result := range g.World.Query(players) {
-		pos := result.Components[position].(*Position)
+		pos := result.Components[position].(*components.Position)
 		index := level.GetIndexFromXY(pos.X+x, pos.Y+y)
 
 		tile := level.Tiles[index]
@@ -40,7 +43,7 @@ func TakePlayerAction(g *Game) {
 			level.PlayerVisible.Compute(level, pos.X, pos.Y, 8)
 		} else if x != 0 || y != 0 {
 			if level.Tiles[index].TileType != WALL {
-				monsterPosition := Position{X: pos.X + x, Y: pos.Y + y}
+				monsterPosition := components.Position{X: pos.X + x, Y: pos.Y + y}
 				AttackSystem(g, pos, &monsterPosition)
 			}
 		}

@@ -4,15 +4,16 @@ import (
 	"fmt"
 
 	"github.com/bytearena/ecs"
+	"github.com/kensonjohnson/roguelike-game-go/components"
 )
 
-func AttackSystem(g *Game, attackerPosition, defenderPosition *Position) {
+func AttackSystem(g *Game, attackerPosition, defenderPosition *components.Position) {
 	var attacker *ecs.QueryResult = nil
 	var defender *ecs.QueryResult = nil
 
 	// Get the attacker and defender if either is a player
 	for _, playerCombatant := range g.World.Query(g.WorldTags["players"]) {
-		pos := playerCombatant.Components[position].(*Position)
+		pos := playerCombatant.Components[position].(*components.Position)
 		if pos.IsEqual(attackerPosition) {
 			attacker = playerCombatant
 		} else if pos.IsEqual(defenderPosition) {
@@ -21,7 +22,7 @@ func AttackSystem(g *Game, attackerPosition, defenderPosition *Position) {
 	}
 
 	for _, cbt := range g.World.Query(g.WorldTags["monsters"]) {
-		pos := cbt.Components[position].(*Position)
+		pos := cbt.Components[position].(*components.Position)
 		if pos.IsEqual(attackerPosition) {
 			attacker = cbt
 		} else if pos.IsEqual(defenderPosition) {

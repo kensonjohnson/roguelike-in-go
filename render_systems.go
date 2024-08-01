@@ -2,11 +2,12 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kensonjohnson/roguelike-game-go/components"
 )
 
 func ProcessRenderables(g *Game, level Level, screen *ebiten.Image) {
 	for _, result := range g.World.Query(g.WorldTags["renderables"]) {
-		pos := result.Components[position].(*Position)
+		pos := result.Components[position].(*components.Position)
 		img := result.Components[renderable].(*Renderable).Image
 
 		if level.PlayerVisible.IsVisible(pos.X, pos.Y) {

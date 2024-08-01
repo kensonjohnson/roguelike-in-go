@@ -3,17 +3,19 @@ package main
 import (
 	"errors"
 	"reflect"
+
+	"github.com/kensonjohnson/roguelike-game-go/components"
 )
 
 type node struct {
 	Parent   *node
-	Position *Position
+	Position *components.Position
 	g        int
 	h        int
 	f        int
 }
 
-func newNode(parent *node, position *Position) *node {
+func newNode(parent *node, position *components.Position) *node {
 	n := node{}
 	n.Parent = parent
 	n.Position = position
@@ -53,7 +55,7 @@ func isInSlice(s []*node, target *node) bool {
 
 type AStar struct{}
 
-func (as AStar) GetPath(level Level, start, end *Position) []Position {
+func (as AStar) GetPath(level Level, start, end *components.Position) []components.Position {
 	gd := NewGameData()
 	openList := make([]*node, 0)
 	closedList := make([]*node, 0)
@@ -83,7 +85,7 @@ func (as AStar) GetPath(level Level, start, end *Position) []Position {
 		closedList = append(closedList, currentNode)
 
 		if currentNode.isEqual(endNodePlaceholder) {
-			path := make([]Position, 0)
+			path := make([]components.Position, 0)
 			current := currentNode
 			for {
 				if current == nil {
@@ -102,7 +104,7 @@ func (as AStar) GetPath(level Level, start, end *Position) []Position {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X, currentNode.Position.Y-1)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable
-				upNodePosition := Position{
+				upNodePosition := components.Position{
 					X: currentNode.Position.X,
 					Y: currentNode.Position.Y - 1,
 				}
@@ -116,7 +118,7 @@ func (as AStar) GetPath(level Level, start, end *Position) []Position {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X, currentNode.Position.Y+1)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable
-				downNodePosition := Position{
+				downNodePosition := components.Position{
 					X: currentNode.Position.X,
 					Y: currentNode.Position.Y + 1,
 				}
@@ -129,7 +131,7 @@ func (as AStar) GetPath(level Level, start, end *Position) []Position {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X-1, currentNode.Position.Y)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable
-				leftNodePosition := Position{
+				leftNodePosition := components.Position{
 					X: currentNode.Position.X - 1,
 					Y: currentNode.Position.Y,
 				}
@@ -142,7 +144,7 @@ func (as AStar) GetPath(level Level, start, end *Position) []Position {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X+1, currentNode.Position.Y)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable
-				rightNodePosition := Position{
+				rightNodePosition := components.Position{
 					X: currentNode.Position.X + 1,
 					Y: currentNode.Position.Y,
 				}

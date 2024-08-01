@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bytearena/ecs"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
+	"github.com/kensonjohnson/roguelike-game-go/components"
 )
 
 var (
@@ -40,7 +41,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 			Image: assets.Player,
 		}).
 		AddComponent(movable, Movable{}).
-		AddComponent(position, &Position{
+		AddComponent(position, &components.Position{
 			X: x,
 			Y: y,
 		}).
@@ -79,7 +80,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 					AddComponent(renderable, &Renderable{
 						Image: assets.Orc,
 					}).
-					AddComponent(position, &Position{
+					AddComponent(position, &components.Position{
 						X: mX,
 						Y: mY,
 					}).
@@ -110,7 +111,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 					AddComponent(renderable, &Renderable{
 						Image: assets.Skelly,
 					}).
-					AddComponent(position, &Position{
+					AddComponent(position, &components.Position{
 						X: mX,
 						Y: mY,
 					}).

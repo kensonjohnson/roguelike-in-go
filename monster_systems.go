@@ -1,21 +1,22 @@
 package main
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/components"
 	"github.com/norendren/go-fov/fov"
 )
 
 func UpdateMonster(game *Game) {
 	l := game.Map.CurrentLevel
-	playerPosition := Position{}
+	playerPosition := components.Position{}
 
 	for _, plr := range game.World.Query(game.WorldTags["players"]) {
-		pos := plr.Components[position].(*Position)
+		pos := plr.Components[position].(*components.Position)
 		playerPosition.X = pos.X
 		playerPosition.Y = pos.Y
 	}
 
 	for _, result := range game.World.Query(game.WorldTags["monsters"]) {
-		pos := result.Components[position].(*Position)
+		pos := result.Components[position].(*components.Position)
 		// mon := result.Components[monster].(*Monster)
 
 		monsterSees := fov.New()
