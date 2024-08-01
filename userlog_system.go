@@ -6,13 +6,12 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/fonts"
 )
 
 var (
-	userLogImg      *ebiten.Image    = nil
 	mplusNormalFont *text.GoTextFace = nil
 	lastText        []string         = make([]string, 0, 5)
 )
@@ -20,18 +19,7 @@ var (
 const FONT_SIZE = 16
 
 func ProcessUserLog(g *Game, screen *ebiten.Image) {
-	if userLogImg == nil {
 
-		imgSource, err := assets.ReadFile("assets/UIPanel.png")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		userLogImg, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 	if mplusNormalFont == nil {
 		source, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
 		if err != nil {
@@ -49,7 +37,7 @@ func ProcessUserLog(g *Game, screen *ebiten.Image) {
 	var fontY = uiLocation + 24
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(0.), float64(uiLocation))
-	screen.DrawImage(userLogImg, op)
+	screen.DrawImage(assets.UIPanel, op)
 	tmpMessages := make([]string, 0, 5)
 	anyMessages := false
 

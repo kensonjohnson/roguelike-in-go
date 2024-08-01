@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/norendren/go-fov/fov"
 )
 
@@ -21,36 +18,8 @@ type MapTile struct {
 type TileType int
 
 var (
-	floor       *ebiten.Image
-	wall        *ebiten.Image
 	levelHeight int = 0
 )
-
-func loadTileImages() {
-	if floor != nil && wall != nil {
-		return
-	}
-
-	imgSource, err := assets.ReadFile("assets/floor.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	floor, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	imgSource, err = assets.ReadFile("assets/wall.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	wall, _, err = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 const (
 	WALL TileType = iota
@@ -65,7 +34,6 @@ type Level struct {
 
 func NewLevel() Level {
 	level := Level{}
-	loadTileImages()
 	rooms := make([]Rect, 0)
 	level.Rooms = rooms
 	level.GenerateLevelTiles()
@@ -94,7 +62,7 @@ func (level *Level) createTiles() []*MapTile {
 				PixelX:     x * gd.TileWidth,
 				PixelY:     y * gd.TileHeight,
 				Blocked:    true,
-				Image:      wall,
+				Image:      assets.Wall,
 				IsRevealed: false,
 				TileType:   WALL,
 			}
@@ -135,7 +103,7 @@ func (level *Level) createRoom(room Rect) {
 			index := level.GetIndexFromXY(x, y)
 			level.Tiles[index].Blocked = false
 			level.Tiles[index].TileType = FLOOR
-			level.Tiles[index].Image = floor
+			level.Tiles[index].Image = assets.Floor
 		}
 	}
 }
@@ -198,7 +166,7 @@ func (level *Level) createHorizontalTunnel(x1 int, x2 int, y int) {
 		if index > 0 && index < gd.ScreenWidth*levelHeight {
 			level.Tiles[index].Blocked = false
 			level.Tiles[index].TileType = FLOOR
-			level.Tiles[index].Image = floor
+			level.Tiles[index].Image = assets.Floor
 		}
 	}
 }
@@ -211,7 +179,7 @@ func (level *Level) createVerticalTunnel(y1 int, y2 int, x int) {
 		if index > 0 && index < gd.ScreenWidth*levelHeight {
 			level.Tiles[index].Blocked = false
 			level.Tiles[index].TileType = FLOOR
-			level.Tiles[index].Image = floor
+			level.Tiles[index].Image = assets.Floor
 		}
 	}
 }

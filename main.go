@@ -6,6 +6,7 @@ import (
 
 	"github.com/bytearena/ecs"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 )
 
 // Holds all data the entire game will need.
@@ -27,6 +28,7 @@ func NewGame() *Game {
 	g.World = world
 	g.Turn = PlayerTurn
 	g.TurnCounter = 0
+
 	return g
 }
 
@@ -59,6 +61,7 @@ func (g *Game) Layout(w, h int) (int, int) {
 }
 
 func main() {
+	assets.MustLoadAssets()
 
 	g := NewGame()
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

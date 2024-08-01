@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"log"
-
 	"github.com/bytearena/ecs"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 )
 
 var (
@@ -22,36 +19,6 @@ var (
 func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 	manager := ecs.NewManager()
 	tags := make(map[string]ecs.Tag)
-
-	imgSource, err := assets.ReadFile("assets/player.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	playerImage, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	imgSource, err = assets.ReadFile("assets/skelly.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	skellyImg, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	imgSource, err = assets.ReadFile("assets/orc.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	orcImg, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	startingRoom := startingLevel.Rooms[0]
 	x, y := startingRoom.Center()
@@ -70,7 +37,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 	manager.NewEntity().
 		AddComponent(player, Player{}).
 		AddComponent(renderable, &Renderable{
-			Image: playerImage,
+			Image: assets.Player,
 		}).
 		AddComponent(movable, Movable{}).
 		AddComponent(position, &Position{
@@ -110,7 +77,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 				manager.NewEntity().
 					AddComponent(monster, &Monster{}).
 					AddComponent(renderable, &Renderable{
-						Image: orcImg,
+						Image: assets.Orc,
 					}).
 					AddComponent(position, &Position{
 						X: mX,
@@ -141,7 +108,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 				manager.NewEntity().
 					AddComponent(monster, &Monster{}).
 					AddComponent(renderable, &Renderable{
-						Image: skellyImg,
+						Image: assets.Skelly,
 					}).
 					AddComponent(position, &Position{
 						X: mX,

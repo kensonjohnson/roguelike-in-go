@@ -7,38 +7,23 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/fonts"
 )
 
-var (
-	hudImg  *ebiten.Image
-	hudErr  error            = nil
-	hudFont *text.GoTextFace = nil
-)
+var hudFont *text.GoTextFace = nil
 
 func ProcessHUD(g *Game, screen *ebiten.Image) {
-	if hudImg == nil {
-		imgSource, err := assets.ReadFile("assets/UIPanel.png")
+
+	if hudFont == nil {
+		source, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		hudImg, _, hudErr = ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
-		if hudErr != nil {
-			log.Fatal(hudErr)
-		}
-
-		if hudFont == nil {
-			source, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
-			if err != nil {
-				log.Fatal(err)
-			}
-			hudFont = &text.GoTextFace{
-				Source: source,
-				Size:   FONT_SIZE,
-			}
+		hudFont = &text.GoTextFace{
+			Source: source,
+			Size:   FONT_SIZE,
 		}
 	}
 
@@ -51,7 +36,7 @@ func ProcessHUD(g *Game, screen *ebiten.Image) {
 
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(float64(uiX), float64(uiY))
-	screen.DrawImage(hudImg, options)
+	screen.DrawImage(assets.UIPanel, options)
 
 	for _, p := range g.World.Query(g.WorldTags["players"]) {
 		h := p.Components[health].(*Health)
