@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
+	"github.com/kensonjohnson/roguelike-game-go/components"
 	"github.com/kensonjohnson/roguelike-game-go/fonts"
 )
 
@@ -42,7 +43,7 @@ func ProcessUserLog(g *Game, screen *ebiten.Image) {
 	anyMessages := false
 
 	for _, m := range g.World.Query(g.WorldTags["messengers"]) {
-		messages := m.Components[userMessage].(*UserMessage)
+		messages := m.Components[userMessage].(*components.UserMessage)
 		if messages.AttackMessage != "" {
 			tmpMessages = append(tmpMessages, messages.AttackMessage)
 			anyMessages = true
@@ -50,7 +51,7 @@ func ProcessUserLog(g *Game, screen *ebiten.Image) {
 		}
 	}
 	for _, m := range g.World.Query(g.WorldTags["messengers"]) {
-		messages := m.Components[userMessage].(*UserMessage)
+		messages := m.Components[userMessage].(*components.UserMessage)
 		if messages.DeadMessage != "" {
 			tmpMessages = append(tmpMessages, messages.DeadMessage)
 			anyMessages = true

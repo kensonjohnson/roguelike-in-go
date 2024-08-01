@@ -34,16 +34,16 @@ func AttackSystem(g *Game, attackerPosition, defenderPosition *components.Positi
 		return
 	}
 
-	defenderArmor := defender.Components[armor].(*Armor)
-	defenderHealth := defender.Components[health].(*Health)
-	defenderName := defender.Components[name].(*Name)
-	defenderMessage := defender.Components[userMessage].(*UserMessage)
+	defenderArmor := defender.Components[armor].(*components.Armor)
+	defenderHealth := defender.Components[health].(*components.Health)
+	defenderName := defender.Components[name].(*components.Name)
+	defenderMessage := defender.Components[userMessage].(*components.UserMessage)
 
-	attackerWeapon := attacker.Components[meleeWeapon].(*MeleeWeapon)
-	attackerName := attacker.Components[name].(*Name)
-	attackerMessage := attacker.Components[userMessage].(*UserMessage)
+	attackerWeapon := attacker.Components[meleeWeapon].(*components.MeleeWeapon)
+	attackerName := attacker.Components[name].(*components.Name)
+	attackerMessage := attacker.Components[userMessage].(*components.UserMessage)
 
-	if attacker.Components[health].(*Health).CurrentHealth <= 0 {
+	if attacker.Components[health].(*components.Health).CurrentHealth <= 0 {
 		return
 	}
 

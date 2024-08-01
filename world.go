@@ -36,32 +36,32 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 	userMessage = manager.NewComponent()
 
 	manager.NewEntity().
-		AddComponent(player, Player{}).
-		AddComponent(renderable, &Renderable{
+		AddComponent(player, components.Player{}).
+		AddComponent(renderable, &components.Renderable{
 			Image: assets.Player,
 		}).
-		AddComponent(movable, Movable{}).
+		AddComponent(movable, components.Movable{}).
 		AddComponent(position, &components.Position{
 			X: x,
 			Y: y,
 		}).
-		AddComponent(health, &Health{
+		AddComponent(health, &components.Health{
 			MaxHealth:     30,
 			CurrentHealth: 30,
 		}).
-		AddComponent(meleeWeapon, &MeleeWeapon{
+		AddComponent(meleeWeapon, &components.MeleeWeapon{
 			Name:          "Battle Axe",
 			MinimumDamage: 10,
 			MaximumDamage: 20,
 			ToHitBonus:    3,
 		}).
-		AddComponent(armor, &Armor{
+		AddComponent(armor, &components.Armor{
 			Name:       "Plate Armor",
 			Defense:    15,
 			ArmorClass: 18,
 		}).
-		AddComponent(name, &Name{Label: "Player"}).
-		AddComponent(userMessage, &UserMessage{
+		AddComponent(name, &components.Name{Label: "Player"}).
+		AddComponent(userMessage, &components.UserMessage{
 			AttackMessage:    "",
 			DeadMessage:      "",
 			GameStateMessage: "",
@@ -76,62 +76,62 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 
 			if mobSpawn == 1 {
 				manager.NewEntity().
-					AddComponent(monster, &Monster{}).
-					AddComponent(renderable, &Renderable{
+					AddComponent(monster, &components.Monster{}).
+					AddComponent(renderable, &components.Renderable{
 						Image: assets.Orc,
 					}).
 					AddComponent(position, &components.Position{
 						X: mX,
 						Y: mY,
 					}).
-					AddComponent(health, &Health{
+					AddComponent(health, &components.Health{
 						MaxHealth:     30,
 						CurrentHealth: 30,
 					}).
-					AddComponent(meleeWeapon, &MeleeWeapon{
+					AddComponent(meleeWeapon, &components.MeleeWeapon{
 						Name:          "Machete",
 						MinimumDamage: 4,
 						MaximumDamage: 8,
 						ToHitBonus:    1,
 					}).
-					AddComponent(armor, &Armor{
+					AddComponent(armor, &components.Armor{
 						Name:       "Leather",
 						Defense:    5,
 						ArmorClass: 6,
 					}).
-					AddComponent(name, &Name{Label: "Orc"}).
-					AddComponent(userMessage, &UserMessage{
+					AddComponent(name, &components.Name{Label: "Orc"}).
+					AddComponent(userMessage, &components.UserMessage{
 						AttackMessage:    "",
 						DeadMessage:      "",
 						GameStateMessage: "",
 					})
 			} else {
 				manager.NewEntity().
-					AddComponent(monster, &Monster{}).
-					AddComponent(renderable, &Renderable{
+					AddComponent(monster, &components.Monster{}).
+					AddComponent(renderable, &components.Renderable{
 						Image: assets.Skelly,
 					}).
 					AddComponent(position, &components.Position{
 						X: mX,
 						Y: mY,
 					}).
-					AddComponent(health, &Health{
+					AddComponent(health, &components.Health{
 						MaxHealth:     10,
 						CurrentHealth: 10,
 					}).
-					AddComponent(meleeWeapon, &MeleeWeapon{
+					AddComponent(meleeWeapon, &components.MeleeWeapon{
 						Name:          "Short Sword",
 						MinimumDamage: 2,
 						MaximumDamage: 6,
 						ToHitBonus:    0,
 					}).
-					AddComponent(armor, &Armor{
+					AddComponent(armor, &components.Armor{
 						Name:       "Bone",
 						Defense:    3,
 						ArmorClass: 4,
 					}).
-					AddComponent(name, &Name{Label: "Skeleton"}).
-					AddComponent(userMessage, &UserMessage{
+					AddComponent(name, &components.Name{Label: "Skeleton"}).
+					AddComponent(userMessage, &components.UserMessage{
 						AttackMessage:    "",
 						DeadMessage:      "",
 						GameStateMessage: "",

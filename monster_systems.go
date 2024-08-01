@@ -25,7 +25,7 @@ func UpdateMonster(game *Game) {
 			if pos.GetManhattanDistance(&playerPosition) == 1 {
 				// The monster is right next to the player. Just smack him down
 				AttackSystem(game, pos, &playerPosition)
-				if result.Components[health].(*Health).CurrentHealth <= 0 {
+				if result.Components[health].(*components.Health).CurrentHealth <= 0 {
 					t := l.Tiles[l.GetIndexFromXY(pos.X, pos.Y)]
 					t.Blocked = false
 				}
