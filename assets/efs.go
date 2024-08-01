@@ -7,6 +7,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/kensonjohnson/roguelike-game-go/fonts"
+	"github.com/kensonjohnson/roguelike-game-go/globals"
 )
 
 var (
@@ -19,6 +22,7 @@ var (
 
 	// UI
 	UIPanel *ebiten.Image
+	HUDFont *text.GoTextFace
 
 	// Characters
 	Player *ebiten.Image
@@ -33,6 +37,8 @@ func MustLoadAssets() {
 	Player = MustLoadImage("player.png")
 	Skelly = MustLoadImage("skelly.png")
 	Orc = MustLoadImage("orc.png")
+
+	HUDFont = MustLoadFont(fonts.MPlus1pRegular_ttf)
 }
 
 func MustLoadImage(filePath string) *ebiten.Image {
@@ -45,4 +51,15 @@ func MustLoadImage(filePath string) *ebiten.Image {
 		log.Fatal(err)
 	}
 	return image
+}
+
+func MustLoadFont(font []byte) *text.GoTextFace {
+	source, err := text.NewGoTextFaceSource(bytes.NewReader(font))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &text.GoTextFace{
+		Source: source,
+		Size:   globals.FONT_SIZE,
+	}
 }
