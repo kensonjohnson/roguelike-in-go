@@ -1,18 +1,20 @@
 package components
 
-import "math"
+import "github.com/yohamta/donburi"
 
-type Position struct {
+type PositionData struct {
 	X int
 	Y int
 }
 
-func (p *Position) GetManhattanDistance(other *Position) int {
-	xDist := math.Abs(float64(p.X - other.X))
-	yDist := math.Abs(float64(p.Y - other.Y))
-	return int(xDist) + int(yDist)
-}
+// func (p *Position) GetManhattanDistance(other *Position) int {
+// 	xDist := math.Abs(float64(p.X - other.X))
+// 	yDist := math.Abs(float64(p.Y - other.Y))
+// 	return int(xDist) + int(yDist)
+// }
 
-func (p *Position) IsEqual(other *Position) bool {
-	return (p.X == other.X && p.Y == other.Y)
-}
+// func (p *Position) IsEqual(other *Position) bool {
+// 	return (p.X == other.X && p.Y == other.Y)
+// }
+
+var Position = donburi.NewComponentType[PositionData]()

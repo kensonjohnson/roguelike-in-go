@@ -3,9 +3,11 @@ package scenes
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
+	"github.com/kensonjohnson/roguelike-game-go/components"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
 	"github.com/norendren/go-fov/fov"
+	"github.com/yohamta/donburi"
 )
 
 type MapTile struct {
@@ -74,7 +76,12 @@ func (level *Level) createTiles() []*MapTile {
 	return tiles
 }
 
-func (level *Level) DrawLevel(screen *ebiten.Image) {
+func (level *Level) DrawLevel(screen *ebiten.Image, world donburi.World) {
+
+	if entry, ok := components.Player.First(world); ok {
+		pos := components.Position.Get(entry)
+		level.PlayerVisible.Compute(level, pos.X, pos.Y, 8)
+	}
 
 	for x := 0; x < config.Config.ScreenWidth; x++ {
 		for y := 0; y < levelHeight; y++ {

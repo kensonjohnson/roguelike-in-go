@@ -1,17 +1,8 @@
 package scenes
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/yohamta/donburi"
+	"github.com/bytearena/ecs"
 )
-
-type System interface {
-	Update(w donburi.World)
-}
-
-type Drawable interface {
-	Draw(w donburi.World, screen *ebiten.Image)
-}
 
 type Dungeon struct {
 	Name   string
@@ -20,7 +11,7 @@ type Dungeon struct {
 
 type Game struct {
 	Map         GameMap
-	World       donburi.World
+	World       ecs.Manager
 	Turn        TurnState
 	TurnCounter int
 }

@@ -4,18 +4,17 @@ import (
 	_ "image/png"
 	"log"
 
-	"github.com/bytearena/ecs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/scenes"
+	"github.com/yohamta/donburi"
 )
 
 // Holds all data the entire game will need.
 type Game struct {
+	World       donburi.World
 	Map         scenes.GameMap
-	World       *ecs.Manager
-	WorldTags   map[string]ecs.Tag
 	Turn        scenes.TurnState
 	TurnCounter int
 }
@@ -24,10 +23,8 @@ type Game struct {
 func NewGame() *Game {
 	g := &Game{}
 	g.Map = scenes.NewGameMap()
-	world, tags := InitializeWorld(g.Map.CurrentLevel)
+	g.World = InitializeWorld(g.Map.CurrentLevel)
 
-	g.WorldTags = tags
-	g.World = world
 	g.Turn = scenes.PlayerTurn
 	g.TurnCounter = 0
 
@@ -36,13 +33,13 @@ func NewGame() *Game {
 
 // Called each tick (game loop).
 func (g *Game) Update() error {
-	g.TurnCounter++
-	if g.Turn == scenes.PlayerTurn && g.TurnCounter > 8 {
-		TakePlayerAction(g)
-	}
-	if g.Turn == scenes.MonsterTurn {
-		UpdateMonster(g)
-	}
+	// g.TurnCounter++
+	// if g.Turn == scenes.PlayerTurn && g.TurnCounter > 8 {
+	// 	TakePlayerAction(g)
+	// }
+	// if g.Turn == scenes.MonsterTurn {
+	// 	UpdateMonster(g)
+	// }
 
 	return nil
 }
@@ -50,10 +47,10 @@ func (g *Game) Update() error {
 // Called each draw cycle in the game loop.
 func (g *Game) Draw(screen *ebiten.Image) {
 	level := g.Map.CurrentLevel
-	level.DrawLevel(screen)
-	ProcessRenderables(g, level, screen)
-	ProcessUserLog(g, screen)
-	ProcessHUD(g, screen)
+	level.DrawLevel(screen, g.World)
+	// ProcessDrawables(g, level, screen)
+	// ProcessUserLog(g, screen)
+	// ProcessHUD(g, screen)
 }
 
 // Returns the screen dimensions.

@@ -1,3 +1,7 @@
 package components
 
-type Player struct{}
+import "github.com/yohamta/donburi"
+
+type PlayerData struct{}
+
+var Player = donburi.NewComponentType[PlayerData]()
