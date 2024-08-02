@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/scenes"
 )
 
 func TakePlayerAction(g *Game) {
@@ -42,7 +43,7 @@ func TakePlayerAction(g *Game) {
 			level.Tiles[index].Blocked = true
 			level.PlayerVisible.Compute(level, pos.X, pos.Y, 8)
 		} else if x != 0 || y != 0 {
-			if level.Tiles[index].TileType != WALL {
+			if level.Tiles[index].TileType != scenes.WALL {
 				monsterPosition := components.Position{X: pos.X + x, Y: pos.Y + y}
 				AttackSystem(g, pos, &monsterPosition)
 			}
@@ -50,7 +51,7 @@ func TakePlayerAction(g *Game) {
 	}
 
 	if x != 0 || y != 0 || turnTaken {
-		g.Turn = GetNextState(g.Turn)
+		g.Turn = scenes.GetNextState(g.Turn)
 		g.TurnCounter = 0
 	}
 }

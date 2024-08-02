@@ -8,8 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/fonts"
-	"github.com/kensonjohnson/roguelike-game-go/globals"
 )
 
 var (
@@ -60,6 +60,6 @@ func MustLoadFont(font []byte) *text.GoTextFace {
 	}
 	return &text.GoTextFace{
 		Source: source,
-		Size:   globals.FONT_SIZE,
+		Size:   float64(config.Config.FontSize),
 	}
 }

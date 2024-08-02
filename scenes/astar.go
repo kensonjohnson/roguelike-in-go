@@ -1,10 +1,11 @@
-package main
+package scenes
 
 import (
 	"errors"
 	"reflect"
 
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/config"
 )
 
 type node struct {
@@ -56,7 +57,6 @@ func isInSlice(s []*node, target *node) bool {
 type AStar struct{}
 
 func (as AStar) GetPath(level Level, start, end *components.Position) []components.Position {
-	gd := NewGameData()
 	openList := make([]*node, 0)
 	closedList := make([]*node, 0)
 
@@ -114,7 +114,7 @@ func (as AStar) GetPath(level Level, start, end *components.Position) []componen
 			}
 		}
 
-		if currentNode.Position.Y < gd.ScreenHeight {
+		if currentNode.Position.Y < config.Config.ScreenHeight {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X, currentNode.Position.Y+1)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable
@@ -140,7 +140,7 @@ func (as AStar) GetPath(level Level, start, end *components.Position) []componen
 			}
 		}
 
-		if currentNode.Position.X < gd.ScreenWidth {
+		if currentNode.Position.X < config.Config.ScreenWidth {
 			tile := level.Tiles[level.GetIndexFromXY(currentNode.Position.X+1, currentNode.Position.Y)]
 			if tile.TileType != WALL {
 				//The location is in the map bounds and is walkable

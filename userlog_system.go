@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/fonts"
 )
 
@@ -31,9 +32,8 @@ func ProcessUserLog(g *Game, screen *ebiten.Image) {
 			Size:   FONT_SIZE,
 		}
 	}
-	gd := NewGameData()
 
-	uiLocation := (gd.ScreenHeight - gd.UIHeight) * gd.TileHeight
+	uiLocation := (config.Config.ScreenHeight - config.Config.UIHeight) * config.Config.TileHeight
 	var fontX = FONT_SIZE
 	var fontY = uiLocation + 24
 	op := &ebiten.DrawImageOptions{}

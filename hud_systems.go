@@ -8,14 +8,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/config"
 )
 
 func ProcessHUD(g *Game, screen *ebiten.Image) {
 
-	gd := NewGameData()
-
-	uiX := (gd.ScreenWidth * gd.TileWidth) / 2
-	uiY := (gd.ScreenHeight - gd.UIHeight) * gd.TileHeight
+	uiX := (config.Config.ScreenWidth * config.Config.TileWidth) / 2
+	uiY := (config.Config.ScreenHeight - config.Config.UIHeight) * config.Config.TileHeight
 	var fontX = uiX + FONT_SIZE
 	var fontY = uiY + 24
 

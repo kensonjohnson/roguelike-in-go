@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Rect struct {
 	X1 int

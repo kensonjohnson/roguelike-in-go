@@ -3,9 +3,10 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/scenes"
 )
 
-func ProcessRenderables(g *Game, level Level, screen *ebiten.Image) {
+func ProcessRenderables(g *Game, level scenes.Level, screen *ebiten.Image) {
 	for _, result := range g.World.Query(g.WorldTags["renderables"]) {
 		pos := result.Components[position].(*components.Position)
 		img := result.Components[renderable].(*components.Renderable).Image

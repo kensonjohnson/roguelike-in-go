@@ -1,4 +1,4 @@
-package main
+package scenes
 
 type TurnState int
 

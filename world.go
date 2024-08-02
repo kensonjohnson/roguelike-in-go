@@ -4,6 +4,8 @@ import (
 	"github.com/bytearena/ecs"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/scenes"
 )
 
 var (
@@ -17,7 +19,7 @@ var (
 	userMessage *ecs.Component
 )
 
-func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
+func InitializeWorld(startingLevel scenes.Level) (*ecs.Manager, map[string]ecs.Tag) {
 	manager := ecs.NewManager()
 	tags := make(map[string]ecs.Tag)
 
@@ -72,7 +74,7 @@ func InitializeWorld(startingLevel Level) (*ecs.Manager, map[string]ecs.Tag) {
 			mX, mY := room.Center()
 
 			// Flip a coin to see what to add...
-			mobSpawn := GetDiceRoll(2)
+			mobSpawn := engine.GetDiceRoll(2)
 
 			if mobSpawn == 1 {
 				manager.NewEntity().

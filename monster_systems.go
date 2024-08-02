@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/scenes"
 	"github.com/norendren/go-fov/fov"
 )
 
@@ -30,7 +31,7 @@ func UpdateMonster(game *Game) {
 					t.Blocked = false
 				}
 			} else {
-				astar := AStar{}
+				astar := scenes.AStar{}
 				path := astar.GetPath(l, pos, &playerPosition)
 				if len(path) > 1 {
 					nextTile := l.Tiles[l.GetIndexFromXY(path[1].X, path[1].Y)]
@@ -44,5 +45,5 @@ func UpdateMonster(game *Game) {
 			}
 		}
 	}
-	game.Turn = PlayerTurn
+	game.Turn = scenes.PlayerTurn
 }

@@ -5,6 +5,8 @@ import (
 
 	"github.com/bytearena/ecs"
 	"github.com/kensonjohnson/roguelike-game-go/components"
+	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/scenes"
 )
 
 func AttackSystem(g *Game, attackerPosition, defenderPosition *components.Position) {
@@ -48,11 +50,11 @@ func AttackSystem(g *Game, attackerPosition, defenderPosition *components.Positi
 	}
 
 	// Roll a d10 to hit
-	toHitRoll := GetDiceRoll(10)
+	toHitRoll := engine.GetDiceRoll(10)
 
 	if toHitRoll+attackerWeapon.ToHitBonus > defenderArmor.ArmorClass {
 		// It's a hit
-		damageRoll := GetRandomBetween(attackerWeapon.MinimumDamage, attackerWeapon.MaximumDamage)
+		damageRoll := engine.GetRandomBetween(attackerWeapon.MinimumDamage, attackerWeapon.MaximumDamage)
 
 		damageDone := damageRoll - defenderArmor.Defense
 		// Prevent healing the defender
@@ -67,7 +69,7 @@ func AttackSystem(g *Game, attackerPosition, defenderPosition *components.Positi
 			defenderMessage.DeadMessage = fmt.Sprintf("%s has died!\n", defenderName.Label)
 			if defenderName.Label == "Player" {
 				defenderMessage.GameStateMessage = "Game Over!\n"
-				g.Turn = GameOver
+				g.Turn = scenes.GameOver
 			}
 		}
 	} else {
