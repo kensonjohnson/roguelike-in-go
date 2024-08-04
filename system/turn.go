@@ -4,6 +4,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/system/action"
+	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
@@ -38,6 +39,19 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			playerMessages := component.UserMessage.Get(entry)
 			playerMessages.GameStateMessage = "Game over!"
 		}
+
+		level := component.Dungeon.Get(archetype.MustFindDungeon(ecs.World)).CurrentLevel
+		// Remove any enemies that died during the last turn
+		archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
+			health := component.Health.Get(entry)
+			if health.CurrentHealth <= 0 {
+				position := component.Position.Get(entry)
+				tile := level.GetFromXY(position.X, position.Y)
+				tile.Blocked = false
+				ecs.World.Remove(entry.Entity())
+			}
+		})
+
 		td.progressTurnState()
 	}
 

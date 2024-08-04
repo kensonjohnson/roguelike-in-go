@@ -42,7 +42,6 @@ func (u *ui) Update(ecs *ecs.ECS) {
 		if messages.DeadMessage != "" {
 			u.lastMessages = append(u.lastMessages, messages.DeadMessage)
 			messages.DeadMessage = ""
-			ecs.World.Remove(entry.Entity())
 		}
 		if messages.GameStateMessage != "" {
 			u.lastMessages = append(u.lastMessages, messages.GameStateMessage)
