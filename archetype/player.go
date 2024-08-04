@@ -58,7 +58,7 @@ func CreateNewPlayer(world donburi.World) {
 	component.Health.SetValue(player, health)
 
 	// Add gear
-	component.Armor.SetValue(player, gear.Armor.BurlapSack)
+	component.Armor.SetValue(player, gear.Armor.PlateArmor)
 
 	component.Weapon.SetValue(player, gear.Weapons.BattleAxe)
 
