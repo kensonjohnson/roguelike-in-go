@@ -1,70 +1,78 @@
 package main
 
 import (
-	_ "image/png"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/kensonjohnson/roguelike-game-go/scenes"
+	"github.com/kensonjohnson/roguelike-game-go/layer"
+	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/yohamta/donburi"
+	"github.com/yohamta/donburi/ecs"
 )
 
-// Holds all data the entire game will need.
 type Game struct {
-	World       donburi.World
-	Map         scenes.GameMap
-	Turn        scenes.TurnState
-	TurnCounter int
+	ecs ecs.ECS
 }
 
-// Creates a new Game Object and initializes the data.
-func NewGame() *Game {
-	g := &Game{}
-	g.Map = scenes.NewGameMap()
-	g.World = InitializeWorld(g.Map.CurrentLevel)
-
-	g.Turn = scenes.PlayerTurn
-	g.TurnCounter = 0
-
-	return g
+func (g *Game) configure() {
+	g.ecs = *ecs.NewECS(createWorld())
+	// Add systems and renderers here
+	g.ecs.
+		AddSystem(system.Turn.Update).
+		AddSystem(system.UI.Update).
+		AddRenderer(layer.Background, system.DrawBackground).
+		AddRenderer(layer.Foreground, system.Render.Draw).
+		AddRenderer(layer.UI, system.UI.Draw)
 }
 
-// Called each tick (game loop).
 func (g *Game) Update() error {
-	// g.TurnCounter++
-	// if g.Turn == scenes.PlayerTurn && g.TurnCounter > 8 {
-	// 	TakePlayerAction(g)
-	// }
-	// if g.Turn == scenes.MonsterTurn {
-	// 	UpdateMonster(g)
-	// }
-
+	g.ecs.Update()
 	return nil
 }
 
-// Called each draw cycle in the game loop.
 func (g *Game) Draw(screen *ebiten.Image) {
-	level := g.Map.CurrentLevel
-	level.DrawLevel(screen, g.World)
-	// ProcessDrawables(g, level, screen)
-	// ProcessUserLog(g, screen)
-	// ProcessHUD(g, screen)
+	screen.Clear()
+	g.ecs.DrawLayer(layer.Background, screen)
+	g.ecs.DrawLayer(layer.Foreground, screen)
+	g.ecs.DrawLayer(layer.UI, screen)
 }
 
 // Returns the screen dimensions.
 func (g *Game) Layout(w, h int) (int, int) {
-	return config.Config.TileWidth * config.Config.ScreenWidth, config.Config.TileHeight * config.Config.ScreenHeight
+	return config.TileWidth * config.ScreenWidth, config.TileHeight * config.ScreenHeight
+}
+
+func createWorld() donburi.World {
+	world := donburi.NewWorld()
+
+	// Create dungeon component
+	dungeon := archetype.GenerateDungeon(world)
+
+	for index, room := range dungeon.CurrentLevel.Rooms {
+		if index == 0 {
+			archetype.CreateNewPlayer(world)
+		} else {
+			archetype.CreateMonster(world, dungeon.CurrentLevel, room)
+		}
+	}
+
+	// Create the UI
+	archetype.CreateNewUI(world)
+
+	return world
 }
 
 func main() {
 	assets.MustLoadAssets()
 
-	g := NewGame()
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-
 	ebiten.SetWindowTitle("Roguelike")
+
+	g := &Game{}
+	g.configure()
 
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

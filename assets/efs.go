@@ -9,7 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/kensonjohnson/roguelike-game-go/fonts"
 )
 
 var (
@@ -30,18 +29,20 @@ var (
 	Orc    *ebiten.Image
 )
 
+// Loads all required assets, panics if any one fails.
 func MustLoadAssets() {
-	Floor = MustLoadImage("floor.png")
-	Wall = MustLoadImage("wall.png")
-	UIPanel = MustLoadImage("UIPanel.png")
-	Player = MustLoadImage("player.png")
-	Skelly = MustLoadImage("skelly.png")
-	Orc = MustLoadImage("orc.png")
+	Floor = mustLoadImage("floor.png")
+	Wall = mustLoadImage("wall.png")
+	UIPanel = mustLoadImage("UIPanel.png")
+	Player = mustLoadImage("player.png")
+	Skelly = mustLoadImage("skelly.png")
+	Orc = mustLoadImage("orc.png")
 
-	HUDFont = MustLoadFont(fonts.MPlus1pRegular_ttf)
+	HUDFont = mustLoadFont(MPlus1pRegular_ttf)
 }
 
-func MustLoadImage(filePath string) *ebiten.Image {
+// Loads image at specified path, panics if it fails.
+func mustLoadImage(filePath string) *ebiten.Image {
 	imgSource, err := assetsFS.ReadFile(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -53,13 +54,14 @@ func MustLoadImage(filePath string) *ebiten.Image {
 	return image
 }
 
-func MustLoadFont(font []byte) *text.GoTextFace {
+// Loads font at specified path, panics if it fails.
+func mustLoadFont(font []byte) *text.GoTextFace {
 	source, err := text.NewGoTextFaceSource(bytes.NewReader(font))
 	if err != nil {
 		log.Fatal(err)
 	}
 	return &text.GoTextFace{
 		Source: source,
-		Size:   float64(config.Config.FontSize),
+		Size:   float64(config.FontSize),
 	}
 }
