@@ -16,7 +16,7 @@ func AttackSystem(attacker, defender *donburi.Entry) {
 	defenderName := component.Name.Get(defender)
 	defenderArmor := component.Armor.Get(defender)
 	defenderHealth := component.Health.Get(defender)
-	// defenderMessages := component.UserMessage.Get(defender)
+	defenderMessages := component.UserMessage.Get(defender)
 
 	if attackerHealth.CurrentHealth <= 0 {
 		return
@@ -35,6 +35,9 @@ func AttackSystem(attacker, defender *donburi.Entry) {
 
 		defenderHealth.CurrentHealth -= damageDone
 		attackerMessages.AttackMessage = fmt.Sprintf("%s %s %s and hits for %d health.\n", attackerName.Label, attackerWeapon.ActionText, defenderName.Label, damageDone)
+		if defenderHealth.CurrentHealth <= 0 {
+			defenderMessages.DeadMessage = fmt.Sprintf("%s has died!\n", defenderName.Label)
+		}
 	} else {
 		attackerMessages.AttackMessage = fmt.Sprintf("%s %s %s and misses.\n", attackerName.Label, attackerWeapon.ActionText, defenderName.Label)
 	}
