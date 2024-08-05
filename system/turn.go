@@ -55,7 +55,7 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 		td.progressTurnState()
 	}
 
-	if td.TurnState == PlayerTurn && td.TurnCounter > 8 {
+	if td.TurnState == PlayerTurn && td.TurnCounter > 12 {
 		turnTaken := action.TakePlayerAction(ecs)
 		if turnTaken {
 			td.progressTurnState()
