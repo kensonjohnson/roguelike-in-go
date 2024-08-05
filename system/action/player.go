@@ -25,23 +25,27 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	moveX := 0
 	moveY := 0
 
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
 		moveX = -1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+	if ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
 		moveX = 1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+	if ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW) {
 		moveY = -1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		moveY = 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
 	}
 
-	if moveX == 0 && moveY == 0 && !turnTaken {
+	if turnTaken {
+		return true
+	}
+
+	if moveX == 0 && moveY == 0 {
 		return false
 	}
 
