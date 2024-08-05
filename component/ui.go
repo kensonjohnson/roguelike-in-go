@@ -13,7 +13,6 @@ type UserMessageBoxData struct {
 	Position PositionData
 	FontX    int
 	FontY    int
-	LastText []string
 }
 
 type PlayerHUDData struct {
