@@ -32,6 +32,7 @@ func CreateNewCamera(world donburi.World) {
 	}
 	cameraData.MainCamera.Lerp = true
 	cameraData.MainCamera.ZoomFactor = 100
+	cameraData.MainCamera.ShakeOptions.MaxShakeAngle = 0
 
 	component.Camera.Set(camera, cameraData)
 }
