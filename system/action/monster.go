@@ -27,7 +27,7 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 		if monsterVision.IsVisible(playerPos.X, playerPos.Y) {
 			if position.GetManhattanDistance(playerPos) == 1 {
 				// The monster is directly next to the player. Smack him!
-				combat.AttackSystem(entry, playerEntry)
+				combat.AttackSystem(ecs.World, entry, playerEntry)
 			} else {
 				astar := pathing.AStar{}
 				path := astar.GetPath(level, position, playerPos)
