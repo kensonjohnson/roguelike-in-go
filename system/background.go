@@ -13,21 +13,25 @@ func DrawBackground(ecs *ecs.ECS, screen *ebiten.Image) {
 	level := component.Dungeon.Get(entry).CurrentLevel
 	entry = archetype.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(entry).VisibleTiles
+	entry = archetype.CameraTag.MustFirst(ecs.World)
+	camera := component.Camera.Get(entry)
 
 	maxTiles := config.ScreenWidth * (config.ScreenHeight - config.UIHeight)
 	for i := 0; i < maxTiles; i++ {
 		tile := level.Tiles[i]
 		isVisible := playerVision.IsVisible(tile.TileX, tile.TileY)
+		camera.CamImageOptions.GeoM.Reset()
+		camera.CamImageOptions.ColorScale.Reset()
 		if isVisible {
-			options := &ebiten.DrawImageOptions{}
-			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
-			screen.DrawImage(tile.Image, options)
+			camera.CamImageOptions.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+			camera.MainCamera.Draw(tile.Image, camera.CamImageOptions, screen)
 			tile.IsRevealed = true
 		} else if tile.IsRevealed {
-			options := &ebiten.DrawImageOptions{}
-			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
-			options.ColorScale.ScaleAlpha(0.35)
-			screen.DrawImage(tile.Image, options)
+			camera.CamImageOptions.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+			camera.CamImageOptions.ColorScale.ScaleAlpha(0.35)
+			camera.MainCamera.Draw(tile.Image, camera.CamImageOptions, screen)
 		}
 	}
+	camera.CamImageOptions.GeoM.Reset()
+	camera.CamImageOptions.ColorScale.Reset()
 }
