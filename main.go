@@ -25,7 +25,8 @@ func (g *Game) configure() {
 		AddSystem(system.UI.Update).
 		AddRenderer(layer.Background, system.DrawBackground).
 		AddRenderer(layer.Foreground, system.Render.Draw).
-		AddRenderer(layer.UI, system.UI.Draw)
+		AddRenderer(layer.UI, system.UI.Draw).
+		AddRenderer(layer.UI, system.Debug.Draw)
 }
 
 func (g *Game) Update() error {
