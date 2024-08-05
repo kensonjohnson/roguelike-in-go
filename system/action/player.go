@@ -75,7 +75,7 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 				monsterEntry = entry
 			}
 		})
-		combat.AttackSystem(playerEntry, monsterEntry)
+		combat.AttackSystem(ecs.World, playerEntry, monsterEntry)
 	}
 
 	return true

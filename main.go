@@ -19,8 +19,8 @@ type Game struct {
 
 func (g *Game) configure() {
 	g.ecs = *ecs.NewECS(createWorld())
-	// Add systems and renderers here
 	g.ecs.
+		AddSystem(system.Camera.Update).
 		AddSystem(system.Turn.Update).
 		AddSystem(system.UI.Update).
 		AddRenderer(layer.Background, system.DrawBackground).
@@ -63,6 +63,9 @@ func createWorld() donburi.World {
 	// Create the UI
 	archetype.CreateNewUI(world)
 
+	// Create the camera
+	archetype.CreateNewCamera(world)
+
 	return world
 }
 
@@ -71,6 +74,7 @@ func main() {
 
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
+	ebiten.SetVsyncEnabled(false)
 
 	g := &Game{}
 	g.configure()

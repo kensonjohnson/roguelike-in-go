@@ -25,15 +25,21 @@ var Render = &render{
 func (r *render) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	entry := archetype.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(entry).VisibleTiles
+	entry = archetype.CameraTag.MustFirst(ecs.World)
+	camera := component.Camera.Get(entry)
 
 	r.query.Each(ecs.World, func(entry *donburi.Entry) {
 		position := component.Position.Get(entry)
 		sprite := component.Sprite.Get(entry)
 
 		if playerVision.IsVisible(position.X, position.Y) {
-			drawOptions := &ebiten.DrawImageOptions{}
-			drawOptions.GeoM.Translate(float64(position.X*config.TileWidth), float64(position.Y*config.TileHeight))
-			screen.DrawImage(sprite.Image, drawOptions)
+			camera.CamImageOptions.GeoM.Reset()
+			camera.CamImageOptions.GeoM.Translate(float64(position.X*config.TileWidth), float64(position.Y*config.TileHeight))
+			camera.MainCamera.Draw(sprite.Image, camera.CamImageOptions, screen)
 		}
 	})
+
+	camera.CamImageOptions.GeoM.Reset()
+	camera.CamImageOptions.GeoM.Translate(0, 0)
+	camera.MainCamera.Draw(camera.CamScreen, camera.CamImageOptions, screen)
 }

@@ -28,7 +28,6 @@ func CreateNewUI(world donburi.World) {
 	}
 	ui.MessageBox.FontX = config.FontSize
 	ui.MessageBox.FontY = topPixel + 10
-	ui.MessageBox.LastText = make([]string, 0, 5)
 
 	// Configure player HUD
 	playerEntry := PlayerTag.MustFirst(world)

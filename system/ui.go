@@ -20,11 +20,18 @@ type ui struct {
 	lastMessages []string
 }
 
+var defaultMessages = []string{
+	"Welcome to the game!",
+	"Use the arrow keys to move.",
+	"Press 'Q' to pass your turn.",
+	"Good luck!",
+}
+
 var UI = &ui{
 	query: *donburi.NewQuery(filter.Contains(
 		component.UserMessage,
 	)),
-	lastMessages: make([]string, 0, 5),
+	lastMessages: defaultMessages,
 }
 
 func (u *ui) Update(ecs *ecs.ECS) {

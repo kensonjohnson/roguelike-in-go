@@ -3,12 +3,13 @@ package combat
 import (
 	"fmt"
 
+	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
 	"github.com/yohamta/donburi"
 )
 
-func AttackSystem(attacker, defender *donburi.Entry) {
+func AttackSystem(world donburi.World, attacker, defender *donburi.Entry) {
 	attackerName := component.Name.Get(attacker)
 	attackerWeapon := component.Weapon.Get(attacker)
 	attackerHealth := component.Health.Get(attacker)
@@ -38,6 +39,9 @@ func AttackSystem(attacker, defender *donburi.Entry) {
 		if defenderHealth.CurrentHealth <= 0 {
 			defenderMessages.DeadMessage = fmt.Sprintf("%s has died!\n", defenderName.Label)
 		}
+		entry := archetype.CameraTag.MustFirst(world)
+		camera := component.Camera.Get(entry)
+		camera.MainCamera.AddTrauma(0.2)
 	} else {
 		attackerMessages.AttackMessage = fmt.Sprintf("%s %s %s and misses.\n", attackerName.Label, attackerWeapon.ActionText, defenderName.Label)
 	}
