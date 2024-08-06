@@ -26,16 +26,16 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	moveY := 0
 
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
-		moveX = -1
+		moveX -= 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
-		moveX = 1
+		moveX += 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW) {
-		moveY = -1
+		moveY -= 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
-		moveY = 1
+		moveY += 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
@@ -49,6 +49,7 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		return false
 	}
 
+	// TODO: Update so diagonal movement consumes two turns
 	// Attempt to move
 	tile := level.GetFromXY(position.X+moveX, position.Y+moveY)
 	if !tile.Blocked {
