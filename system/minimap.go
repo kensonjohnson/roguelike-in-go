@@ -1,4 +1,4 @@
-package ui
+package system
 
 import (
 	"image/color"
@@ -19,7 +19,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	level := component.Dungeon.Get(entry).CurrentLevel
 
 	startingXPixel := (config.ScreenWidth * config.TileWidth) - 340
-	startingYPixel := (config.ScreenHeight * config.TileWidth) - 200
+	startingYPixel := (config.ScreenHeight * config.TileWidth) - 210
 
 	// Draw the walls and floors
 	for _, tile := range level.Tiles {
