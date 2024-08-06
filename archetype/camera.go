@@ -1,6 +1,8 @@
 package archetype
 
 import (
+	"log"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
@@ -11,15 +13,22 @@ import (
 var CameraTag = donburi.NewTag("camera")
 
 func CreateNewCamera(world donburi.World) {
-	camera := world.Entry(world.Create(
+	var entry *donburi.Entry
+	var ok bool
+	if entry, ok = PlayerTag.First(world); !ok {
+		log.Fatal("CreateNewCamera failed: Player not found")
+	}
+	playerPosition := component.Position.Get(entry)
+
+	entry = world.Entry(world.Create(
 		CameraTag,
 		component.Camera,
 	))
 
 	cameraData := &component.CameraData{
 		MainCamera: kamera.NewCamera(
-			config.ScreenWidth*config.TileWidth/2,
-			config.ScreenHeight*config.TileHeight/2,
+			float64((playerPosition.X*config.TileWidth)+config.TileWidth/2),
+			float64((playerPosition.Y*config.TileHeight)+config.TileHeight/2),
 			config.ScreenWidth*config.TileWidth,
 			(config.ScreenHeight-config.UIHeight)*config.TileHeight,
 		),
@@ -34,5 +43,5 @@ func CreateNewCamera(world donburi.World) {
 	cameraData.MainCamera.ZoomFactor = 100
 	cameraData.MainCamera.ShakeOptions.MaxShakeAngle = 0
 
-	component.Camera.Set(camera, cameraData)
+	component.Camera.Set(entry, cameraData)
 }
