@@ -88,7 +88,7 @@ func drawUserMessages(screen *ebiten.Image, messageBox *component.UserMessageBox
 		float64(messageBox.Position.X),
 		float64(messageBox.Position.Y),
 	)
-	screen.DrawImage(assets.UIPanel, options)
+	screen.DrawImage(messageBox.Sprite, options)
 
 	// Draw the user messages
 	fontX := messageBox.FontX
@@ -113,7 +113,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 		float64(playerHUD.Position.X),
 		float64(playerHUD.Position.Y),
 	)
-	screen.DrawImage(assets.UIPanel, options)
+	screen.DrawImage(playerHUD.Sprite, options)
 
 	// Draw the player's info
 	fontX := playerHUD.FontX
