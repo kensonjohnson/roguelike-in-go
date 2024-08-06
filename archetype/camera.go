@@ -21,7 +21,7 @@ func CreateNewCamera(world donburi.World) {
 			config.ScreenWidth*config.TileWidth/2,
 			config.ScreenHeight*config.TileHeight/2,
 			config.ScreenWidth*config.TileWidth,
-			config.ScreenHeight*config.TileHeight,
+			(config.ScreenHeight-config.UIHeight)*config.TileHeight,
 		),
 		CamSpeed: 5,
 		CamScreen: ebiten.NewImage(
