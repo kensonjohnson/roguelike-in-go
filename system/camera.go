@@ -18,7 +18,7 @@ func (c *camera) Update(ecs *ecs.ECS) {
 	position := component.Position.Get(entry)
 
 	camera.MainCamera.LookAt(
-		float64(((position.X)*config.TileWidth)+config.TileWidth/2),
-		float64((position.Y+2)*config.TileHeight),
+		float64((position.X)*config.TileWidth)+config.TileWidth/2,
+		float64((position.Y)*config.TileHeight)+config.TileHeight/2,
 	)
 }

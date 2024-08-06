@@ -1,6 +1,7 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/yohamta/donburi"
@@ -21,25 +22,28 @@ func CreateNewUI(world donburi.World) {
 	}
 
 	// Configure message box
-	topPixel := (config.ScreenHeight - config.UIHeight) * config.TileHeight
+	messageBoxTopPixel := (config.ScreenHeight - config.UIHeight) * config.TileHeight
 	ui.MessageBox.Position = component.PositionData{
 		X: 0,
-		Y: topPixel,
+		Y: messageBoxTopPixel,
 	}
 	ui.MessageBox.FontX = config.FontSize
-	ui.MessageBox.FontY = topPixel + 10
+	ui.MessageBox.FontY = messageBoxTopPixel + 10
+	ui.MessageBox.Sprite = assets.UIPanel
 
 	// Configure player HUD
+	playerHUDTopPixel := (config.ScreenHeight * config.TileHeight) - 220
 	playerEntry := PlayerTag.MustFirst(world)
 	ui.PlayerHUD.Position = component.PositionData{
 		X: config.ScreenWidth * config.TileWidth / 2,
-		Y: topPixel,
+		Y: playerHUDTopPixel,
 	}
 	ui.PlayerHUD.FontX = ui.PlayerHUD.Position.X + config.FontSize
-	ui.PlayerHUD.FontY = topPixel + 12
+	ui.PlayerHUD.FontY = messageBoxTopPixel + 12
 	ui.PlayerHUD.Health = component.Health.Get(playerEntry)
 	ui.PlayerHUD.Armor = component.Armor.Get(playerEntry)
 	ui.PlayerHUD.Weapon = component.Weapon.Get(playerEntry)
+	ui.PlayerHUD.Sprite = assets.UIPanelWithMinimap
 
 	component.UI.SetValue(entry, ui)
 }

@@ -61,6 +61,14 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		position.Y += moveY
 		// Update the player's field of view
 		vision.VisibleTiles.Compute(level, position.X, position.Y, 8)
+		// Update any discoverable entities
+		component.Discoverable.Each(ecs.World, func(entry *donburi.Entry) {
+			discoverablePosition := component.Position.Get(entry)
+			if vision.VisibleTiles.IsVisible(discoverablePosition.X, discoverablePosition.Y) {
+				discoverable := component.Discoverable.Get(entry)
+				discoverable.SeenByPlayer = true
+			}
+		})
 	} else if tile.TileType != component.WALL {
 		// Not a wall, so it must be an enemy. Attack!
 		// Find the monster in the direction we're pointing

@@ -20,8 +20,9 @@ var (
 	Wall  *ebiten.Image
 
 	// UI
-	UIPanel *ebiten.Image
-	HUDFont *text.GoTextFace
+	UIPanel            *ebiten.Image
+	UIPanelWithMinimap *ebiten.Image
+	HUDFont            *text.GoTextFace
 
 	// Characters
 	Player *ebiten.Image
@@ -34,6 +35,7 @@ func MustLoadAssets() {
 	Floor = mustLoadImage("floor.png")
 	Wall = mustLoadImage("wall.png")
 	UIPanel = mustLoadImage("UIPanel.png")
+	UIPanelWithMinimap = mustLoadImage("UIPanelWithMinimap.png")
 	Player = mustLoadImage("player.png")
 	Skelly = mustLoadImage("skelly.png")
 	Orc = mustLoadImage("orc.png")
