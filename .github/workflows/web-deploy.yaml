@@ -37,13 +37,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Build Go WASM app
-        run: GOOS=js GOARCH=wasm go build -o dist/rogue-game.wasm
-
-      - name: Copy wasm_exec
-        run: cp $(go env GOROOT)/misc/wasm/wasm_exec.js dist
-
-      - name: Copy index.html
-        run: cp index.html dist
+        run: bash build-wasm.sh
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
