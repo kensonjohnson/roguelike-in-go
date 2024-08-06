@@ -92,14 +92,10 @@ push: tidy audit no-dirty
 
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty
-	GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/linux_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=linux GOARCH=arm go build -ldflags='-s' -o=/tmp/bin/linux_arm/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=linux GOARCH=arm64 go build -ldflags='-s' -o=/tmp/bin/linux_arm64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=darwin GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/macos_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+production/deploy: confirm tidy audit 
 	GOOS=darwin GOARCH=arm64 go build -ldflags='-s' -o=/tmp/bin/macos_arm64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=window GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/windows_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=window GOARCH=arm go build -ldflags='-s' -o=/tmp/bin/windows_arm/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	GOOS=window GOARCH=arm64 go build -ldflags='-s' -o=/tmp/bin/windows_arm64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+	GOOS=windows GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/windows_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+	GOOS=windows GOARCH=arm go build -ldflags='-s' -o=/tmp/bin/windows_arm/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+	GOOS=windows GOARCH=arm64 go build -ldflags='-s' -o=/tmp/bin/windows_arm64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 	# Include additional deployment steps here...
 	
