@@ -8,8 +8,6 @@ echoYellow() {
   echo -e "\x1b[93m$1\x1b[0m"
 }
 
-GOOS=js 
-GOARCH=wasm 
 echoPurple "✅ Env vars set"
 
 if [ -d "dist" ]; then
@@ -21,8 +19,13 @@ else
     echoPurple "✅ Dist directory created"
 fi
 
-go build -o dist/rogue-game.wasm
-echoPurple "✅ WebAssembly module built"
+GOOS=js GOARCH=wasm go build -o dist/rogue-game.wasm
+if [ -f "dist/rogue-game.wasm" ]; then
+  echoPurple "✅ WebAssembly module built"
+else
+    echoYellow "❌ WebAssembly module failed to build"
+    exit 1
+fi
 
 if [ -f "dist/wasm_exec.js" ]; then
   echoPurple "✅ wasm_exec.js exists in dist directory"
