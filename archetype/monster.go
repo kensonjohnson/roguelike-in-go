@@ -22,6 +22,7 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		component.Weapon,
 		component.Health,
 		component.UserMessage,
+		component.Discoverable,
 	))
 
 	// Set position
@@ -72,5 +73,9 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 			DeadMessage:      "",
 			GameStateMessage: "",
 		},
+	)
+	component.Discoverable.SetValue(
+		monster,
+		component.DiscoverableData{SeenByPlayer: false},
 	)
 }
