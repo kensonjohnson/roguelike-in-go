@@ -6,7 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/component/ui"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/layer"
 	"github.com/kensonjohnson/roguelike-game-go/system"
@@ -28,7 +27,7 @@ func (g *Game) configure() {
 		AddRenderer(layer.Foreground, system.Render.Draw).
 		AddRenderer(layer.UI, system.UI.Draw).
 		AddRenderer(layer.UI, system.Debug.Draw).
-		AddRenderer(layer.UI, ui.DrawMinimap)
+		AddRenderer(layer.UI, system.DrawMinimap)
 }
 
 func (g *Game) Update() error {
@@ -76,7 +75,7 @@ func main() {
 
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
-	ebiten.SetVsyncEnabled(false)
+	// ebiten.SetVsyncEnabled(false)
 
 	g := &Game{}
 	g.configure()
