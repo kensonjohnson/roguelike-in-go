@@ -11,7 +11,8 @@ import (
 )
 
 type render struct {
-	query *donburi.Query
+	query           *donburi.Query
+	backgroundImage *ebiten.Image
 }
 
 var Render = &render{
@@ -20,6 +21,7 @@ var Render = &render{
 			component.Position,
 			component.Sprite,
 		)),
+	backgroundImage: ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight),
 }
 
 func (r *render) Draw(ecs *ecs.ECS, screen *ebiten.Image) {

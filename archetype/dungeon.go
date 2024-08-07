@@ -24,6 +24,7 @@ func GenerateDungeon(world donburi.World) *component.DungeonData {
 	level := generateLevelTiles()
 	dungeon.Levels = append(dungeon.Levels, level)
 	dungeon.CurrentLevel = level
+	dungeon.CurrentLevel.Redraw = true
 
 	component.Dungeon.SetValue(entry, dungeon)
 

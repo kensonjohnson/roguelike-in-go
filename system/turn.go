@@ -52,6 +52,8 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			}
 		})
 
+		level.Redraw = true
+
 		td.progressTurnState()
 	}
 

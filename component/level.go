@@ -28,8 +28,9 @@ const (
 )
 
 type LevelData struct {
-	Tiles []*MapTile
-	Rooms []engine.Rect
+	Tiles  []*MapTile
+	Rooms  []engine.Rect
+	Redraw bool
 }
 
 // Gets the index of the map array from a given X,Y TILE coordinate.
