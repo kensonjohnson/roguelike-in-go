@@ -19,15 +19,14 @@ type Game struct {
 
 func (g *Game) configure() {
 	g.ecs = *ecs.NewECS(createWorld())
-	g.ecs.
-		AddSystem(system.Camera.Update).
-		AddSystem(system.Turn.Update).
-		AddSystem(system.UI.Update).
-		AddRenderer(layer.Background, system.DrawBackground).
-		AddRenderer(layer.Foreground, system.Render.Draw).
-		AddRenderer(layer.UI, system.UI.Draw).
-		AddRenderer(layer.UI, system.Debug.Draw).
-		AddRenderer(layer.UI, system.DrawMinimap)
+	g.ecs.AddSystem(system.Camera.Update)
+	g.ecs.AddSystem(system.Turn.Update)
+	g.ecs.AddSystem(system.UI.Update)
+	g.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
+	g.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
+	g.ecs.AddRenderer(layer.UI, system.UI.Draw)
+	g.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	g.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 }
 
 func (g *Game) Update() error {
@@ -36,7 +35,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Clear()
+
 	g.ecs.DrawLayer(layer.Background, screen)
 	g.ecs.DrawLayer(layer.Foreground, screen)
 	g.ecs.DrawLayer(layer.UI, screen)
