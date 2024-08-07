@@ -101,7 +101,7 @@ func drawUserMessages(screen *ebiten.Image, messageBox *component.UserMessageBox
 				float64(fontY),
 			)
 			textOptions.ColorScale.ScaleWithColor(color.White)
-			text.Draw(screen, message, assets.HUDFont, textOptions)
+			text.Draw(screen, message, assets.KenneyMiniFont, textOptions)
 			fontY += config.FontSize + 2
 		}
 	}
@@ -128,7 +128,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	text.Draw(
 		screen,
 		message,
-		assets.HUDFont,
+		assets.KenneyMiniFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
 	fontY += config.FontSize + 4
@@ -141,7 +141,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	text.Draw(
 		screen,
 		message,
-		assets.HUDFont,
+		assets.KenneyMiniFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
 	fontY += config.FontSize + 4
@@ -153,7 +153,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	text.Draw(
 		screen,
 		message,
-		assets.HUDFont,
+		assets.KenneyMiniFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
 	fontY += config.FontSize + 4
@@ -167,7 +167,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	text.Draw(
 		screen,
 		message,
-		assets.HUDFont,
+		assets.KenneyMiniFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
 	fontY += config.FontSize + 4
@@ -179,7 +179,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	text.Draw(
 		screen,
 		message,
-		assets.HUDFont,
+		assets.KenneyMiniFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
 }
