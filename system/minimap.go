@@ -18,7 +18,10 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	entry := archetype.MustFindDungeon(ecs.World)
 	level := component.Dungeon.Get(entry).CurrentLevel
 
-	startingXPixel := (config.ScreenWidth * config.TileWidth) - 340
+	// The values of 330 and 210 are based on the size of the minimap image.
+	// That image is 340x220 pixels, with a 10 pixel border, and is placed
+	// in the bottom right corner of the screen.
+	startingXPixel := (config.ScreenWidth * config.TileWidth) - 330
 	startingYPixel := (config.ScreenHeight * config.TileWidth) - 210
 
 	// Draw the walls and floors
