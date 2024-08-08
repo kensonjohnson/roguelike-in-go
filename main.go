@@ -79,7 +79,6 @@ func main() {
 
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
-	ebiten.SetVsyncEnabled(false)
 
 	g := &Game{}
 	g.configure()
