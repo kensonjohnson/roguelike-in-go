@@ -20,7 +20,7 @@ fi
 
 echoPurple "✅ Building for WebAssembly"
 GOOS=js GOARCH=wasm go build -o dist/rogue-game.wasm
-if [ -f "dist/rogue-game.wasm" ]; then
+if [ -f "dist/roguelike-demo.wasm" ]; then
   echoPurple "✅ Finished build"
 else
     echoYellow "❌ WebAssembly module failed to build. Exiting..."

@@ -11,7 +11,7 @@
 
   const go = new Go();
   WebAssembly.instantiateStreaming(
-    fetch("rogue-game.wasm"),
+    fetch("roguelike-demo.wasm"),
     go.importObject
   ).then((result) => {
     go.run(result.instance);

@@ -1,6 +1,6 @@
 # Change these variables as necessary.
 MAIN_PACKAGE_PATH := .
-BINARY_NAME := rougelike-game
+BINARY_NAME := rougelike-demo
 
 # ==================================================================================== #
 # HELPERS
