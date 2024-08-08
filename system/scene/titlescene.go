@@ -34,60 +34,91 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 	y := 32.0
 	drawLogo(screen, "ROGUELIKE DEMO", x, y)
 
+	message := "PRESS SPACE TO START"
+	y = float64(s.PixelHeight - 200)
+	drawTextWithShadow(
+		screen,
+		message,
+		x, y,
+		color.RGBA{R: 178, G: 182, B: 194, A: 255},
+		text.AlignCenter, text.AlignStart,
+	)
+
+	x = float64((s.PixelWidth / 2) - 200)
 	y = float64(s.PixelHeight / 2)
 	drawCharacter(screen, x, y)
 
-	message := "PRESS SPACE TO START"
-	y = float64(s.PixelHeight - 200)
-	drawTextWithShadow(screen, message, x, y, color.RGBA{R: 178, G: 182, B: 194, A: 255}, text.AlignCenter, text.AlignStart)
+	x = float64((s.PixelWidth / 2) + 120)
+	y = float64((s.PixelHeight / 2) - 150)
+	drawSkelly(screen, x, y)
+
+	x = float64((s.PixelWidth / 2) + 200)
+	y = float64((s.PixelHeight / 2) + 130)
+	drawOrc(screen, x, y)
 }
 
-func (s *TitleScene) drawTitleBackground(r *ebiten.Image, count int) {
+func (s *TitleScene) drawTitleBackground(screen *ebiten.Image, count int) {
 
-	op := &ebiten.DrawImageOptions{}
+	options := &ebiten.DrawImageOptions{}
 	offset := float64(count % (config.TileWidth * 4))
 	for i := 0; i < (config.ScreenWidth)*(config.ScreenHeight); i++ {
-		op.GeoM.Reset()
+		options.GeoM.Reset()
 		x := float64(i%(config.ScreenWidth)) * config.TileWidth * scale
 		y := float64(i/(config.ScreenWidth)-1) * config.TileHeight * scale
 		dstX := x - offset
 		dstY := y + offset
-		op.GeoM.Scale(scale, scale)
-		op.GeoM.Translate(dstX, dstY)
-		r.DrawImage(s.ImageBackground, op)
+		options.GeoM.Scale(scale, scale)
+		options.GeoM.Translate(dstX, dstY)
+		screen.DrawImage(s.ImageBackground, options)
 	}
 }
 
-func drawLogo(r *ebiten.Image, str string, x, y float64) {
-	drawTextWithShadow(r, str, x, y, color.RGBA{R: 202, G: 146, B: 74, A: 255}, text.AlignCenter, text.AlignStart)
+func drawLogo(screen *ebiten.Image, str string, x, y float64) {
+	drawTextWithShadow(screen, str, x, y, color.RGBA{R: 202, G: 146, B: 74, A: 255}, text.AlignCenter, text.AlignStart)
 }
 
-func drawCharacter(r *ebiten.Image, x, y float64) {
+func drawCharacter(screen *ebiten.Image, x, y float64) {
 	tileOffset := float64(config.TileWidth * scale * scale / 2)
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(scale*scale, scale*scale)
-	op.GeoM.Translate(x-tileOffset, y-tileOffset)
-	r.DrawImage(assets.Player, op)
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Scale(scale*scale, scale*scale)
+	options.GeoM.Translate(x-tileOffset, y-tileOffset)
+	screen.DrawImage(assets.Player, options)
 }
 
-func drawTextWithShadow(rt *ebiten.Image, str string, x, y float64, clr color.Color, primaryAlign, secondaryAlign text.Align) {
-	op := &text.DrawOptions{}
-	op.GeoM.Translate(float64(x)+1, float64(y)+1)
-	op.ColorScale.ScaleWithColor(color.RGBA{0, 0, 0, 0x80})
-	op.LineSpacing = config.FontSize * float64(scale)
-	op.PrimaryAlign = primaryAlign
-	op.SecondaryAlign = secondaryAlign
-	text.Draw(rt, str, &text.GoTextFace{
-		Source: assets.KenneyMiniSquaredFont.Source,
-		Size:   config.FontSize * float64(scale),
-	}, op)
+func drawSkelly(screen *ebiten.Image, x, y float64) {
+	tileOffset := float64(config.TileWidth * scale * scale / 2)
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Scale(scale*scale, scale*scale)
+	options.GeoM.Translate(x-tileOffset, y-tileOffset)
+	screen.DrawImage(assets.Skelly, options)
+}
 
-	op.GeoM.Reset()
-	op.GeoM.Translate(float64(x), float64(y))
-	op.ColorScale.Reset()
-	op.ColorScale.ScaleWithColor(clr)
-	text.Draw(rt, str, &text.GoTextFace{
+func drawOrc(screen *ebiten.Image, x, y float64) {
+	tileOffset := float64(config.TileWidth * scale * scale / 2)
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Scale(scale*scale, scale*scale)
+	options.GeoM.Translate(x-tileOffset, y-tileOffset)
+	screen.DrawImage(assets.Orc, options)
+}
+
+func drawTextWithShadow(screen *ebiten.Image, message string, x, y float64, clr color.Color, primaryAlign, secondaryAlign text.Align) {
+	options := &text.DrawOptions{}
+	options.GeoM.Translate(float64(x)+1, float64(y)+1)
+	options.ColorScale.ScaleWithColor(color.RGBA{0, 0, 0, 0x80})
+	options.LineSpacing = config.FontSize * float64(scale)
+	options.PrimaryAlign = primaryAlign
+	options.SecondaryAlign = secondaryAlign
+	text.Draw(screen, message, &text.GoTextFace{
 		Source: assets.KenneyMiniSquaredFont.Source,
 		Size:   config.FontSize * float64(scale),
-	}, op)
+	}, options)
+
+	options.GeoM.Reset()
+	options.GeoM.Translate(float64(x), float64(y))
+	options.ColorScale.Reset()
+	options.ColorScale.ScaleWithColor(clr)
+	text.Draw(screen, message, &text.GoTextFace{
+		Source: assets.KenneyMiniSquaredFont.Source,
+		Size:   config.FontSize * float64(scale),
+	}, options)
 }
