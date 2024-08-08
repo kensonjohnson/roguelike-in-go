@@ -15,7 +15,7 @@ type Scene interface {
 	Draw(screen *ebiten.Image)
 }
 
-const transitionMaxCount = 20
+const transitionMaxCount = 30
 
 type SceneManager struct {
 	current         Scene
