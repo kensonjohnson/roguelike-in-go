@@ -20,7 +20,7 @@ type TitleScene struct {
 func (s *TitleScene) Update() {
 	s.count++
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		SceneManager.GoTo(NewLevel())
+		SceneManager.GoTo(CreateFirstLevel())
 		return
 	}
 

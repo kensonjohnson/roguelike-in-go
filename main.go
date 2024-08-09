@@ -1,11 +1,13 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/scene"
 )
 
@@ -38,10 +40,16 @@ func (g *Game) Layout(w, h int) (int, int) {
 }
 
 func main() {
+	DebugOn := flag.Bool("debug", false, "Enable debug screens")
+	flag.Parse()
 	assets.MustLoadAssets()
 
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
+	if DebugOn != nil && *DebugOn {
+		ebiten.SetVsyncEnabled(false)
+		system.Debug.On = true
+	}
 
 	g := &Game{}
 	g.configure()

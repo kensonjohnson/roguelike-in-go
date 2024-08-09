@@ -28,8 +28,8 @@ type SceneManagerData struct {
 var SceneManager = &SceneManagerData{}
 
 func (s *SceneManagerData) Update() {
-	s.current.Update()
 	if s.transitionCount == 0 {
+		s.current.Update()
 		return
 	}
 

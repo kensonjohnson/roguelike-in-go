@@ -47,7 +47,7 @@ audit:
 ## Run with dev flags
 .PHONY: dev
 dev:
-	go run -tags dev .
+	go run . -debug
 
 ## test: run all tests
 .PHONY: test

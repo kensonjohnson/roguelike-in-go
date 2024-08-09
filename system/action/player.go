@@ -2,8 +2,10 @@ package action
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
+	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -39,6 +41,10 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyL) {
+		event.ProgressLevelEvent.Publish(ecs.World, event.ProgressLevel{})
 	}
 
 	if turnTaken {
