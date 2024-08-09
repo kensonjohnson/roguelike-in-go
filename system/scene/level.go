@@ -32,7 +32,7 @@ func NewLevel() *Level {
 	level.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
 	level.ecs.AddRenderer(layer.UI, system.UI.Draw)
 	level.ecs.AddRenderer(layer.UI, system.DrawMinimap)
-	level.ecs.AddRenderer(layer.UI, system.Debug.Draw)
+	// level.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 
 	return level
 }
