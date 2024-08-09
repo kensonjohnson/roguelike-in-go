@@ -1,8 +1,6 @@
 package system
 
 import (
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
@@ -19,7 +17,6 @@ func (r *render) DrawBackground(ecs *ecs.ECS, screen *ebiten.Image) {
 		camera.MainCamera.Draw(r.backgroundImage, camera.CamImageOptions, screen)
 		return
 	}
-	log.Println("Redrawing background")
 	entry = archetype.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(entry).VisibleTiles
 
