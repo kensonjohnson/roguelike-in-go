@@ -14,11 +14,11 @@ import (
 )
 
 type Game struct {
-	sceneManager *scene.SceneManager
+	sceneManager *scene.SceneManagerData
 }
 
 func (g *Game) configure() {
-	g.sceneManager = &scene.SceneManager{}
+	g.sceneManager = scene.SceneManager
 	g.sceneManager.GoTo(&scene.TitleScene{
 		ImageBackground: assets.Floor,
 		PixelWidth:      config.ScreenWidth * config.TileWidth,

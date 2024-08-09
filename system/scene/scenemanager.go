@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	transitionFrom = ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
-	transitionTo   = ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
+	transitionFrom = ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight)
+	transitionTo   = ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight)
 )
 
 type Scene interface {
@@ -17,15 +17,17 @@ type Scene interface {
 
 const transitionMaxCount = 30
 
-type SceneManager struct {
+type SceneManagerData struct {
 	current         Scene
 	next            Scene
 	transitionCount int
 }
 
-func (s *SceneManager) Update() {
+var SceneManager = &SceneManagerData{}
+
+func (s *SceneManagerData) Update() {
+	s.current.Update()
 	if s.transitionCount == 0 {
-		s.current.Update()
 		return
 	}
 
@@ -39,13 +41,12 @@ func (s *SceneManager) Update() {
 
 }
 
-func (s *SceneManager) Draw(screen *ebiten.Image) {
+func (s *SceneManagerData) Draw(screen *ebiten.Image) {
 	if s.transitionCount == 0 {
 		s.current.Draw(screen)
 		return
 	}
 
-	transitionFrom.Clear()
 	s.current.Draw(transitionFrom)
 
 	transitionTo.Clear()
@@ -59,7 +60,7 @@ func (s *SceneManager) Draw(screen *ebiten.Image) {
 	screen.DrawImage(transitionTo, op)
 }
 
-func (s *SceneManager) GoTo(scene Scene) {
+func (s *SceneManagerData) GoTo(scene Scene) {
 	if s.current == nil {
 		s.current = scene
 	} else {

@@ -13,8 +13,8 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	turnTaken := false
 
 	// Grab current level
-	dungeonEntry := archetype.MustFindDungeon(ecs.World)
-	level := component.Dungeon.Get(dungeonEntry).CurrentLevel
+	levelEntry := archetype.LevelTag.MustFirst(ecs.World)
+	level := component.Level.Get(levelEntry)
 
 	// Grab player data
 	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)

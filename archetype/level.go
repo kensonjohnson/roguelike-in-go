@@ -6,38 +6,34 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
 	"github.com/yohamta/donburi"
-	"github.com/yohamta/donburi/filter"
-	"github.com/yohamta/donburi/query"
 )
 
 const levelHeight = config.ScreenHeight - config.UIHeight
 
+var LevelTag = donburi.NewTag("level")
+
 // Creates a new Dungeon
-func GenerateDungeon(world donburi.World) *component.DungeonData {
-	entity := world.Create(component.Dungeon)
-	entry := world.Entry(entity)
+func GenerateLevel(world donburi.World) *component.LevelData {
+	entry := world.Entry(world.Create(
+		LevelTag,
+		component.Level,
+	))
 
-	dungeon := component.DungeonData{}
-	dungeon.Name = "Default"
-	dungeon.Levels = make([]*component.LevelData, 0)
+	level := GenerateLevelTiles()
+	level.Redraw = true
 
-	level := generateLevelTiles()
-	dungeon.Levels = append(dungeon.Levels, level)
-	dungeon.CurrentLevel = level
-	dungeon.CurrentLevel.Redraw = true
+	component.Level.SetValue(entry, level)
 
-	component.Dungeon.SetValue(entry, dungeon)
-
-	return &dungeon
+	return &level
 }
 
 // Creates a new Dungeon Level Map.
-func generateLevelTiles() *component.LevelData {
+func GenerateLevelTiles() component.LevelData {
 	MIN_SIZE := 6
 	MAX_SIZE := 10
 	MAX_ROOMS := 30
 
-	level := &component.LevelData{}
+	level := component.LevelData{}
 	tiles := createTiles(level)
 	level.Tiles = tiles
 	containsRooms := false
@@ -83,7 +79,7 @@ func generateLevelTiles() *component.LevelData {
 }
 
 // Creates a map of all tiles as a baseline to carve out a level.
-func createTiles(level *component.LevelData) []*component.MapTile {
+func createTiles(level component.LevelData) []*component.MapTile {
 	levelHeight := config.ScreenHeight - config.UIHeight
 	tiles := make([]*component.MapTile, config.ScreenWidth*levelHeight)
 	index := 0
@@ -110,7 +106,7 @@ func createTiles(level *component.LevelData) []*component.MapTile {
 }
 
 // Carves out a room in the map of tiles
-func createRoom(level *component.LevelData, room engine.Rect) {
+func createRoom(level component.LevelData, room engine.Rect) {
 	for y := room.Y1 + 1; y < room.Y2; y++ {
 		for x := room.X1 + 1; x < room.X2; x++ {
 			index := level.GetIndexFromXY(x, y)
@@ -122,7 +118,7 @@ func createRoom(level *component.LevelData, room engine.Rect) {
 }
 
 // Carves out a tunnel to another room horizontally
-func createHorizontalTunnel(level *component.LevelData, x1 int, x2 int, y int) {
+func createHorizontalTunnel(level component.LevelData, x1 int, x2 int, y int) {
 
 	for x := min(x1, x2); x < max(x1, x2)+1; x++ {
 		index := level.GetIndexFromXY(x, y)
@@ -135,7 +131,7 @@ func createHorizontalTunnel(level *component.LevelData, x1 int, x2 int, y int) {
 }
 
 // Carves out a tunnel to another room vertically
-func createVerticalTunnel(level *component.LevelData, y1 int, y2 int, x int) {
+func createVerticalTunnel(level component.LevelData, y1 int, y2 int, x int) {
 
 	for y := min(y1, y2); y < max(y1, y2)+1; y++ {
 		index := level.GetIndexFromXY(x, y)
@@ -162,12 +158,4 @@ func min(x, y int) int {
 		return y
 	}
 	return x
-}
-
-func MustFindDungeon(w donburi.World) *donburi.Entry {
-	dungeon, ok := query.NewQuery(filter.Contains(component.Dungeon)).First(w)
-	if !ok {
-		panic("Cannot find Dungeon Data!")
-	}
-	return dungeon
 }

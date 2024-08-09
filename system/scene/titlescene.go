@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	// "github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/config"
@@ -19,10 +19,10 @@ type TitleScene struct {
 
 func (s *TitleScene) Update() {
 	s.count++
-	// if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-	// 	// state.SceneManager.GoTo(NewGameScene())
-	// 	return nil
-	// }
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		SceneManager.GoTo(NewLevel())
+		return
+	}
 
 }
 

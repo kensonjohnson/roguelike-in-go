@@ -11,8 +11,8 @@ import (
 )
 
 func (r *render) DrawBackground(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.MustFindDungeon(ecs.World)
-	level := component.Dungeon.Get(entry).CurrentLevel
+	entry := archetype.LevelTag.MustFirst(ecs.World)
+	level := component.Level.Get(entry)
 	entry = archetype.CameraTag.MustFirst(ecs.World)
 	camera := component.Camera.Get(entry)
 	if !level.Redraw {

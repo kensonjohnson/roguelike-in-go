@@ -24,8 +24,8 @@ func CreateNewPlayer(world donburi.World) {
 	))
 
 	// Grab level
-	entry := MustFindDungeon(world)
-	level := component.Dungeon.Get(entry).CurrentLevel
+	entry := LevelTag.MustFirst(world)
+	level := component.Level.Get(entry)
 
 	// Set starting position
 	startingX, startingY := level.Rooms[0].Center()

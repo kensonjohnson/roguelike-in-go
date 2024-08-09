@@ -15,8 +15,8 @@ import (
 const blipSize = 4
 
 func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.MustFindDungeon(ecs.World)
-	level := component.Dungeon.Get(entry).CurrentLevel
+	entry := archetype.LevelTag.MustFirst(ecs.World)
+	level := component.Level.Get(entry)
 
 	// The values of 330 and 210 are based on the size of the minimap image.
 	// That image is 340x220 pixels, with a 10 pixel border, and is placed

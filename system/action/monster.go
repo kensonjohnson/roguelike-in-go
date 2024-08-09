@@ -11,8 +11,8 @@ import (
 
 func TakeMonsterAction(ecs *ecs.ECS) {
 	// Grab level data
-	entry := archetype.MustFindDungeon(ecs.World)
-	level := component.Dungeon.Get(entry).CurrentLevel
+	entry := archetype.LevelTag.MustFirst(ecs.World)
+	level := component.Level.Get(entry)
 
 	// Grab player data
 	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
