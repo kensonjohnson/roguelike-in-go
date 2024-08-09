@@ -40,7 +40,7 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			playerMessages.GameStateMessage = "Game over!"
 		}
 
-		level := component.Dungeon.Get(archetype.MustFindDungeon(ecs.World)).CurrentLevel
+		level := component.Level.Get(archetype.LevelTag.MustFirst(ecs.World))
 		// Remove any enemies that died during the last turn
 		archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
 			health := component.Health.Get(entry)
@@ -51,6 +51,8 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 				ecs.World.Remove(entry.Entity())
 			}
 		})
+
+		level.Redraw = true
 
 		td.progressTurnState()
 	}

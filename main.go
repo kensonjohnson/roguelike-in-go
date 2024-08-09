@@ -4,43 +4,32 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/component/ui"
 	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/kensonjohnson/roguelike-game-go/layer"
-	"github.com/kensonjohnson/roguelike-game-go/system"
-	"github.com/yohamta/donburi"
-	"github.com/yohamta/donburi/ecs"
+	"github.com/kensonjohnson/roguelike-game-go/system/scene"
 )
 
 type Game struct {
-	ecs ecs.ECS
+	sceneManager *scene.SceneManagerData
 }
 
 func (g *Game) configure() {
-	g.ecs = *ecs.NewECS(createWorld())
-	g.ecs.
-		AddSystem(system.Camera.Update).
-		AddSystem(system.Turn.Update).
-		AddSystem(system.UI.Update).
-		AddRenderer(layer.Background, system.DrawBackground).
-		AddRenderer(layer.Foreground, system.Render.Draw).
-		AddRenderer(layer.UI, system.UI.Draw).
-		AddRenderer(layer.UI, system.Debug.Draw).
-		AddRenderer(layer.UI, ui.DrawMinimap)
+	g.sceneManager = scene.SceneManager
+	g.sceneManager.GoTo(&scene.TitleScene{
+		ImageBackground: assets.Floor,
+		PixelWidth:      config.ScreenWidth * config.TileWidth,
+		PixelHeight:     config.ScreenHeight * config.TileHeight,
+	})
+
 }
 
 func (g *Game) Update() error {
-	g.ecs.Update()
+	g.sceneManager.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Clear()
-	g.ecs.DrawLayer(layer.Background, screen)
-	g.ecs.DrawLayer(layer.Foreground, screen)
-	g.ecs.DrawLayer(layer.UI, screen)
+	g.sceneManager.Draw(screen)
 }
 
 // Returns the screen dimensions.
@@ -48,35 +37,11 @@ func (g *Game) Layout(w, h int) (int, int) {
 	return config.TileWidth * config.ScreenWidth, config.TileHeight * config.ScreenHeight
 }
 
-func createWorld() donburi.World {
-	world := donburi.NewWorld()
-
-	// Create dungeon component
-	dungeon := archetype.GenerateDungeon(world)
-
-	for index, room := range dungeon.CurrentLevel.Rooms {
-		if index == 0 {
-			archetype.CreateNewPlayer(world)
-		} else {
-			archetype.CreateMonster(world, dungeon.CurrentLevel, room)
-		}
-	}
-
-	// Create the UI
-	archetype.CreateNewUI(world)
-
-	// Create the camera
-	archetype.CreateNewCamera(world)
-
-	return world
-}
-
 func main() {
 	assets.MustLoadAssets()
 
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
-	ebiten.SetVsyncEnabled(false)
 
 	g := &Game{}
 	g.configure()
