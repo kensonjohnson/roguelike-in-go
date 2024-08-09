@@ -72,7 +72,7 @@ func createWorld() donburi.World {
 	return world
 }
 
-func progressLevel(world donburi.World, event event.ProgressLevel) {
+func progressLevel(world donburi.World, eventData event.ProgressLevel) {
 
 	// Create a new world
 	newWorld := createWorld()
@@ -98,6 +98,8 @@ func progressLevel(world donburi.World, event event.ProgressLevel) {
 	if system.Debug.On {
 		level.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 	}
+
+	event.ProgressLevelEvent.Subscribe(level.ecs.World, progressLevel)
 
 	SceneManager.GoTo(level)
 }
