@@ -17,6 +17,7 @@ func (r *render) DrawBackground(ecs *ecs.ECS, screen *ebiten.Image) {
 		camera.MainCamera.Draw(r.backgroundImage, camera.CamImageOptions, screen)
 		return
 	}
+	r.backgroundImage.Clear()
 	entry = archetype.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(entry).VisibleTiles
 
