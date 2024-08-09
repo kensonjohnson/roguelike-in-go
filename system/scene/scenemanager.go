@@ -1,6 +1,8 @@
 package scene
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 )
@@ -36,8 +38,11 @@ func (s *SceneManagerData) Update() {
 		return
 	}
 
-	s.current = s.next
-	s.next = nil
+	if s.next != nil {
+		s.current = s.next
+		s.next = nil
+		s.transitionCount = transitionMaxCount
+	}
 
 }
 
@@ -47,13 +52,15 @@ func (s *SceneManagerData) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	s.current.Draw(transitionFrom)
-
-	transitionTo.Clear()
-	s.next.Draw(transitionTo)
-
-	screen.DrawImage(transitionFrom, nil)
-
+	if s.next != nil {
+		s.current.Draw(transitionFrom)
+		transitionTo.Fill(color.Black)
+		screen.DrawImage(transitionFrom, nil)
+	} else {
+		s.current.Draw(transitionTo)
+		transitionFrom.Fill(color.Black)
+		screen.DrawImage(transitionFrom, nil)
+	}
 	alpha := 1 - float32(s.transitionCount)/float32(transitionMaxCount)
 	op := &ebiten.DrawImageOptions{}
 	op.ColorScale.ScaleAlpha(alpha)
