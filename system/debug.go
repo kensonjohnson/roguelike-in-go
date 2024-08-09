@@ -10,9 +10,13 @@ import (
 	donburiDebug "github.com/yohamta/donburi/features/debug"
 )
 
-type debug struct{}
+type debug struct {
+	On bool
+}
 
-var Debug = &debug{}
+var Debug = &debug{
+	On: false,
+}
 
 func (d *debug) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	width := config.ScreenWidth * config.TileWidth
