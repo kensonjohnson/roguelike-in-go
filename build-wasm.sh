@@ -19,7 +19,7 @@ else
 fi
 
 echoPurple "✅ Building for WebAssembly"
-GOOS=js GOARCH=wasm go build -o dist/rogue-game.wasm
+GOOS=js GOARCH=wasm go build -o dist/roguelike-demo.wasm
 if [ -f "dist/roguelike-demo.wasm" ]; then
   echoPurple "✅ Finished build"
 else
