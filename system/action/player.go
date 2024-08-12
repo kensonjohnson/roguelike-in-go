@@ -14,15 +14,6 @@ import (
 func TakePlayerAction(ecs *ecs.ECS) bool {
 	turnTaken := false
 
-	// Grab current level
-	levelEntry := archetype.LevelTag.MustFirst(ecs.World)
-	level := component.Level.Get(levelEntry)
-
-	// Grab player data
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
-	position := component.Position.Get(playerEntry)
-	vision := component.Fov.Get(playerEntry)
-
 	// Capture any keypresses we care about
 	moveX := 0
 	moveY := 0
@@ -55,6 +46,16 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		return false
 	}
 
+	// Grab current level
+	levelEntry := archetype.LevelTag.MustFirst(ecs.World)
+	level := component.Level.Get(levelEntry)
+
+	// Grab player data
+	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	position := component.Position.Get(playerEntry)
+	sprite := component.Sprite.Get(playerEntry)
+	vision := component.Fov.Get(playerEntry)
+
 	// TODO: Update so diagonal movement consumes two turns
 	// Attempt to move
 	tile := level.GetFromXY(position.X+moveX, position.Y+moveY)
@@ -66,6 +67,10 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		// Update the player's position
 		position.X += moveX
 		position.Y += moveY
+		sprite.OffestX = -moveX
+		sprite.OffestY = -moveY
+		sprite.Animating = true
+		sprite.SetProgress(0)
 		// Update the player's field of view
 		vision.VisibleTiles.Compute(level, position.X, position.Y, 8)
 		// Update any discoverable entities
