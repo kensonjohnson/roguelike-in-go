@@ -20,7 +20,7 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 
 	archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
 		position := component.Position.Get(entry)
-
+		sprite := component.Sprite.Get(entry)
 		monsterVision := component.Fov.Get(entry).VisibleTiles
 
 		// Check if the monster can see the player
@@ -37,8 +37,12 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 						// Update the tile this monster is blocking
 						level.GetFromXY(position.X, position.Y).Blocked = false
 						nextTile.Blocked = true
+						sprite.OffestX = position.X - path[1].X
+						sprite.OffestY = position.Y - path[1].Y
 						position.X = path[1].X
 						position.Y = path[1].Y
+						sprite.Animating = true
+						sprite.SetProgress(0)
 						// Since the monster moved, update the field of view
 						monsterVision.Compute(level, position.X, position.Y, 8)
 					}

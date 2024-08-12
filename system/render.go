@@ -36,7 +36,12 @@ func (r *render) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 
 		if playerVision.IsVisible(position.X, position.Y) {
 			camera.CamImageOptions.GeoM.Reset()
-			camera.CamImageOptions.GeoM.Translate(float64(position.X*config.TileWidth), float64(position.Y*config.TileHeight))
+			if sprite.Animating {
+				offsetX, offsetY := sprite.GetAnimationStep()
+				camera.CamImageOptions.GeoM.Translate(float64(position.X*config.TileWidth)+offsetX, float64(position.Y*config.TileHeight)+offsetY)
+			} else {
+				camera.CamImageOptions.GeoM.Translate(float64(position.X*config.TileWidth), float64(position.Y*config.TileHeight))
+			}
 			camera.MainCamera.Draw(sprite.Image, camera.CamImageOptions, screen)
 		}
 	})
