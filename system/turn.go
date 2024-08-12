@@ -28,9 +28,9 @@ const (
 )
 
 func (td *TurnData) Update(ecs *ecs.ECS) {
-	td.TurnCounter++
 
 	if td.TurnState == BeforePlayerAction {
+		td.TurnCounter++
 		// Check if player survived the last cycle of monster turns
 		entry := archetype.PlayerTag.MustFirst(ecs.World)
 		playerHealth := component.Health.Get(entry)
@@ -52,16 +52,30 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			}
 		})
 
-		level.Redraw = true
+		component.Sprite.Each(ecs.World, func(entry *donburi.Entry) {
+			sprite := component.Sprite.Get(entry)
+			sprite.SetProgress(float64(td.TurnCounter) / 12)
+		})
 
-		td.progressTurnState()
-	}
+		if td.TurnCounter > 12 {
+			// Reset the progress of all sprites
+			component.Sprite.Each(ecs.World, func(entry *donburi.Entry) {
+				sprite := component.Sprite.Get(entry)
+				sprite.SetProgress(0)
+				sprite.Animating = false
+				sprite.OffestX = 0
+				sprite.OffestY = 0
+			})
 
-	if td.TurnState == PlayerTurn && td.TurnCounter > 12 {
-		turnTaken := action.TakePlayerAction(ecs)
-		if turnTaken {
+			level.Redraw = true
 			td.progressTurnState()
 			td.resetCounter()
+		}
+	}
+
+	if td.TurnState == PlayerTurn {
+		if turnTaken := action.TakePlayerAction(ecs); turnTaken {
+			td.progressTurnState()
 		}
 	}
 
