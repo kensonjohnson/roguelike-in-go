@@ -25,6 +25,8 @@ const levelHeight = config.ScreenHeight - config.UIHeight
 const (
 	WALL tileType = iota
 	FLOOR
+	STAIR_UP
+	STAIR_DOWN
 )
 
 type LevelData struct {
