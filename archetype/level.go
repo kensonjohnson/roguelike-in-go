@@ -74,6 +74,12 @@ func GenerateLevelTiles() component.LevelData {
 			containsRooms = true
 		}
 	}
+	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
+	exitRoom := level.Rooms[exitRoomIndex]
+	exitTile := level.GetFromXY(exitRoom.X1+1, exitRoom.Y1+1)
+	exitTile.Image = assets.StairsDown
+	exitTile.Blocked = false
+	exitTile.TileType = component.STAIR_DOWN
 
 	return level
 }
