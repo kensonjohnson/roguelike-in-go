@@ -16,13 +16,14 @@ var (
 	assetsFS embed.FS
 
 	// Tiles
-	Floor *ebiten.Image
-	Wall  *ebiten.Image
+	Floor      *ebiten.Image
+	Wall       *ebiten.Image
+	StairsUp   *ebiten.Image
+	StairsDown *ebiten.Image
 
 	// UI
 	UIPanel               *ebiten.Image
 	UIPanelWithMinimap    *ebiten.Image
-	HUDFont               *text.GoTextFace
 	KenneyMiniFont        *text.GoTextFace
 	KenneyMiniSquaredFont *text.GoTextFace
 	KenneyPixelFont       *text.GoTextFace
@@ -35,26 +36,27 @@ var (
 
 // Loads all required assets, panics if any one fails.
 func MustLoadAssets() {
-	Floor = mustLoadImage("floor.png")
-	Wall = mustLoadImage("wall.png")
-	UIPanel = mustLoadImage("UIPanel.png")
-	UIPanelWithMinimap = mustLoadImage("UIPanelWithMinimap.png")
-	Player = mustLoadImage("player.png")
-	Skelly = mustLoadImage("skelly.png")
-	Orc = mustLoadImage("orc.png")
+	Floor = mustLoadImage("images/floor.png")
+	Wall = mustLoadImage("images/wall.png")
+	StairsUp = mustLoadImage("images/stairs-up.png")
+	StairsDown = mustLoadImage("images/stairs-down.png")
+	UIPanel = mustLoadImage("images/UIPanel.png")
+	UIPanelWithMinimap = mustLoadImage("images/UIPanelWithMinimap.png")
+	Player = mustLoadImage("images/player.png")
+	Skelly = mustLoadImage("images/skelly.png")
+	Orc = mustLoadImage("images/orc.png")
 
-	HUDFont = mustLoadFont(MPlus1pRegular_ttf)
-	kenneyMiniFontBytes, err := assetsFS.ReadFile("KenneyMini.ttf")
+	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
 		log.Fatal(err)
 	}
 	KenneyMiniFont = mustLoadFont(kenneyMiniFontBytes)
-	kenneyMiniSquaredFontBytes, err := assetsFS.ReadFile("KenneyMiniSquared.ttf")
+	kenneyMiniSquaredFontBytes, err := assetsFS.ReadFile("fonts/KenneyMiniSquared.ttf")
 	if err != nil {
 		log.Fatal(err)
 	}
 	KenneyMiniSquaredFont = mustLoadFont(kenneyMiniSquaredFontBytes)
-	kenneyPixelFontBytes, err := assetsFS.ReadFile("KenneyPixel.ttf")
+	kenneyPixelFontBytes, err := assetsFS.ReadFile("fonts/KenneyPixel.ttf")
 	if err != nil {
 		log.Fatal(err)
 	}
