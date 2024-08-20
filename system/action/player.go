@@ -2,7 +2,6 @@ package action
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
@@ -32,10 +31,6 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
-	}
-
-	if inpututil.IsKeyJustPressed(ebiten.KeyL) {
-		event.ProgressLevelEvent.Publish(ecs.World, event.ProgressLevel{})
 	}
 
 	if turnTaken {
@@ -81,6 +76,10 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 				discoverable.SeenByPlayer = true
 			}
 		})
+		if tile.TileType == component.STAIR_DOWN {
+			// Move to the next level
+			event.ProgressLevelEvent.Publish(ecs.World, event.ProgressLevel{})
+		}
 	} else if tile.TileType != component.WALL {
 		// Not a wall, so it must be an enemy. Attack!
 		// Find the monster in the direction we're pointing
