@@ -18,7 +18,6 @@ type Level struct {
 func (level *Level) Update() {
 	level.ecs.Update()
 	event.ProgressLevelEvent.ProcessEvents(level.ecs.World)
-
 }
 
 func (level *Level) Draw(screen *ebiten.Image) {
