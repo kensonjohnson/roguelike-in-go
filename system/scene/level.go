@@ -18,7 +18,6 @@ type Level struct {
 func (level *Level) Update() {
 	level.ecs.Update()
 	event.ProgressLevelEvent.ProcessEvents(level.ecs.World)
-
 }
 
 func (level *Level) Draw(screen *ebiten.Image) {
@@ -74,14 +73,14 @@ func createWorld() donburi.World {
 
 func progressLevel(world donburi.World, eventData event.ProgressLevel) {
 
-	// Create a new world
-	newWorld := createWorld()
-
 	// Grab the current player's data
 	playerEntry := archetype.PlayerTag.MustFirst(world)
 	playerHealth := component.Health.Get(playerEntry)
 	playerWeapon := component.Weapon.Get(playerEntry)
 	playerArmor := component.Armor.Get(playerEntry)
+
+	// Create a new world
+	newWorld := createWorld()
 
 	// Apply the player's data to the new world
 	copyPlayerInstance(newWorld, playerHealth, playerWeapon, playerArmor)
