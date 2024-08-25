@@ -36,15 +36,15 @@ var (
 
 // Loads all required assets, panics if any one fails.
 func MustLoadAssets() {
-	Floor = mustLoadImage("images/floor.png")
-	Wall = mustLoadImage("images/wall.png")
-	StairsUp = mustLoadImage("images/stairs-up.png")
-	StairsDown = mustLoadImage("images/stairs-down.png")
-	UIPanel = mustLoadImage("images/UIPanel.png")
-	UIPanelWithMinimap = mustLoadImage("images/UIPanelWithMinimap.png")
-	Player = mustLoadImage("images/player.png")
-	Skelly = mustLoadImage("images/skelly.png")
-	Orc = mustLoadImage("images/orc.png")
+	Floor = mustLoadImage("images/tiles/floor.png")
+	Wall = mustLoadImage("images/tiles/wall.png")
+	StairsUp = mustLoadImage("images/tiles/stairs-up.png")
+	StairsDown = mustLoadImage("images/tiles/stairs-down.png")
+	UIPanel = mustLoadImage("images/ui/UIPanel.png")
+	UIPanelWithMinimap = mustLoadImage("images/ui/UIPanelWithMinimap.png")
+	Player = mustLoadImage("images/characters/player.png")
+	Skelly = mustLoadImage("images/enemies/skelly.png")
+	Orc = mustLoadImage("images/enemies/orc.png")
 
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
