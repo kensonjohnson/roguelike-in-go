@@ -11,21 +11,21 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-type Level struct {
+type LevelScene struct {
 	ecs ecs.ECS
 }
 
-func (level *Level) Update() {
+func (level *LevelScene) Update() {
 	level.ecs.Update()
 	event.ProgressLevelEvent.ProcessEvents(level.ecs.World)
 }
 
-func (level *Level) Draw(screen *ebiten.Image) {
+func (level *LevelScene) Draw(screen *ebiten.Image) {
 	level.ecs.Draw(screen)
 }
 
-func CreateFirstLevel() *Level {
-	level := &Level{}
+func CreateFirstLevel() *LevelScene {
+	level := &LevelScene{}
 	level.configureECS(createWorld())
 	return level
 }
@@ -61,13 +61,13 @@ func progressLevel(world donburi.World, eventData event.ProgressLevel) {
 	// Apply the player's data to the new world
 	copyPlayerInstance(world, newWorld)
 
-	level := &Level{}
+	level := &LevelScene{}
 	level.configureECS(newWorld)
 
 	SceneManager.GoTo(level)
 }
 
-func (l *Level) configureECS(world donburi.World) {
+func (l *LevelScene) configureECS(world donburi.World) {
 	l.ecs = *ecs.NewECS(world)
 	// Add systems
 	l.ecs.AddSystem(system.Camera.Update)
