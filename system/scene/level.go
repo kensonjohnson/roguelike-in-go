@@ -26,25 +26,7 @@ func (level *Level) Draw(screen *ebiten.Image) {
 
 func CreateFirstLevel() *Level {
 	level := &Level{}
-	level.ecs = *ecs.NewECS(createWorld())
-
-	// Add systems
-	level.ecs.AddSystem(system.Camera.Update)
-	level.ecs.AddSystem(system.Turn.Update)
-	level.ecs.AddSystem(system.UI.Update)
-
-	// Add renderers
-	level.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
-	level.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
-	level.ecs.AddRenderer(layer.UI, system.UI.Draw)
-	level.ecs.AddRenderer(layer.UI, system.DrawMinimap)
-	if system.Debug.On {
-		level.ecs.AddRenderer(layer.UI, system.Debug.Draw)
-	}
-
-	// Add event listeners
-	event.ProgressLevelEvent.Subscribe(level.ecs.World, progressLevel)
-
+	level.configureECS(createWorld())
 	return level
 }
 
@@ -73,55 +55,63 @@ func createWorld() donburi.World {
 
 func progressLevel(world donburi.World, eventData event.ProgressLevel) {
 
-	// Grab the current player's data
-	playerEntry := archetype.PlayerTag.MustFirst(world)
-	playerHealth := component.Health.Get(playerEntry)
-	playerWeapon := component.Weapon.Get(playerEntry)
-	playerArmor := component.Armor.Get(playerEntry)
-
 	// Create a new world
 	newWorld := createWorld()
 
 	// Apply the player's data to the new world
-	copyPlayerInstance(newWorld, playerHealth, playerWeapon, playerArmor)
+	copyPlayerInstance(world, newWorld)
 
 	level := &Level{}
-	level.ecs = *ecs.NewECS(newWorld)
-	level.ecs.AddSystem(system.Camera.Update)
-	level.ecs.AddSystem(system.Turn.Update)
-	level.ecs.AddSystem(system.UI.Update)
-	level.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
-	level.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
-	level.ecs.AddRenderer(layer.UI, system.UI.Draw)
-	level.ecs.AddRenderer(layer.UI, system.DrawMinimap)
-	if system.Debug.On {
-		level.ecs.AddRenderer(layer.UI, system.Debug.Draw)
-	}
-
-	event.ProgressLevelEvent.Subscribe(level.ecs.World, progressLevel)
+	level.configureECS(newWorld)
 
 	SceneManager.GoTo(level)
 }
 
+func (l *Level) configureECS(world donburi.World) {
+	l.ecs = *ecs.NewECS(world)
+	// Add systems
+	l.ecs.AddSystem(system.Camera.Update)
+	l.ecs.AddSystem(system.Turn.Update)
+	l.ecs.AddSystem(system.UI.Update)
+
+	// Add renderers
+	l.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
+	l.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
+	l.ecs.AddRenderer(layer.UI, system.UI.Draw)
+	l.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	if system.Debug.On {
+		l.ecs.AddRenderer(layer.UI, system.Debug.Draw)
+	}
+
+	// Add event listeners
+	event.ProgressLevelEvent.Subscribe(l.ecs.World, progressLevel)
+}
+
 func copyPlayerInstance(
+	oldWorld donburi.World,
 	newWorld donburi.World,
-	health *component.HealthData,
-	weapon *component.WeaponData,
-	armor *component.ArmorData,
 ) {
+	currentPlayerEntry := archetype.PlayerTag.MustFirst(oldWorld)
+	currentPlayerHealth := component.Health.Get(currentPlayerEntry)
+	currentPlayerWeapon := component.Weapon.Get(currentPlayerEntry)
+	currentPlayerArmor := component.Armor.Get(currentPlayerEntry)
+
 	playerEntry := archetype.PlayerTag.MustFirst(newWorld)
-	component.Health.SetValue(playerEntry, component.HealthData{MaxHealth: health.MaxHealth, CurrentHealth: health.CurrentHealth})
+	component.Health.SetValue(playerEntry, component.HealthData{
+		MaxHealth:     currentPlayerHealth.MaxHealth,
+		CurrentHealth: currentPlayerHealth.CurrentHealth,
+	})
 	component.Weapon.SetValue(playerEntry, component.WeaponData{
-		Name:          weapon.Name,
-		ActionText:    weapon.ActionText,
-		MinimumDamage: weapon.MinimumDamage,
-		MaximumDamage: weapon.MaximumDamage,
-		ToHitBonus:    weapon.ToHitBonus,
+		Name:          currentPlayerWeapon.Name,
+		ActionText:    currentPlayerWeapon.ActionText,
+		MinimumDamage: currentPlayerWeapon.MinimumDamage,
+		MaximumDamage: currentPlayerWeapon.MaximumDamage,
+		ToHitBonus:    currentPlayerWeapon.ToHitBonus,
 	})
 	component.Armor.SetValue(playerEntry, component.ArmorData{
-		Name:       armor.Name,
-		Defense:    armor.Defense,
-		ArmorClass: armor.ArmorClass,
+		Name:       currentPlayerArmor.Name,
+		Defense:    currentPlayerArmor.Defense,
+		ArmorClass: currentPlayerArmor.ArmorClass,
 	})
 
 }
