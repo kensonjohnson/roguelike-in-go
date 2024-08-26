@@ -4,13 +4,14 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/component/gear"
+	"github.com/kensonjohnson/roguelike-game-go/engine"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
 
 var PlayerTag = donburi.NewTag("player")
 
-func CreateNewPlayer(world donburi.World) {
+func CreateNewPlayer(world donburi.World, level *component.LevelData, startingRoom engine.Rect) {
 	player := world.Entry(world.Create(
 		PlayerTag,
 		component.Position,
@@ -23,12 +24,8 @@ func CreateNewPlayer(world donburi.World) {
 		component.UserMessage,
 	))
 
-	// Grab level
-	entry := LevelTag.MustFirst(world)
-	level := component.Level.Get(entry)
-
 	// Set starting position
-	startingX, startingY := level.Rooms[0].Center()
+	startingX, startingY := startingRoom.Center()
 	position := component.PositionData{
 		X: startingX,
 		Y: startingY,

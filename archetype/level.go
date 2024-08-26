@@ -21,7 +21,7 @@ func GenerateLevel(world donburi.World) *component.LevelData {
 
 	level := GenerateLevelTiles()
 	level.Redraw = true
-
+	seedRooms(world, &level)
 	component.Level.SetValue(entry, level)
 
 	return &level
@@ -74,12 +74,6 @@ func GenerateLevelTiles() component.LevelData {
 			containsRooms = true
 		}
 	}
-	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
-	exitRoom := level.Rooms[exitRoomIndex]
-	exitTile := level.GetFromXY(exitRoom.X1+1, exitRoom.Y1+1)
-	exitTile.Image = assets.StairsDown
-	exitTile.Blocked = false
-	exitTile.TileType = component.STAIR_DOWN
 
 	return level
 }
@@ -164,4 +158,20 @@ func min(x, y int) int {
 		return y
 	}
 	return x
+}
+
+func seedRooms(world donburi.World, level *component.LevelData) {
+	for index, room := range level.Rooms {
+		if index == 0 {
+			CreateNewPlayer(world, level, room)
+		} else {
+			CreateMonster(world, level, room)
+		}
+	}
+	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
+	exitRoom := level.Rooms[exitRoomIndex]
+	exitTile := level.GetFromXY(exitRoom.X1+1, exitRoom.Y1+1)
+	exitTile.Image = assets.StairsDown
+	exitTile.Blocked = false
+	exitTile.TileType = component.STAIR_DOWN
 }

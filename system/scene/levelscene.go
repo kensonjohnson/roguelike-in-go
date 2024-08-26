@@ -34,15 +34,7 @@ func createWorld() donburi.World {
 	world := donburi.NewWorld()
 
 	// Create current level
-	level := archetype.GenerateLevel(world)
-
-	for index, room := range level.Rooms {
-		if index == 0 {
-			archetype.CreateNewPlayer(world)
-		} else {
-			archetype.CreateMonster(world, level, room)
-		}
-	}
+	archetype.GenerateLevel(world)
 
 	// Create the UI
 	archetype.CreateNewUI(world)
