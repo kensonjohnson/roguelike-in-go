@@ -4,22 +4,28 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/items"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
 
 var PlayerTag = donburi.NewTag("player")
 
-func CreateNewPlayer(world donburi.World, level *component.LevelData, startingRoom engine.Rect) {
+func CreateNewPlayer(
+	world donburi.World,
+	level *component.LevelData,
+	startingRoom engine.Rect,
+	weaponId weapons.WeaponId,
+	armorId armors.ArmorId,
+) {
 	player := world.Entry(world.Create(
 		PlayerTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
 		component.Fov,
-		component.Armor,
-		component.Weapon,
+		component.Equipment,
 		component.Health,
 		component.UserMessage,
 	))
@@ -44,7 +50,7 @@ func CreateNewPlayer(world donburi.World, level *component.LevelData, startingRo
 	component.Sprite.SetValue(player, sprite)
 
 	// Set name
-	name := component.NameData{Label: "Player"}
+	name := component.NameData{Value: "Player"}
 	component.Name.SetValue(player, name)
 
 	// Set health
@@ -55,9 +61,11 @@ func CreateNewPlayer(world donburi.World, level *component.LevelData, startingRo
 	component.Health.SetValue(player, health)
 
 	// Add gear
-	component.Armor.SetValue(player, items.Armor.PlateArmor)
-
-	component.Weapon.SetValue(player, items.Weapons.BattleAxe)
+	equipment := component.EquipmentData{
+		Weapon: CreateNewWeapon(world, weaponId),
+		Armor:  CreateNewArmor(world, armorId),
+	}
+	component.Equipment.SetValue(player, equipment)
 
 	// Set default messages
 	component.UserMessage.SetValue(
