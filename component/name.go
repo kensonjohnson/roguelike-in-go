@@ -3,7 +3,7 @@ package component
 import "github.com/yohamta/donburi"
 
 type NameData struct {
-	Label string
+	Value string
 }
 
 var Name = donburi.NewComponentType[NameData]()
