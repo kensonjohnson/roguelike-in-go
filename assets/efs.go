@@ -128,6 +128,9 @@ var (
 	WorldHealthPotion      *ebiten.Image
 	WorldGreatHealthPotion *ebiten.Image
 	WorldRoyalHealthPotion *ebiten.Image
+
+	// Other / Misc
+	Bones *ebiten.Image
 )
 
 // Loads all required assets, panics if any one fails.
@@ -271,6 +274,10 @@ func MustLoadAssets() {
 	WorldGreatHealthPotion = mustLoadImage("images/items/world_great_health_potion.png")
 	WorldRoyalHealthPotion = mustLoadImage("images/items/world_royal_health_potion.png")
 
+	/*-----------------------
+	------ Other Items ------
+	-----------------------*/
+	Bones = mustLoadImage("images/items/bones.png")
 }
 
 // Loads image at specified path, panics if it fails.
