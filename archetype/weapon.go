@@ -8,7 +8,7 @@ import (
 
 var WeaponTag = donburi.NewTag("weapon")
 
-func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) {
+func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) *donburi.Entry {
 	weapon := world.Entry(world.Create(
 		WeaponTag,
 		component.Name,
@@ -41,6 +41,7 @@ func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) {
 	}
 	component.ActionText.SetValue(weapon, actionText)
 
+	return weapon
 }
 
 func IsWeapon(entry *donburi.Entry) bool {
