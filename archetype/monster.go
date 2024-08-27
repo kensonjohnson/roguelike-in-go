@@ -4,7 +4,8 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/items"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
@@ -18,8 +19,7 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		component.Sprite,
 		component.Name,
 		component.Fov,
-		component.Armor,
-		component.Weapon,
+		component.Equipment,
 		component.Health,
 		component.UserMessage,
 		component.Discoverable,
@@ -41,24 +41,23 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	// Set sprite, name, and gear
 	sprite := component.SpriteData{}
 	name := component.NameData{}
-	var armor component.ArmorData
-	var weapon component.WeaponData
+	equipment := component.EquipmentData{}
 	coinflip := engine.GetDiceRoll(2)
 	if coinflip == 2 {
 		sprite.Image = assets.Orc
-		name.Label = "Orc"
-		armor = items.Armor.LeatherArmor
-		weapon = items.Weapons.Machete
+		name.Value = "Orc"
+		equipment.Armor = CreateNewArmor(world, armors.PaddedArmor)
+		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
 	} else {
 		sprite.Image = assets.Skelly
-		name.Label = "Skeleton"
-		armor = items.Armor.Bones
-		weapon = items.Weapons.ShortSword
+		name.Value = "Skeleton"
+		equipment.Armor = CreateNewArmor(world, armors.Bones)
+		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
 	}
 	component.Sprite.SetValue(monster, sprite)
 	component.Name.SetValue(monster, name)
-	component.Armor.SetValue(monster, armor)
-	component.Weapon.SetValue(monster, weapon)
+	component.Equipment.SetValue(monster, equipment)
+
 	component.Health.SetValue(
 		monster,
 		component.HealthData{
