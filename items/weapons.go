@@ -1,4 +1,4 @@
-package gear
+package items
 
 import "github.com/kensonjohnson/roguelike-game-go/component"
 

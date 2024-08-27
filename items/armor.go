@@ -1,13 +1,22 @@
-package gear
+package items
 
 import "github.com/kensonjohnson/roguelike-game-go/component"
 
 type armor struct {
 	BurlapSack   component.ArmorData
 	LeatherArmor component.ArmorData
-	Bone         component.ArmorData
+	Bones        component.ArmorData
 	PlateArmor   component.ArmorData
 }
+
+type armorId int
+
+const (
+	BurlapSack armorId = iota
+	LeatherArmor
+	Bones
+	PlateArmor
+)
 
 var Armor armor
 
@@ -25,7 +34,7 @@ func init() {
 			ArmorClass: 6,
 		},
 
-		Bone: component.ArmorData{
+		Bones: component.ArmorData{
 			Name:       "Bone",
 			Defense:    3,
 			ArmorClass: 4,

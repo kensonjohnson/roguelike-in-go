@@ -3,8 +3,8 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/component/gear"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
@@ -55,9 +55,9 @@ func CreateNewPlayer(world donburi.World, level *component.LevelData, startingRo
 	component.Health.SetValue(player, health)
 
 	// Add gear
-	component.Armor.SetValue(player, gear.Armor.PlateArmor)
+	component.Armor.SetValue(player, items.Armor.PlateArmor)
 
-	component.Weapon.SetValue(player, gear.Weapons.BattleAxe)
+	component.Weapon.SetValue(player, items.Weapons.BattleAxe)
 
 	// Set default messages
 	component.UserMessage.SetValue(

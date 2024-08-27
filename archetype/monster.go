@@ -3,8 +3,8 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/component/gear"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
@@ -47,13 +47,13 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	if coinflip == 2 {
 		sprite.Image = assets.Orc
 		name.Label = "Orc"
-		armor = gear.Armor.LeatherArmor
-		weapon = gear.Weapons.Machete
+		armor = items.Armor.LeatherArmor
+		weapon = items.Weapons.Machete
 	} else {
 		sprite.Image = assets.Skelly
 		name.Label = "Skeleton"
-		armor = gear.Armor.Bone
-		weapon = gear.Weapons.ShortSword
+		armor = items.Armor.Bones
+		weapon = items.Weapons.ShortSword
 	}
 	component.Sprite.SetValue(monster, sprite)
 	component.Name.SetValue(monster, name)
