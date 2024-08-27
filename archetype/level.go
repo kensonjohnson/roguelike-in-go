@@ -5,6 +5,8 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/yohamta/donburi"
 )
 
@@ -163,7 +165,7 @@ func min(x, y int) int {
 func seedRooms(world donburi.World, level *component.LevelData) {
 	for index, room := range level.Rooms {
 		if index == 0 {
-			CreateNewPlayer(world, level, room)
+			CreateNewPlayer(world, level, room, weapons.BattleAxe, armors.PlateArmor)
 		} else {
 			CreateMonster(world, level, room)
 		}
