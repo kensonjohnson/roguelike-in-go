@@ -23,6 +23,9 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		component.Health,
 		component.UserMessage,
 		component.Discoverable,
+		component.Attack,
+		component.ActionText,
+		component.Defense,
 	))
 
 	// Set position
@@ -77,4 +80,20 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		monster,
 		component.DiscoverableData{SeenByPlayer: false},
 	)
+
+	// Total up all of the attack values
+	// Right now, only the weapon contributes to attack.
+	// TODO: Add up all attack values from all equipment
+	attack := component.Attack.Get(equipment.Weapon)
+	component.Attack.SetValue(monster, *attack)
+
+	// Set action text for equiped weapon
+	actionText := component.ActionText.Get(equipment.Weapon)
+	component.ActionText.SetValue(monster, *actionText)
+
+	// Total all of the defense values
+	// Right now, only the armor contributes to defense.
+	// TODO: Add up all defense values from all equipment
+	defense := component.Defense.Get(equipment.Armor)
+	component.Defense.SetValue(monster, *defense)
 }

@@ -28,6 +28,9 @@ func CreateNewPlayer(
 		component.Equipment,
 		component.Health,
 		component.UserMessage,
+		component.Attack,
+		component.ActionText,
+		component.Defense,
 	))
 
 	// Set starting position
@@ -76,4 +79,21 @@ func CreateNewPlayer(
 			GameStateMessage: "",
 		},
 	)
+
+	// Total up all of the attack values
+	// Right now, only the weapon contributes to attack.
+	// TODO: Add up all attack values from all equipment
+	attack := component.Attack.Get(equipment.Weapon)
+	component.Attack.SetValue(player, *attack)
+
+	// Set action text for equiped weapon
+	actionText := component.ActionText.Get(equipment.Weapon)
+	component.ActionText.SetValue(player, *actionText)
+
+	// Total all of the defense values
+	// Right now, only the armor contributes to defense.
+	// TODO: Add up all defense values from all equipment
+	defense := component.Defense.Get(equipment.Armor)
+	component.Defense.SetValue(player, *defense)
+
 }
