@@ -23,7 +23,8 @@ const (
 
 type armorList []armorData
 
-var Data = make(armorList, 0)
+// MAKE SURE THAT THIS NUMBER MATCHES THE NUMBER OF ARMORS DEFINED!
+var Data = make(armorList, 4)
 
 func init() {
 	Data[LinenShirt] = armorData{

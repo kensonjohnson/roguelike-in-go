@@ -23,7 +23,8 @@ const (
 	BattleAxe
 )
 
-var Data weaponList = make(weaponList, 0)
+// MAKE SURE THAT THIS NUMBER MATCHES THE NUMBER OF WEAPONS DEFINED!
+var Data weaponList = make(weaponList, 2)
 
 func init() {
 	Data[ShortSword] = weaponData{
