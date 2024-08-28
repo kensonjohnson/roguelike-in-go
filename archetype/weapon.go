@@ -1,6 +1,8 @@
 package archetype
 
 import (
+	"errors"
+
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/yohamta/donburi"
@@ -52,4 +54,19 @@ func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) *donburi.En
 
 func IsWeapon(entry *donburi.Entry) bool {
 	return entry.HasComponent(WeaponTag)
+}
+
+func PlaceWeaponInWorld(world *donburi.World, entry *donburi.Entry, x, y int) error {
+	if !IsWeapon(entry) {
+		return errors.New("entry is not an Weapon Entity")
+	}
+
+	entry.AddComponent(component.Position)
+	position := component.PositionData{
+		X: x,
+		Y: y,
+	}
+	component.Position.SetValue(entry, position)
+
+	return nil
 }
