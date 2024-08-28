@@ -11,6 +11,7 @@ var WeaponTag = donburi.NewTag("weapon")
 func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) *donburi.Entry {
 	weapon := world.Entry(world.Create(
 		WeaponTag,
+		component.ItemId,
 		component.Name,
 		component.Sprite,
 		component.Attack,
@@ -18,6 +19,11 @@ func CreateNewWeapon(world donburi.World, weaponId weapons.WeaponId) *donburi.En
 	))
 
 	weaponData := weapons.Data[weaponId]
+
+	itemId := component.ItemIdData{
+		Id: int(weaponId),
+	}
+	component.ItemId.SetValue(weapon, itemId)
 
 	name := component.NameData{
 		Value: weaponData.Name,

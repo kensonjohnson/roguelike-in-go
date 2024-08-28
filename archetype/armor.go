@@ -11,12 +11,18 @@ var ArmorTag = donburi.NewTag("armor")
 func CreateNewArmor(world donburi.World, armorId armors.ArmorId) *donburi.Entry {
 	armor := world.Entry(world.Create(
 		ArmorTag,
+		component.ItemId,
 		component.Name,
 		component.Sprite,
 		component.Defense,
 	))
 
 	armorData := armors.Data[armorId]
+
+	itemId := component.ItemIdData{
+		Id: int(armorId),
+	}
+	component.ItemId.SetValue(armor, itemId)
 
 	name := component.NameData{
 		Value: armorData.Name,
