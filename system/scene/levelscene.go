@@ -5,6 +5,8 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/kensonjohnson/roguelike-game-go/layer"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/yohamta/donburi"
@@ -85,25 +87,19 @@ func copyPlayerInstance(
 ) {
 	currentPlayerEntry := archetype.PlayerTag.MustFirst(oldWorld)
 	currentPlayerHealth := component.Health.Get(currentPlayerEntry)
-	currentPlayerWeapon := component.Weapon.Get(currentPlayerEntry)
-	currentPlayerArmor := component.Armor.Get(currentPlayerEntry)
+	currentPlayerEquipment := component.Equipment.Get(currentPlayerEntry)
+
+	weaponId := component.ItemId.Get(currentPlayerEquipment.Weapon)
+	armorId := component.ItemId.Get(currentPlayerEquipment.Armor)
 
 	playerEntry := archetype.PlayerTag.MustFirst(newWorld)
-	component.Health.SetValue(playerEntry, component.HealthData{
-		MaxHealth:     currentPlayerHealth.MaxHealth,
-		CurrentHealth: currentPlayerHealth.CurrentHealth,
-	})
-	component.Weapon.SetValue(playerEntry, component.WeaponData{
-		Name:          currentPlayerWeapon.Name,
-		ActionText:    currentPlayerWeapon.ActionText,
-		MinimumDamage: currentPlayerWeapon.MinimumDamage,
-		MaximumDamage: currentPlayerWeapon.MaximumDamage,
-		ToHitBonus:    currentPlayerWeapon.ToHitBonus,
-	})
-	component.Armor.SetValue(playerEntry, component.ArmorData{
-		Name:       currentPlayerArmor.Name,
-		Defense:    currentPlayerArmor.Defense,
-		ArmorClass: currentPlayerArmor.ArmorClass,
+	component.Health.SetValue(playerEntry, *currentPlayerHealth)
+	component.Equipment.SetValue(playerEntry, component.EquipmentData{
+		Weapon: archetype.CreateNewWeapon(newWorld, weapons.WeaponId(weaponId.Id)),
+		// Sheild: currentPlayerEquipment.Sheild,
+		// Gloves: currentPlayerEquipment.Gloves,
+		Armor: archetype.CreateNewArmor(newWorld, armors.ArmorId(armorId.Id)),
+		// Boots:  currentPlayerEquipment.Boots,
 	})
 
 }
