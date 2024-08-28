@@ -22,8 +22,8 @@ type PlayerHUDData struct {
 	FontX    int
 	FontY    int
 	Health   *HealthData
-	Armor    *ArmorData
-	Weapon   *WeaponData
+	Attack   *AttackData
+	Defense  *DefenseData
 	Sprite   *ebiten.Image
 }
 
