@@ -10,7 +10,7 @@ import (
 
 var ConsumableTag = donburi.NewTag("consumable")
 
-func CreateNewConsumable(world donburi.World, consumablesId consumables.ConsumablesId) {
+func CreateNewConsumable(world donburi.World, consumablesId consumables.ConsumablesId) *donburi.Entry {
 	consumable := world.Entry(world.Create(
 		ConsumableTag,
 		component.Name,
@@ -34,13 +34,15 @@ func CreateNewConsumable(world donburi.World, consumablesId consumables.Consumab
 		Image: consumableData.Sprite,
 	}
 	component.Sprite.SetValue(consumable, sprite)
+
+	return consumable
 }
 
 func IsConsumable(entry *donburi.Entry) bool {
 	return entry.HasComponent(ConsumableTag)
 }
 
-func PlaceConsumableInWorld(world *donburi.World, entry *donburi.Entry, x, y int) error {
+func PlaceConsumableInWorld(world donburi.World, entry *donburi.Entry, x, y int) error {
 	if !IsConsumable(entry) {
 		return errors.New("entry is not an Consumable Entity")
 	}
