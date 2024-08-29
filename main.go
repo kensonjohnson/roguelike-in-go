@@ -43,22 +43,22 @@ func main() {
 	DebugOn := flag.Bool("debug", false, "Enable debug screens and prints")
 	flag.Parse()
 
-	assets.MustLoadAssets()
-
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Roguelike")
 	if DebugOn != nil && *DebugOn {
 		ebiten.SetVsyncEnabled(false)
 		system.Debug.On = true
-		logger.SetDebug(DebugOn)
+		logger.SetDebug(*DebugOn)
 	}
 
 	g := &Game{}
 	g.configure()
 
-	logger.Debug("Starting Game")
+	if logger.DebugOn {
+		logger.DebugLogger.Println("Starting Game")
+	}
 
 	if err := ebiten.RunGame(g); err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 }

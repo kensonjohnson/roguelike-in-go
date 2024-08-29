@@ -46,7 +46,7 @@ func (l *LevelData) GetIndexFromXY(x int, y int) int {
 // This coordinate is logical tiles, not pixels.
 func (l *LevelData) GetFromXY(x, y int) *MapTile {
 	if len(l.Tiles) == 0 {
-		logger.Fatal("levelData.Tiles has no length")
+		logger.ErrorLogger.Panic("levelData.Tiles has no length")
 	}
 	return l.Tiles[(y*config.ScreenWidth)+x]
 }

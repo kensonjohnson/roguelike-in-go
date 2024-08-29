@@ -15,7 +15,7 @@ func CreateNewCamera(world donburi.World) {
 	var entry *donburi.Entry
 	var ok bool
 	if entry, ok = PlayerTag.First(world); !ok {
-		logger.Fatal("CreateNewCamera failed: Player not found")
+		logger.ErrorLogger.Panic("CreateNewCamera failed: Player not found")
 	}
 	playerPosition := component.Position.Get(entry)
 
