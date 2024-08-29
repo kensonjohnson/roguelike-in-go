@@ -5,7 +5,9 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/consumables"
 	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/yohamta/donburi"
 )
@@ -165,9 +167,16 @@ func min(x, y int) int {
 func seedRooms(world donburi.World, level *component.LevelData) {
 	for index, room := range level.Rooms {
 		if index == 0 {
-			CreateNewPlayer(world, level, room, weapons.BattleAxe, armors.PlateArmor)
+			CreateNewPlayer(
+				world,
+				level,
+				room,
+				weapons.BattleAxe,
+				armors.PlateArmor,
+			)
 		} else {
 			CreateMonster(world, level, room)
+			addRandomPickupToRoom(world, room)
 		}
 	}
 	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
@@ -176,4 +185,20 @@ func seedRooms(world donburi.World, level *component.LevelData) {
 	exitTile.Image = assets.StairsDown
 	exitTile.Blocked = false
 	exitTile.TileType = component.STAIR_DOWN
+}
+
+func addRandomPickupToRoom(world donburi.World, room engine.Rect) {
+	// TODO: add a random chance for an item to appear
+	// TODO: create a random distribution of items
+	// for now, we'll just put a single health potion in each room
+	width := room.X2 - room.X1
+	height := room.Y2 - room.Y1
+	offsetX := engine.GetRandomInt(width)
+	offsetY := engine.GetRandomInt(height)
+	potion := CreateNewConsumable(world, consumables.HealthPotion)
+	err := PlaceConsumableInWorld(world, potion, room.X1+offsetX, room.Y1+offsetY)
+	if err != nil {
+		logger.ErrorLogger.Panic("Failed to place consumable in the world")
+	}
+
 }
