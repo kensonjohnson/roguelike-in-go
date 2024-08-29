@@ -134,7 +134,7 @@ var (
 )
 
 // Loads all required assets, panics if any one fails.
-func MustLoadAssets() {
+func init() {
 	/*-----------------------
 	--------- Tiles ---------
 	-----------------------*/
@@ -153,17 +153,17 @@ func MustLoadAssets() {
 
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	KenneyMiniFont = mustLoadFont(kenneyMiniFontBytes)
 	kenneyMiniSquaredFontBytes, err := assetsFS.ReadFile("fonts/KenneyMiniSquared.ttf")
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	KenneyMiniSquaredFont = mustLoadFont(kenneyMiniSquaredFontBytes)
 	kenneyPixelFontBytes, err := assetsFS.ReadFile("fonts/KenneyPixel.ttf")
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	KenneyPixelFont = mustLoadFont(kenneyPixelFontBytes)
 	// For some reason, the KenneyPixel shows up as half the size of the other fonts.
@@ -208,9 +208,9 @@ func MustLoadAssets() {
 	LongSword = mustLoadImage("images/items/weapons/long_sword.png")
 	RoyalLongSword = mustLoadImage("images/items/weapons/royal_long_sword.png")
 
-	RustyLongSword = mustLoadImage("images/items/weapons/rusty_short_sword.png")
-	LongSword = mustLoadImage("images/items/weapons/short_sword.png")
-	RoyalLongSword = mustLoadImage("images/items/weapons/royal_short_sword.png")
+	RustyShortSword = mustLoadImage("images/items/weapons/rusty_short_sword.png")
+	ShortSword = mustLoadImage("images/items/weapons/short_sword.png")
+	RoyalShortSword = mustLoadImage("images/items/weapons/royal_short_sword.png")
 
 	Mace = mustLoadImage("images/items/weapons/mace.png")
 	RoyalMace = mustLoadImage("images/items/weapons/royal_mace.png")
@@ -284,11 +284,11 @@ func MustLoadAssets() {
 func mustLoadImage(filePath string) *ebiten.Image {
 	imgSource, err := assetsFS.ReadFile(filePath)
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	image, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	return image
 }
@@ -297,7 +297,7 @@ func mustLoadImage(filePath string) *ebiten.Image {
 func mustLoadFont(font []byte) *text.GoTextFace {
 	source, err := text.NewGoTextFaceSource(bytes.NewReader(font))
 	if err != nil {
-		logger.Fatal(err)
+		logger.ErrorLogger.Panic(err)
 	}
 	return &text.GoTextFace{
 		Source: source,
