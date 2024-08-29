@@ -3,6 +3,7 @@ package armors
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 )
 
 type armorData struct {
@@ -31,27 +32,34 @@ func init() {
 		Name:       "Linen Shirt",
 		Defense:    1,
 		ArmorClass: 1,
-		Sprite:     assets.LinenShirt,
+		Sprite:     mustBeValidImage(assets.LinenShirt, "LinenShirt"),
 	}
 
 	Data[PaddedArmor] = armorData{
 		Name:       "Padded Armor",
 		Defense:    5,
 		ArmorClass: 6,
-		Sprite:     assets.PaddedArmor,
+		Sprite:     mustBeValidImage(assets.PaddedArmor, "PaddedArmor"),
 	}
 
 	Data[Bones] = armorData{
 		Name:       "Bone",
 		Defense:    3,
 		ArmorClass: 4,
-		Sprite:     assets.Bones,
+		Sprite:     mustBeValidImage(assets.Bones, "Bones"),
 	}
 
 	Data[PlateArmor] = armorData{
 		Name:       "Plate Armor",
 		Defense:    15,
 		ArmorClass: 18,
-		Sprite:     assets.PlateArmor,
+		Sprite:     mustBeValidImage(assets.PlateArmor, "PlateArmor"),
 	}
+}
+
+func mustBeValidImage(image *ebiten.Image, name string) *ebiten.Image {
+	if image == nil {
+		logger.ErrorLogger.Panicf("%s asset not loaded!", name)
+	}
+	return image
 }
