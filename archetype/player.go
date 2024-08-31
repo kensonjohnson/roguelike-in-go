@@ -3,32 +3,38 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/component/gear"
+	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
 
 var PlayerTag = donburi.NewTag("player")
 
-func CreateNewPlayer(world donburi.World) {
+func CreateNewPlayer(
+	world donburi.World,
+	level *component.LevelData,
+	startingRoom engine.Rect,
+	weaponId weapons.WeaponId,
+	armorId armors.ArmorId,
+) {
 	player := world.Entry(world.Create(
 		PlayerTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
 		component.Fov,
-		component.Armor,
-		component.Weapon,
+		component.Equipment,
 		component.Health,
 		component.UserMessage,
+		component.Attack,
+		component.ActionText,
+		component.Defense,
 	))
 
-	// Grab level
-	entry := LevelTag.MustFirst(world)
-	level := component.Level.Get(entry)
-
 	// Set starting position
-	startingX, startingY := level.Rooms[0].Center()
+	startingX, startingY := startingRoom.Center()
 	position := component.PositionData{
 		X: startingX,
 		Y: startingY,
@@ -47,7 +53,7 @@ func CreateNewPlayer(world donburi.World) {
 	component.Sprite.SetValue(player, sprite)
 
 	// Set name
-	name := component.NameData{Label: "Player"}
+	name := component.NameData{Value: "Player"}
 	component.Name.SetValue(player, name)
 
 	// Set health
@@ -58,9 +64,11 @@ func CreateNewPlayer(world donburi.World) {
 	component.Health.SetValue(player, health)
 
 	// Add gear
-	component.Armor.SetValue(player, gear.Armor.PlateArmor)
-
-	component.Weapon.SetValue(player, gear.Weapons.BattleAxe)
+	equipment := component.EquipmentData{
+		Weapon: CreateNewWeapon(world, weaponId),
+		Armor:  CreateNewArmor(world, armorId),
+	}
+	component.Equipment.SetValue(player, equipment)
 
 	// Set default messages
 	component.UserMessage.SetValue(
@@ -71,4 +79,21 @@ func CreateNewPlayer(world donburi.World) {
 			GameStateMessage: "",
 		},
 	)
+
+	// Total up all of the attack values
+	// Right now, only the weapon contributes to attack.
+	// TODO: Add up all attack values from all equipment
+	attack := component.Attack.Get(equipment.Weapon)
+	component.Attack.SetValue(player, *attack)
+
+	// Set action text for equiped weapon
+	actionText := component.ActionText.Get(equipment.Weapon)
+	component.ActionText.SetValue(player, *actionText)
+
+	// Total all of the defense values
+	// Right now, only the armor contributes to defense.
+	// TODO: Add up all defense values from all equipment
+	defense := component.Defense.Get(equipment.Armor)
+	component.Defense.SetValue(player, *defense)
+
 }

@@ -1,11 +1,10 @@
 package archetype
 
 import (
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/setanarut/kamera/v2"
 	"github.com/yohamta/donburi"
 )
@@ -16,7 +15,7 @@ func CreateNewCamera(world donburi.World) {
 	var entry *donburi.Entry
 	var ok bool
 	if entry, ok = PlayerTag.First(world); !ok {
-		log.Fatal("CreateNewCamera failed: Player not found")
+		logger.ErrorLogger.Panic("CreateNewCamera failed: Player not found")
 	}
 	playerPosition := component.Position.Get(entry)
 

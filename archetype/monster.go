@@ -3,8 +3,9 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/component/gear"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items/armors"
+	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
@@ -18,11 +19,13 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		component.Sprite,
 		component.Name,
 		component.Fov,
-		component.Armor,
-		component.Weapon,
+		component.Equipment,
 		component.Health,
 		component.UserMessage,
 		component.Discoverable,
+		component.Attack,
+		component.ActionText,
+		component.Defense,
 	))
 
 	// Set position
@@ -41,24 +44,23 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	// Set sprite, name, and gear
 	sprite := component.SpriteData{}
 	name := component.NameData{}
-	var armor component.ArmorData
-	var weapon component.WeaponData
+	equipment := component.EquipmentData{}
 	coinflip := engine.GetDiceRoll(2)
 	if coinflip == 2 {
 		sprite.Image = assets.Orc
-		name.Label = "Orc"
-		armor = gear.Armor.LeatherArmor
-		weapon = gear.Weapons.Machete
+		name.Value = "Orc"
+		equipment.Armor = CreateNewArmor(world, armors.PaddedArmor)
+		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
 	} else {
 		sprite.Image = assets.Skelly
-		name.Label = "Skeleton"
-		armor = gear.Armor.Bone
-		weapon = gear.Weapons.ShortSword
+		name.Value = "Skeleton"
+		equipment.Armor = CreateNewArmor(world, armors.Bones)
+		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
 	}
 	component.Sprite.SetValue(monster, sprite)
 	component.Name.SetValue(monster, name)
-	component.Armor.SetValue(monster, armor)
-	component.Weapon.SetValue(monster, weapon)
+	component.Equipment.SetValue(monster, equipment)
+
 	component.Health.SetValue(
 		monster,
 		component.HealthData{
@@ -78,4 +80,20 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 		monster,
 		component.DiscoverableData{SeenByPlayer: false},
 	)
+
+	// Total up all of the attack values
+	// Right now, only the weapon contributes to attack.
+	// TODO: Add up all attack values from all equipment
+	attack := component.Attack.Get(equipment.Weapon)
+	component.Attack.SetValue(monster, *attack)
+
+	// Set action text for equiped weapon
+	actionText := component.ActionText.Get(equipment.Weapon)
+	component.ActionText.SetValue(monster, *actionText)
+
+	// Total all of the defense values
+	// Right now, only the armor contributes to defense.
+	// TODO: Add up all defense values from all equipment
+	defense := component.Defense.Get(equipment.Armor)
+	component.Defense.SetValue(monster, *defense)
 }

@@ -42,6 +42,10 @@ func (u *ui) Update(ecs *ecs.ECS) {
 			u.lastMessages = append(u.lastMessages, messages.AttackMessage)
 			messages.AttackMessage = ""
 		}
+		if messages.WorldInteractionMessage != "" {
+			u.lastMessages = append(u.lastMessages, messages.WorldInteractionMessage)
+			messages.WorldInteractionMessage = ""
+		}
 	})
 	// Then process any deaths, including the player's
 	u.query.Each(ecs.World, func(entry *donburi.Entry) {
@@ -134,9 +138,10 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	fontY += config.FontSize + 4
 
 	// Armor
+
 	message = fmt.Sprintf(
 		"Armor Class: %d",
-		playerHUD.Armor.ArmorClass,
+		playerHUD.Defense.ArmorClass,
 	)
 	text.Draw(
 		screen,
@@ -148,7 +153,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 
 	message = fmt.Sprintf(
 		"Defense: %d",
-		playerHUD.Armor.Defense,
+		playerHUD.Defense.Defense,
 	)
 	text.Draw(
 		screen,
@@ -161,8 +166,8 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	// Weapon
 	message = fmt.Sprintf(
 		"Damage: %d - %d",
-		playerHUD.Weapon.MinimumDamage,
-		playerHUD.Weapon.MaximumDamage,
+		playerHUD.Attack.MinimumDamage,
+		playerHUD.Attack.MaximumDamage,
 	)
 	text.Draw(
 		screen,
@@ -174,7 +179,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 
 	message = fmt.Sprintf(
 		"To Hit Bonus: %d",
-		playerHUD.Weapon.ToHitBonus,
+		playerHUD.Attack.ToHitBonus,
 	)
 	text.Draw(
 		screen,

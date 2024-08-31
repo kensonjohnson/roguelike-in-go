@@ -1,6 +1,8 @@
 package action
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
@@ -8,6 +10,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
+	"github.com/yohamta/donburi/filter"
 )
 
 func TakePlayerAction(ecs *ecs.ECS) bool {
@@ -76,10 +79,32 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 				discoverable.SeenByPlayer = true
 			}
 		})
+
+		query := donburi.NewQuery(
+			filter.Contains(
+				component.ItemId,
+				component.Position,
+				component.Name,
+			))
+
+		query.Each(ecs.World, func(entry *donburi.Entry) {
+			itemPosition := component.Position.Get(entry)
+			if position.X == itemPosition.X && position.Y == itemPosition.Y {
+				// The character has moved on top of a pickup
+				archetype.RemoveItemFromWorld(entry)
+				itemName := component.Name.Get(entry)
+				playerMessages := component.UserMessage.Get(playerEntry)
+				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
+				// TODO: add pickup message to UIs
+				// TODO: place in player's inventory
+			}
+		})
+
 		if tile.TileType == component.STAIR_DOWN {
 			// Move to the next level
 			event.ProgressLevelEvent.Publish(ecs.World, event.ProgressLevel{})
 		}
+
 	} else if tile.TileType != component.WALL {
 		// Not a wall, so it must be an enemy. Attack!
 		// Find the monster in the direction we're pointing

@@ -41,8 +41,8 @@ func CreateNewUI(world donburi.World) {
 	ui.PlayerHUD.FontX = ui.PlayerHUD.Position.X + config.FontSize
 	ui.PlayerHUD.FontY = messageBoxTopPixel + 12
 	ui.PlayerHUD.Health = component.Health.Get(playerEntry)
-	ui.PlayerHUD.Armor = component.Armor.Get(playerEntry)
-	ui.PlayerHUD.Weapon = component.Weapon.Get(playerEntry)
+	ui.PlayerHUD.Attack = component.Attack.Get(playerEntry)
+	ui.PlayerHUD.Defense = component.Defense.Get(playerEntry)
 	ui.PlayerHUD.Sprite = assets.UIPanelWithMinimap
 
 	component.UI.SetValue(entry, ui)
