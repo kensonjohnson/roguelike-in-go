@@ -34,6 +34,8 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 
 		if tile.TileType == component.WALL {
 			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 202, G: 146, B: 74, A: 255}, false)
+		} else if tile.TileType == component.STAIR_DOWN {
+			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 255, G: 165, B: 0, A: 255}, false)
 		} else {
 			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 178, G: 182, B: 194, A: 255}, false)
 		}
