@@ -34,7 +34,7 @@ func GenerateLevel(world donburi.World) *component.LevelData {
 // Creates a new Dungeon Level Map.
 func GenerateLevelTiles() component.LevelData {
 	MIN_SIZE := 6
-	MAX_SIZE := 10
+	MAX_SIZE := 13
 	MAX_ROOMS := 30
 
 	level := component.LevelData{}
