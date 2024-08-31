@@ -191,12 +191,12 @@ func addRandomPickupToRoom(world donburi.World, room engine.Rect) {
 	// TODO: add a random chance for an item to appear
 	// TODO: create a random distribution of items
 	// for now, we'll just put a single health potion in each room
-	width := room.X2 - room.X1
-	height := room.Y2 - room.Y1
+	width := room.X2 - room.X1 - 2
+	height := room.Y2 - room.Y1 - 2
 	offsetX := engine.GetRandomInt(width)
 	offsetY := engine.GetRandomInt(height)
 	potion := CreateNewConsumable(world, consumables.HealthPotion)
-	err := PlaceItemInWorld(potion, room.X1+offsetX, room.Y1+offsetY)
+	err := PlaceItemInWorld(potion, room.X1+offsetX+1, room.Y1+offsetY+1)
 	if err != nil {
 		logger.ErrorLogger.Panic("Failed to place consumable in the world")
 	}
