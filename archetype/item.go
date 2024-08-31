@@ -50,6 +50,7 @@ func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 	component.Position.SetValue(entry, position)
 
 	if discoverable {
+		entry.AddComponent(component.Discoverable)
 		discovery := component.DiscoverableData{}
 		component.Discoverable.SetValue(entry, discovery)
 	}
