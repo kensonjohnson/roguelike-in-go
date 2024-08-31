@@ -60,4 +60,7 @@ func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 
 func RemoveItemFromWorld(entry *donburi.Entry) {
 	entry.RemoveComponent(component.Position)
+	if entry.HasComponent(component.Discoverable) {
+		entry.RemoveComponent(component.Discoverable)
+	}
 }
