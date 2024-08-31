@@ -42,6 +42,10 @@ func (u *ui) Update(ecs *ecs.ECS) {
 			u.lastMessages = append(u.lastMessages, messages.AttackMessage)
 			messages.AttackMessage = ""
 		}
+		if messages.WorldInteractionMessage != "" {
+			u.lastMessages = append(u.lastMessages, messages.WorldInteractionMessage)
+			messages.WorldInteractionMessage = ""
+		}
 	})
 	// Then process any deaths, including the player's
 	u.query.Each(ecs.World, func(entry *donburi.Entry) {

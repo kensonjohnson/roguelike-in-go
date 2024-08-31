@@ -1,11 +1,12 @@
 package action
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -90,13 +91,11 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			itemPosition := component.Position.Get(entry)
 			if position.X == itemPosition.X && position.Y == itemPosition.Y {
 				// The character has moved on top of a pickup
-				itemName := component.Name.Get(entry)
-				if logger.DebugOn {
-					logger.DebugLogger.Printf("%s picked up!", itemName.Value)
-				}
-
 				archetype.RemoveItemFromWorld(entry)
-				// TODO: add pickup message to UIS
+				itemName := component.Name.Get(entry)
+				playerMessages := component.UserMessage.Get(playerEntry)
+				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
+				// TODO: add pickup message to UIs
 				// TODO: place in player's inventory
 			}
 		})
