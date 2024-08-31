@@ -37,7 +37,7 @@ func isItem(entry *donburi.Entry) bool {
 	return entry.HasComponent(component.ItemId)
 }
 
-func PlaceItemInWorld(entry *donburi.Entry, x, y int) error {
+func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 	if !isItem(entry) {
 		return errors.New("entry is not an Item Entity")
 	}
@@ -48,6 +48,11 @@ func PlaceItemInWorld(entry *donburi.Entry, x, y int) error {
 		Y: y,
 	}
 	component.Position.SetValue(entry, position)
+
+	if discoverable {
+		discovery := component.DiscoverableData{}
+		component.Discoverable.SetValue(entry, discovery)
+	}
 
 	return nil
 }
