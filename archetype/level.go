@@ -176,7 +176,7 @@ func seedRooms(world donburi.World, level *component.LevelData) {
 			)
 		} else {
 			CreateMonster(world, level, room)
-			addRandomPickupToRoom(world, room)
+			addRandomPickupsToRoom(world, level, room, 3)
 		}
 	}
 	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
@@ -187,17 +187,43 @@ func seedRooms(world donburi.World, level *component.LevelData) {
 	exitTile.TileType = component.STAIR_DOWN
 }
 
-func addRandomPickupToRoom(world donburi.World, room engine.Rect) {
-	// TODO: add a random chance for an item to appear
+func addRandomPickupsToRoom(
+	world donburi.World,
+	level *component.LevelData,
+	room engine.Rect,
+	generosity int,
+) {
 	// TODO: create a random distribution of items
-	// for now, we'll just put a single health potion in each room
-	width := room.X2 - room.X1 - 2
-	height := room.Y2 - room.Y1 - 2
-	offsetX := engine.GetRandomInt(width)
-	offsetY := engine.GetRandomInt(height)
-	potion := CreateNewConsumable(world, consumables.HealthPotion)
-	err := PlaceItemInWorld(potion, room.X1+offsetX+1, room.Y1+offsetY+1, true)
-	if err != nil {
-		logger.ErrorLogger.Panic("Failed to place consumable in the world")
+	// TODO: add a random chance for an item to appear
+	switch d10Roll := engine.GetDiceRoll(10); {
+	case d10Roll <= generosity:
+		width := room.X2 - room.X1 - 2
+		height := room.Y2 - room.Y1 - 2
+		for i := 0; i < d10Roll; i++ {
+			offsetX := engine.GetRandomInt(width)
+			offsetY := engine.GetRandomInt(height)
+			x := room.X1 + offsetX + 1
+			y := room.Y1 + offsetY + 1
+			tile := level.GetFromXY(x, y)
+			if tile.Blocked {
+				continue
+			}
+			spotTaken := false
+			ConsumableTag.Each(world, func(entry *donburi.Entry) {
+				position := component.Position.Get(entry)
+				if position.X == x && position.Y == y {
+					spotTaken = true
+				}
+			})
+			if spotTaken {
+				continue
+			}
+			potion := CreateNewConsumable(world, consumables.HealthPotion)
+			err := PlaceItemInWorld(potion, x, y, true)
+			if err != nil {
+				logger.ErrorLogger.Panic("Failed to place consumable in the world")
+			}
+		}
 	}
+
 }
