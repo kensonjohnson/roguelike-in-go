@@ -10,7 +10,6 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
-	"github.com/yohamta/donburi/filter"
 )
 
 func TakePlayerAction(ecs *ecs.ECS) bool {
@@ -80,14 +79,7 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			}
 		})
 
-		query := donburi.NewQuery(
-			filter.Contains(
-				archetype.ItemTag,
-				component.Position,
-				component.Name,
-			))
-
-		query.Each(ecs.World, func(entry *donburi.Entry) {
+		archetype.PickupTag.Each(ecs.World, func(entry *donburi.Entry) {
 			itemPosition := component.Position.Get(entry)
 			if position.X == itemPosition.X && position.Y == itemPosition.Y {
 				// The character has moved on top of a pickup
