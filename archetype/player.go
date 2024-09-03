@@ -4,8 +4,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
@@ -16,8 +15,8 @@ func CreateNewPlayer(
 	world donburi.World,
 	level *component.LevelData,
 	startingRoom engine.Rect,
-	weaponId weapons.WeaponId,
-	armorId armors.ArmorId,
+	weapon items.WeaponData,
+	armorId items.ArmorData,
 ) {
 	player := world.Entry(world.Create(
 		PlayerTag,
@@ -65,8 +64,8 @@ func CreateNewPlayer(
 
 	// Add gear
 	equipment := component.EquipmentData{
-		Weapon: CreateNewWeapon(world, weaponId),
-		Armor:  CreateNewArmor(world, armorId),
+		Weapon: CreateNewWeapon(world, items.Weapons.BattleAxe),
+		Armor:  CreateNewArmor(world, items.Armor.PlateArmor),
 	}
 	component.Equipment.SetValue(player, equipment)
 

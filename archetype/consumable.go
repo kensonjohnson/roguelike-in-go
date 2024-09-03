@@ -2,16 +2,15 @@ package archetype
 
 import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/items/consumables"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
 var ConsumableTag = donburi.NewTag("consumable")
 
-func CreateNewConsumable(world donburi.World, consumablesId consumables.ConsumablesId) *donburi.Entry {
-	consumableData := consumables.Data[consumablesId]
+func CreateNewConsumable(world donburi.World, consumableData items.ConsumableData) *donburi.Entry {
 
-	entry := CreateNewItem(world, int(consumablesId), consumableData.Name, consumableData.Sprite)
+	entry := CreateNewItem(world, &consumableData.ItemData)
 
 	// Mark as a consumable
 	entry.AddComponent(ConsumableTag)

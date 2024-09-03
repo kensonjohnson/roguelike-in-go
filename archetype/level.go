@@ -6,9 +6,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/config"
 	"github.com/kensonjohnson/roguelike-game-go/engine"
 	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/consumables"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
@@ -171,8 +169,8 @@ func seedRooms(world donburi.World, level *component.LevelData) {
 				world,
 				level,
 				room,
-				weapons.BattleAxe,
-				armors.PlateArmor,
+				items.Weapons.BattleAxe,
+				items.Armor.PlateArmor,
 			)
 		} else {
 			CreateMonster(world, level, room)
@@ -218,7 +216,8 @@ func addRandomPickupsToRoom(
 			if spotTaken {
 				continue
 			}
-			potion := CreateNewConsumable(world, consumables.HealthPotion)
+			potion := CreateNewConsumable(world, items.Consumables.HealthPotion)
+
 			err := PlaceItemInWorld(potion, x, y, true)
 			if err != nil {
 				logger.ErrorLogger.Panic("Failed to place consumable in the world")

@@ -3,30 +3,27 @@ package archetype
 import (
 	"errors"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/component"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
-func CreateNewItem(world donburi.World, itemId int, itemName string, itemImage *ebiten.Image) *donburi.Entry {
+var ItemTag = donburi.NewTag("item")
+
+func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry {
 	item := world.Entry(world.Create(
-		component.ItemId,
+		ItemTag,
 		component.Name,
 		component.Sprite,
 	))
 
-	id := component.ItemIdData{
-		Id: itemId,
-	}
-	component.ItemId.SetValue(item, id)
-
 	name := component.NameData{
-		Value: itemName,
+		Value: itemData.Name,
 	}
 	component.Name.SetValue(item, name)
 
 	sprite := component.SpriteData{
-		Image: itemImage,
+		Image: itemData.Sprite,
 	}
 	component.Sprite.SetValue(item, sprite)
 
@@ -34,7 +31,7 @@ func CreateNewItem(world donburi.World, itemId int, itemName string, itemImage *
 }
 
 func isItem(entry *donburi.Entry) bool {
-	return entry.HasComponent(component.ItemId)
+	return entry.HasComponent(ItemTag)
 }
 
 func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
