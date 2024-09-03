@@ -12,25 +12,43 @@ type consumable struct {
 	Sprite     *ebiten.Image
 }
 
-type consumablesList []*consumable
-
 type ConsumablesId int
 
 const (
 	HealthPotion ConsumablesId = iota
+	GreatHealthPotion
+	RoyalHealthPotion
+
+	Apple
+	Bread
+	Carrot
+	Cheese
+	Egg
+	Fish
+	Ham
+	Milk
+	Pear
+	Steak
 )
 
-// MAKE SURE THAT THIS NUMBER MATCHES THE NUMBER OF WEAPONS DEFINED!
-var Data consumablesList = make(consumablesList, 1)
-
-func init() {
-
-	Data[HealthPotion] = &consumable{
+var Data = []*consumable{
+	{
 		Name:       "Health Potion",
 		AmountHeal: 10,
 		Sprite:     mustBeValidImage(assets.WorldHealthPotion, "WorldHealthPotion"),
-	}
+	},
 
+	{
+		Name:       "Great Heath Potion",
+		AmountHeal: 20,
+		Sprite:     mustBeValidImage(assets.WorldGreatHealthPotion, "WorldGreatHealthPotion"),
+	},
+
+	{
+		Name:       "Royal Heath Potion",
+		AmountHeal: 40,
+		Sprite:     mustBeValidImage(assets.WorldRoyalHealthPotion, "WorldRoyalHealthPotion"),
+	},
 }
 
 func mustBeValidImage(image *ebiten.Image, name string) *ebiten.Image {
