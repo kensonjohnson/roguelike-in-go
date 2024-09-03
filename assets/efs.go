@@ -304,3 +304,10 @@ func mustLoadFont(font []byte) *text.GoTextFace {
 		Size:   float64(config.FontSize),
 	}
 }
+
+func MustBeValidImage(image *ebiten.Image, name string) *ebiten.Image {
+	if image == nil {
+		logger.ErrorLogger.Panicf("%s asset not loaded!", name)
+	}
+	return image
+}
