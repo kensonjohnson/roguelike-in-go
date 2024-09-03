@@ -13,6 +13,18 @@ import (
 var MonsterTag = donburi.NewTag("monster")
 
 func CreateMonster(world donburi.World, level *component.LevelData, room engine.Rect) {
+
+	innerRoomWidth := room.X2 - room.X1 - 2
+	innerRoomHeight := room.Y2 - room.Y1 - 2
+	offsetX := engine.GetRandomInt(innerRoomWidth)
+	offsetY := engine.GetRandomInt(innerRoomHeight)
+	startingX := room.X1 + offsetX + 1
+	startingY := room.Y1 + offsetY + 1
+	tile := level.GetFromXY(startingX, startingY)
+	if tile.Blocked {
+		return
+	}
+
 	monster := world.Entry(world.Create(
 		MonsterTag,
 		component.Position,
@@ -29,7 +41,6 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	))
 
 	// Set position
-	startingX, startingY := room.Center()
 	position := component.PositionData{
 		X: startingX,
 		Y: startingY,
