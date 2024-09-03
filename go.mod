@@ -1,6 +1,6 @@
 module github.com/kensonjohnson/roguelike-game-go
 
-go 1.22.5
+go 1.23.0
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.7.8
@@ -8,7 +8,10 @@ require (
 	github.com/setanarut/kamera/v2 v2.5.1
 )
 
-require github.com/ojrac/opensimplex-go v1.0.2 // indirect
+require (
+	github.com/go-text/typesetting-utils v0.0.0-20240317173224-1986cbe96c66 // indirect
+	github.com/ojrac/opensimplex-go v1.0.2 // indirect
+)
 
 require (
 	github.com/ebitengine/gomobile v0.0.0-20240802043200-192f051f4fcc // indirect
