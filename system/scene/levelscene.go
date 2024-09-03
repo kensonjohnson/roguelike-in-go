@@ -103,17 +103,17 @@ func copyPlayerInstance(
 
 func copyWeapon(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
 	if entry == nil {
-		logger.ErrorLogger.Fatal("Entry is nil when copying weapon data")
+		logger.ErrorLogger.Panic("Entry is nil when copying weapon data")
 	}
 	name := component.Name.Get(entry).Value
 	sprite := component.Sprite.Get(entry).Image
 	if sprite == nil {
-		logger.ErrorLogger.Fatal("Sprite missing when copying weapon data")
+		logger.ErrorLogger.Panic("Sprite missing when copying weapon data")
 	}
 	actionText := component.ActionText.Get(entry).Value
 	attack := component.Attack.Get(entry)
 	if attack == nil {
-		logger.ErrorLogger.Fatal("Attack data missing when copying weapon data")
+		logger.ErrorLogger.Panic("Attack data missing when copying weapon data")
 	}
 
 	newWeaponData := items.WeaponData{
@@ -129,23 +129,23 @@ func copyWeapon(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
 
 	newWeapon := archetype.CreateNewWeapon(newWorld, newWeaponData)
 	if newWeapon == nil {
-		logger.ErrorLogger.Fatal("Failed to create new weapon when copying weapon data")
+		logger.ErrorLogger.Panic("Failed to create new weapon when copying weapon data")
 	}
 	return newWeapon
 }
 
 func copyArmor(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
 	if entry == nil {
-		logger.ErrorLogger.Fatal("Entry is nil when copying armor data")
+		logger.ErrorLogger.Panic("Entry is nil when copying armor data")
 	}
 	name := component.Name.Get(entry).Value
 	sprite := component.Sprite.Get(entry).Image
 	if sprite == nil {
-		logger.ErrorLogger.Fatal("Sprite missing when copying armor data")
+		logger.ErrorLogger.Panic("Sprite missing when copying armor data")
 	}
 	defense := component.Defense.Get(entry)
 	if defense == nil {
-		logger.ErrorLogger.Fatal("Defense data missing when copying armor data")
+		logger.ErrorLogger.Panic("Defense data missing when copying armor data")
 	}
 
 	newArmorData := items.ArmorData{
@@ -159,7 +159,7 @@ func copyArmor(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
 
 	newArmor := archetype.CreateNewArmor(newWorld, newArmorData)
 	if newArmor == nil {
-		logger.ErrorLogger.Fatal("Failed to create new armor when copying armor data")
+		logger.ErrorLogger.Panic("Failed to create new armor when copying armor data")
 	}
 	return newArmor
 }
