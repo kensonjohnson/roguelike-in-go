@@ -34,10 +34,14 @@ func isItem(entry *donburi.Entry) bool {
 	return entry.HasComponent(ItemTag)
 }
 
+var PickupTag = donburi.NewTag("pickup")
+
 func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 	if !isItem(entry) {
 		return errors.New("entry is not an Item Entity")
 	}
+
+	entry.AddComponent(PickupTag)
 
 	entry.AddComponent(component.Position)
 	position := component.PositionData{
@@ -56,6 +60,7 @@ func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 }
 
 func RemoveItemFromWorld(entry *donburi.Entry) {
+	entry.RemoveComponent(PickupTag)
 	entry.RemoveComponent(component.Position)
 	if entry.HasComponent(component.Discoverable) {
 		entry.RemoveComponent(component.Discoverable)
