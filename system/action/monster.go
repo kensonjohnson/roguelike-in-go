@@ -5,7 +5,6 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/engine/pathing"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
-	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
@@ -18,7 +17,7 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
 	playerPos := component.Position.Get(playerEntry)
 
-	archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
+	for entry = range archetype.MonsterTag.Iter(ecs.World) {
 		position := component.Position.Get(entry)
 		sprite := component.Sprite.Get(entry)
 		monsterVision := component.Fov.Get(entry).VisibleTiles
@@ -49,5 +48,5 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 				}
 			}
 		}
-	})
+	}
 }

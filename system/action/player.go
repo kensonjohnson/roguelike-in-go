@@ -69,13 +69,13 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		// Update the player's field of view
 		vision.VisibleTiles.Compute(level, position.X, position.Y, 8)
 		// Update any discoverable entities
-		component.Discoverable.Each(ecs.World, func(entry *donburi.Entry) {
+		for entry := range component.Discoverable.Iter(ecs.World) {
 			discoverablePosition := component.Position.Get(entry)
 			if vision.VisibleTiles.IsVisible(discoverablePosition.X, discoverablePosition.Y) {
 				discoverable := component.Discoverable.Get(entry)
 				discoverable.SeenByPlayer = true
 			}
-		})
+		}
 
 		if tile.TileType == component.STAIR_DOWN {
 			// Move to the next level
@@ -90,12 +90,12 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			Y: position.Y + moveY,
 		}
 		var monsterEntry *donburi.Entry
-		archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
+		for entry := range archetype.MonsterTag.Iter(ecs.World) {
 			position := component.Position.Get(entry)
 			if position.IsEqual(&enemyPosition) {
 				monsterEntry = entry
 			}
-		})
+		}
 		combat.AttackSystem(ecs.World, playerEntry, monsterEntry)
 	}
 

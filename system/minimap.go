@@ -8,7 +8,6 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
@@ -42,7 +41,8 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	}
 
 	// Draw all discovered entities
-	component.Discoverable.Each(ecs.World, func(entry *donburi.Entry) {
+	for entry = range component.Discoverable.Iter(ecs.World) {
+
 		position := component.Position.Get(entry)
 		if !level.InBounds(position.X, position.Y) {
 			return
@@ -58,7 +58,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 255, G: 0, B: 0, A: 255}, false)
 			}
 		}
-	})
+	}
 
 	// Draw the player
 	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
