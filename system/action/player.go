@@ -1,8 +1,6 @@
 package action
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
@@ -76,18 +74,6 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			if vision.VisibleTiles.IsVisible(discoverablePosition.X, discoverablePosition.Y) {
 				discoverable := component.Discoverable.Get(entry)
 				discoverable.SeenByPlayer = true
-			}
-		})
-
-		archetype.PickupTag.Each(ecs.World, func(entry *donburi.Entry) {
-			itemPosition := component.Position.Get(entry)
-			if position.X == itemPosition.X && position.Y == itemPosition.Y {
-				// The character has moved on top of a pickup
-				archetype.RemoveItemFromWorld(entry)
-				itemName := component.Name.Get(entry)
-				playerMessages := component.UserMessage.Get(playerEntry)
-				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-				// TODO: place in player's inventory
 			}
 		})
 
