@@ -82,7 +82,7 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 
 		query := donburi.NewQuery(
 			filter.Contains(
-				component.ItemId,
+				archetype.ItemTag,
 				component.Position,
 				component.Name,
 			))
@@ -95,7 +95,6 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 				itemName := component.Name.Get(entry)
 				playerMessages := component.UserMessage.Get(playerEntry)
 				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-				// TODO: add pickup message to UIs
 				// TODO: place in player's inventory
 			}
 		})
