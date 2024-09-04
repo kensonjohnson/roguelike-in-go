@@ -191,38 +191,58 @@ func addRandomPickupsToRoom(
 	room engine.Rect,
 	generosity int,
 ) {
-	// TODO: create a random distribution of items
-	// TODO: add a random chance for an item to appear
-	switch d10Roll := engine.GetDiceRoll(10); {
-	case d10Roll <= generosity:
-		width := room.X2 - room.X1 - 2
-		height := room.Y2 - room.Y1 - 2
-		for i := 0; i < d10Roll; i++ {
-			offsetX := engine.GetRandomInt(width)
-			offsetY := engine.GetRandomInt(height)
-			x := room.X1 + offsetX + 1
-			y := room.Y1 + offsetY + 1
-			tile := level.GetFromXY(x, y)
-			if tile.Blocked {
-				continue
-			}
-			spotTaken := false
-			ConsumableTag.Each(world, func(entry *donburi.Entry) {
-				position := component.Position.Get(entry)
-				if position.X == x && position.Y == y {
-					spotTaken = true
-				}
-			})
-			if spotTaken {
-				continue
-			}
-			potion := CreateNewConsumable(world, items.Consumables.HealthPotion)
+	d10Roll := engine.GetDiceRoll(10)
+	if d10Roll > generosity {
+		return
+	}
+	width := room.X2 - room.X1 - 2
+	height := room.Y2 - room.Y1 - 2
+	for i := 0; i < d10Roll; i++ {
 
-			err := PlaceItemInWorld(potion, x, y, true)
-			if err != nil {
-				logger.ErrorLogger.Panic("Failed to place consumable in the world")
+		offsetX := engine.GetRandomInt(width)
+		offsetY := engine.GetRandomInt(height)
+		x := room.X1 + offsetX + 1
+		y := room.Y1 + offsetY + 1
+
+		tile := level.GetFromXY(x, y)
+		if tile.Blocked {
+			continue
+		}
+
+		spotTaken := false
+		for entry := range PickupTag.Iter(world) {
+			position := component.Position.Get(entry)
+			if position.X == x && position.Y == y {
+				spotTaken = true
 			}
 		}
+
+		if spotTaken {
+			continue
+		}
+
+		entry := createRandomPickup(world)
+
+		err := PlaceItemInWorld(entry, x, y, true)
+		if err != nil {
+			logger.ErrorLogger.Panic("Failed to place consumable in the world")
+		}
+	}
+}
+
+func createRandomPickup(world donburi.World) *donburi.Entry {
+	// This is where we can manipulate the randomness of which item drops
+	switch roll := engine.GetDiceRoll(10); roll {
+	case 1, 4:
+		return CreateNewConsumable(world, items.Consumables.HealthPotion)
+	case 2, 3, 5, 6:
+		return CreateCoins(world, items.Valuables.SmallCoin())
+	case 7, 9, 10:
+		return CreateCoins(world, items.Valuables.CoinStack())
+	case 8:
+		return CreateNewValuable(world, items.Valuables.Alcohol)
+	default:
+		return CreateNewConsumable(world, items.Consumables.HealthPotion)
 	}
 
 }
