@@ -52,7 +52,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 		y := startingYPixel + (position.Y * blipSize)
 
 		if component.Discoverable.Get(entry).SeenByPlayer {
-			if entry.HasComponent(component.ItemId) {
+			if entry.HasComponent(archetype.ItemTag) {
 				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 15, G: 10, B: 222, A: 255}, false)
 			} else {
 				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 255, G: 0, B: 0, A: 255}, false)
