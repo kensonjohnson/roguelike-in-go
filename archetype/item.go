@@ -11,7 +11,7 @@ import (
 var ItemTag = donburi.NewTag("item")
 
 func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry {
-	item := world.Entry(world.Create(
+	entry := world.Entry(world.Create(
 		ItemTag,
 		component.Name,
 		component.Sprite,
@@ -20,14 +20,14 @@ func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry
 	name := component.NameData{
 		Value: itemData.Name,
 	}
-	component.Name.SetValue(item, name)
+	component.Name.SetValue(entry, name)
 
 	sprite := component.SpriteData{
 		Image: itemData.Sprite,
 	}
-	component.Sprite.SetValue(item, sprite)
+	component.Sprite.SetValue(entry, sprite)
 
-	return item
+	return entry
 }
 
 func isItem(entry *donburi.Entry) bool {
