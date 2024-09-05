@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 )
 
 type node struct {
