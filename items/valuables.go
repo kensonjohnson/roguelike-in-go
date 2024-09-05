@@ -2,7 +2,7 @@ package items
 
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 )
 
 type ValuableData struct {

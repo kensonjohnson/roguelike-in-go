@@ -9,7 +9,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"

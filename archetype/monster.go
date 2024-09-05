@@ -3,7 +3,7 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"

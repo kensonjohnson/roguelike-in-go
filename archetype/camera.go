@@ -3,7 +3,7 @@ package archetype
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/setanarut/kamera/v2"
 	"github.com/yohamta/donburi"

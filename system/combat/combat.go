@@ -5,7 +5,7 @@ import (
 
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/yohamta/donburi"
 )
 

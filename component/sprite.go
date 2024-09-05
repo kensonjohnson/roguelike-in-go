@@ -2,7 +2,7 @@ package component
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi"
 )
 

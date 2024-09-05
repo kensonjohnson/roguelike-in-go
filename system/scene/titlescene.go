@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 )
 
 type TitleScene struct {
@@ -23,7 +23,6 @@ func (s *TitleScene) Update() {
 		SceneManager.GoTo(CreateFirstLevel())
 		return
 	}
-
 }
 
 const scale = 4

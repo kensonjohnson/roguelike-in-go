@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/scene"

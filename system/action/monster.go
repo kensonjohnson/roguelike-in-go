@@ -3,7 +3,7 @@ package action
 import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine/pathing"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine/pathing"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi/ecs"
 )

@@ -4,7 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi/ecs"
 )
 
