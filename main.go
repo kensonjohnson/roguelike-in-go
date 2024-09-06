@@ -17,6 +17,7 @@ type Game struct {
 
 func (g *Game) configure() {
 	g.sceneManager = scene.SceneManager
+	g.sceneManager.Setup()
 	g.sceneManager.GoTo(&scene.TitleScene{
 		ImageBackground: assets.Floor,
 		PixelWidth:      config.ScreenWidth * config.TileWidth,
