@@ -15,8 +15,8 @@ type SpriteData struct {
 	Animating      bool
 }
 
-// Returns the X and Y offset for the current animation frame. TODO: Add
-// support for animation frames.
+// Returns the X and Y offset for the current animation frame.
+// TODO: Add support for animation frames.
 func (sd *SpriteData) GetAnimationStep() (float64, float64) {
 	offsetX := (1 - sd.progress) * config.TileWidth * float64(sd.OffestX)
 	offsetY := (1 - sd.progress) * config.TileHeight * float64(sd.OffestY)
