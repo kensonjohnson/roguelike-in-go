@@ -8,6 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
+	"github.com/yohamta/donburi"
 )
 
 type TitleScene struct {
@@ -15,12 +17,13 @@ type TitleScene struct {
 	ImageBackground *ebiten.Image
 	PixelWidth      int
 	PixelHeight     int
+	ready           bool
 }
 
 func (s *TitleScene) Update() {
 	s.count++
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		SceneManager.GoTo(CreateFirstLevel())
+		SceneManager.GoTo(&LevelScene{})
 		return
 	}
 }
@@ -54,6 +57,24 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 	x = float64((s.PixelWidth / 2) + 200)
 	y = float64((s.PixelHeight / 2) + 130)
 	drawOrc(screen, x, y)
+}
+
+func (s *TitleScene) Ready() bool {
+	return s.ready
+}
+
+func (s *TitleScene) Teardown() {
+	if logger.DebugOn {
+		logger.DebugLogger.Println("TitleScene teardown")
+	}
+	s.ready = true
+}
+
+func (s *TitleScene) Setup(world donburi.World) {
+	if logger.DebugOn {
+		logger.DebugLogger.Println("TitleScene setup")
+	}
+	s.ready = true
 }
 
 func (s *TitleScene) drawTitleBackground(screen *ebiten.Image, count int) {
