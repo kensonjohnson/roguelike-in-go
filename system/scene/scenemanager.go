@@ -4,74 +4,118 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/config"
-)
-
-var (
-	transitionFrom = ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight)
-	transitionTo   = ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight)
+	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
+	"github.com/kensonjohnson/roguelike-game-go/items"
+	"github.com/yohamta/donburi"
 )
 
 type Scene interface {
 	Update()
 	Draw(screen *ebiten.Image)
+	Setup(world donburi.World)
+	Teardown()
+	Ready() bool
 }
 
 const transitionMaxCount = 30
 
 type SceneManagerData struct {
-	current         Scene
-	next            Scene
-	transitionCount int
+	current                Scene
+	next                   Scene
+	fadeOut                bool
+	transitionCount        int
+	transitionTo           *ebiten.Image
+	transitionFrom         *ebiten.Image
+	transitionImagesCached bool
+	world                  donburi.World
 }
 
-var SceneManager = &SceneManagerData{}
+var SceneManager = &SceneManagerData{
+	transitionTo:   ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight),
+	transitionFrom: ebiten.NewImage(config.ScreenWidth*config.TileWidth, config.ScreenHeight*config.TileHeight),
+}
 
-func (s *SceneManagerData) Update() {
-	if s.transitionCount == 0 {
-		s.current.Update()
+func (sm *SceneManagerData) Setup() {
+	if logger.DebugOn {
+		logger.DebugLogger.Println("SceneManager Setup")
+	}
+	sm.world = donburi.NewWorld()
+	archetype.CreateNewPlayer(sm.world, items.Weapons.BattleAxe, items.Armor.PlateArmor)
+	archetype.CreateNewCamera(sm.world)
+}
+
+func (sm *SceneManagerData) Update() {
+	if sm.next == nil && sm.transitionCount == 0 {
+		sm.current.Update()
 		return
 	}
 
-	s.transitionCount--
-	if s.transitionCount > 0 {
+	sm.transitionCount--
+	if sm.transitionCount > 0 {
 		return
 	}
 
-	if s.next != nil {
-		s.current = s.next
-		s.next = nil
-		s.transitionCount = transitionMaxCount
+	if sm.fadeOut {
+		if logger.DebugOn {
+			logger.DebugLogger.Println("Running Teardown on current scene")
+		}
+		sm.fadeOut = false
+		sm.current.Teardown()
+		return
+	}
+
+	if sm.transitionCount != 0 && sm.next != nil && sm.current.Ready() {
+		if logger.DebugOn {
+			logger.DebugLogger.Println("Running Setup on next scene")
+		}
+		sm.current = sm.next
+		sm.next = nil
+		sm.current.Setup(sm.world)
+		return
+	}
+
+	if sm.transitionCount != 0 && sm.next == nil && sm.current.Ready() {
+		sm.transitionCount = transitionMaxCount
+		sm.transitionImagesCached = false
 	}
 
 }
 
-func (s *SceneManagerData) Draw(screen *ebiten.Image) {
-	if s.transitionCount == 0 {
-		s.current.Draw(screen)
+func (sm *SceneManagerData) Draw(screen *ebiten.Image) {
+
+	if sm.next == nil && sm.transitionCount == 0 {
+		sm.current.Draw(screen)
 		return
 	}
 
-	if s.next != nil {
-		s.current.Draw(transitionFrom)
-		transitionTo.Fill(color.Black)
-		screen.DrawImage(transitionFrom, nil)
-	} else {
-		s.current.Draw(transitionTo)
-		transitionFrom.Fill(color.Black)
-		screen.DrawImage(transitionFrom, nil)
+	if sm.fadeOut && !sm.transitionImagesCached {
+		sm.current.Draw(sm.transitionFrom)
+		sm.transitionTo.Fill(color.Black)
+		sm.transitionImagesCached = true
 	}
-	alpha := 1 - float32(s.transitionCount)/float32(transitionMaxCount)
+
+	if !sm.fadeOut && !sm.transitionImagesCached {
+		sm.current.Draw(sm.transitionTo)
+		sm.transitionFrom.Fill(color.Black)
+		sm.transitionImagesCached = true
+	}
+
+	screen.DrawImage(sm.transitionFrom, nil)
+	alpha := 1 - float32(sm.transitionCount)/float32(transitionMaxCount)
 	op := &ebiten.DrawImageOptions{}
 	op.ColorScale.ScaleAlpha(alpha)
-	screen.DrawImage(transitionTo, op)
+	screen.DrawImage(sm.transitionTo, op)
 }
 
-func (s *SceneManagerData) GoTo(scene Scene) {
-	if s.current == nil {
-		s.current = scene
+func (sm *SceneManagerData) GoTo(scene Scene) {
+	if sm.current == nil {
+		sm.current = scene
 	} else {
-		s.next = scene
-		s.transitionCount = transitionMaxCount
+		sm.next = scene
+		sm.fadeOut = true
+		sm.transitionCount = transitionMaxCount
+		sm.transitionImagesCached = false
 	}
 }
