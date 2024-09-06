@@ -165,13 +165,9 @@ func min(x, y int) int {
 func seedRooms(world donburi.World, level *component.LevelData) {
 	for index, room := range level.Rooms {
 		if index == 0 {
-			CreateNewPlayer(
-				world,
-				level,
-				room,
-				items.Weapons.BattleAxe,
-				items.Armor.PlateArmor,
-			)
+			playerEntry := PlayerTag.MustFirst(world)
+			playerPosition := component.Position.Get(playerEntry)
+			playerPosition.X, playerPosition.Y = room.Center()
 		} else {
 			CreateMonster(world, level, room)
 			addRandomPickupsToRoom(world, level, room, 3)
