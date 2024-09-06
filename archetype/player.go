@@ -3,7 +3,6 @@ package archetype
 import (
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
@@ -13,11 +12,9 @@ var PlayerTag = donburi.NewTag("player")
 
 func CreateNewPlayer(
 	world donburi.World,
-	level *component.LevelData,
-	startingRoom engine.Rect,
 	weapon items.WeaponData,
 	armorId items.ArmorData,
-) {
+) *donburi.Entry {
 	player := world.Entry(world.Create(
 		PlayerTag,
 		component.Position,
@@ -32,17 +29,11 @@ func CreateNewPlayer(
 		component.Defense,
 	))
 
-	// Set starting position
-	startingX, startingY := startingRoom.Center()
-	position := component.PositionData{
-		X: startingX,
-		Y: startingY,
-	}
+	position := component.PositionData{}
 	component.Position.SetValue(player, position)
 
 	// Update player's field of view
 	vision := component.FovData{VisibleTiles: fov.New()}
-	vision.VisibleTiles.Compute(level, startingX, startingY, 8)
 	component.Fov.SetValue(player, vision)
 
 	// Set sprite
@@ -95,4 +86,5 @@ func CreateNewPlayer(
 	defense := component.Defense.Get(equipment.Armor)
 	component.Defense.SetValue(player, *defense)
 
+	return player
 }
