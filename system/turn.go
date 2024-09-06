@@ -60,38 +60,39 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 
 		}
 
-		if td.TurnCounter > 12 {
-			// Reset the progress of all sprites
-			for entry = range component.Sprite.Iter(ecs.World) {
-				sprite := component.Sprite.Get(entry)
-				sprite.SetProgress(0)
-				sprite.Animating = false
-				sprite.OffestX = 0
-				sprite.OffestY = 0
-			}
-
-			entry = archetype.PlayerTag.MustFirst(ecs.World)
-			playerPosition := component.Position.Get(entry)
-			playerMessages := component.UserMessage.Get(entry)
-
-			for entry = range archetype.PickupTag.Iter(ecs.World) {
-				if !entry.HasComponent(component.Position) {
-					continue
-				}
-				pickupPosition := component.Position.Get(entry)
-
-				if pickupPosition.X == playerPosition.X && pickupPosition.Y == playerPosition.Y {
-					archetype.RemoveItemFromWorld(entry)
-					itemName := component.Name.Get(entry)
-					playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-					// TODO: place in player's inventory
-				}
-			}
-
-			level.Redraw = true
-			td.progressTurnState()
-			td.resetCounter()
+		if td.TurnCounter < 13 {
+			return
 		}
+		// Reset the progress of all sprites
+		for entry = range component.Sprite.Iter(ecs.World) {
+			sprite := component.Sprite.Get(entry)
+			sprite.SetProgress(0)
+			sprite.Animating = false
+			sprite.OffestX = 0
+			sprite.OffestY = 0
+		}
+
+		entry = archetype.PlayerTag.MustFirst(ecs.World)
+		playerPosition := component.Position.Get(entry)
+		playerMessages := component.UserMessage.Get(entry)
+
+		for entry = range archetype.PickupTag.Iter(ecs.World) {
+			if !entry.HasComponent(component.Position) {
+				continue
+			}
+			pickupPosition := component.Position.Get(entry)
+
+			if pickupPosition.X == playerPosition.X && pickupPosition.Y == playerPosition.Y {
+				archetype.RemoveItemFromWorld(entry)
+				itemName := component.Name.Get(entry)
+				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
+				// TODO: place in player's inventory
+			}
+		}
+
+		level.Redraw = true
+		td.progressTurnState()
+		td.resetCounter()
 	}
 
 	if td.TurnState == PlayerTurn {
