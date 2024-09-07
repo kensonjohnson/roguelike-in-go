@@ -1,18 +1,17 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
-var WeaponTag = donburi.NewTag("weapon")
-
 func CreateNewWeapon(world donburi.World, weaponData items.WeaponData) *donburi.Entry {
 	entry := CreateNewItem(world, &weaponData.ItemData)
 
 	// Mark as a weapon
-	entry.AddComponent(WeaponTag)
+	entry.AddComponent(tags.WeaponTag)
 
 	// Add attack information
 	entry.AddComponent(component.Attack)
@@ -34,5 +33,5 @@ func CreateNewWeapon(world donburi.World, weaponData items.WeaponData) *donburi.
 }
 
 func IsWeapon(entry *donburi.Entry) bool {
-	return entry.HasComponent(WeaponTag)
+	return entry.HasComponent(tags.WeaponTag)
 }

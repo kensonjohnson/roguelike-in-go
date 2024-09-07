@@ -2,7 +2,7 @@ package system
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/norendren/go-fov/fov"
@@ -20,13 +20,13 @@ type render struct {
 var Render = &render{
 	enemyQuery: donburi.NewQuery(
 		filter.Contains(
-			archetype.MonsterTag,
+			tags.MonsterTag,
 			component.Sprite,
 			component.Position,
 		)),
 	pickupsQuery: donburi.NewQuery(
 		filter.Contains(
-			archetype.ItemTag,
+			tags.ItemTag,
 			component.Position,
 			component.Sprite,
 		)),
@@ -34,9 +34,9 @@ var Render = &render{
 }
 
 func (r *render) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(playerEntry).VisibleTiles
-	entry := archetype.CameraTag.MustFirst(ecs.World)
+	entry := tags.CameraTag.MustFirst(ecs.World)
 	camera := component.Camera.Get(entry)
 
 	for entry = range r.pickupsQuery.Iter(ecs.World) {

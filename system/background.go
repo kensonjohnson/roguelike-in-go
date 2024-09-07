@@ -2,23 +2,23 @@ package system
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi/ecs"
 )
 
 func (r *render) DrawBackground(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.LevelTag.MustFirst(ecs.World)
+	entry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(entry)
-	entry = archetype.CameraTag.MustFirst(ecs.World)
+	entry = tags.CameraTag.MustFirst(ecs.World)
 	camera := component.Camera.Get(entry)
 	if !level.Redraw {
 		camera.MainCamera.Draw(r.backgroundImage, camera.CamImageOptions, screen)
 		return
 	}
 	r.backgroundImage.Clear()
-	entry = archetype.PlayerTag.MustFirst(ecs.World)
+	entry = tags.PlayerTag.MustFirst(ecs.World)
 	playerVision := component.Fov.Get(entry).VisibleTiles
 
 	maxTiles := config.ScreenWidth * (config.ScreenHeight - config.UIHeight)

@@ -1,6 +1,7 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
@@ -12,12 +13,10 @@ import (
 
 const levelHeight = config.ScreenHeight - config.UIHeight
 
-var LevelTag = donburi.NewTag("level")
-
 // Creates a new Dungeon
 func GenerateLevel(world donburi.World) *component.LevelData {
 	entry := world.Entry(world.Create(
-		LevelTag,
+		tags.LevelTag,
 		component.Level,
 	))
 
@@ -165,7 +164,7 @@ func min(x, y int) int {
 func seedRooms(world donburi.World, level *component.LevelData) {
 	for index, room := range level.Rooms {
 		if index == 0 {
-			playerEntry := PlayerTag.MustFirst(world)
+			playerEntry := tags.PlayerTag.MustFirst(world)
 			playerPosition := component.Position.Get(playerEntry)
 			playerPosition.X, playerPosition.Y = room.Center()
 		} else {
@@ -206,7 +205,7 @@ func addRandomPickupsToRoom(
 		}
 
 		spotTaken := false
-		for entry := range PickupTag.Iter(world) {
+		for entry := range tags.PickupTag.Iter(world) {
 			position := component.Position.Get(entry)
 			if position.X == x && position.Y == y {
 				spotTaken = true

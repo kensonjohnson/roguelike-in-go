@@ -2,7 +2,7 @@ package action
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
@@ -42,11 +42,11 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	}
 
 	// Grab current level
-	levelEntry := archetype.LevelTag.MustFirst(ecs.World)
+	levelEntry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(levelEntry)
 
 	// Grab player data
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	position := component.Position.Get(playerEntry)
 	sprite := component.Sprite.Get(playerEntry)
 	vision := component.Fov.Get(playerEntry)
@@ -90,7 +90,7 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			Y: position.Y + moveY,
 		}
 		var monsterEntry *donburi.Entry
-		for entry := range archetype.MonsterTag.Iter(ecs.World) {
+		for entry := range tags.MonsterTag.Iter(ecs.World) {
 			position := component.Position.Get(entry)
 			if position.IsEqual(&enemyPosition) {
 				monsterEntry = entry

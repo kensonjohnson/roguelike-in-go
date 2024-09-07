@@ -3,16 +3,15 @@ package archetype
 import (
 	"errors"
 
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
-var ItemTag = donburi.NewTag("item")
-
 func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry {
 	entry := world.Entry(world.Create(
-		ItemTag,
+		tags.ItemTag,
 		component.Name,
 		component.Sprite,
 	))
@@ -31,17 +30,15 @@ func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry
 }
 
 func isItem(entry *donburi.Entry) bool {
-	return entry.HasComponent(ItemTag)
+	return entry.HasComponent(tags.ItemTag)
 }
-
-var PickupTag = donburi.NewTag("pickup")
 
 func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 	if !isItem(entry) {
 		return errors.New("entry is not an Item Entity")
 	}
 
-	entry.AddComponent(PickupTag)
+	entry.AddComponent(tags.PickupTag)
 
 	entry.AddComponent(component.Position)
 	position := component.PositionData{
@@ -60,7 +57,7 @@ func PlaceItemInWorld(entry *donburi.Entry, x, y int, discoverable bool) error {
 }
 
 func RemoveItemFromWorld(entry *donburi.Entry) {
-	entry.RemoveComponent(PickupTag)
+	entry.RemoveComponent(tags.PickupTag)
 	entry.RemoveComponent(component.Position)
 	if entry.HasComponent(component.Discoverable) {
 		entry.RemoveComponent(component.Discoverable)

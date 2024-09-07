@@ -1,17 +1,16 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
-var ValuableTag = donburi.NewTag("valuable")
-
 func CreateNewValuable(world donburi.World, valuableData *items.ValuableData) *donburi.Entry {
 	entry := CreateNewItem(world, &valuableData.ItemData)
 
-	entry.AddComponent(ValuableTag)
+	entry.AddComponent(tags.ValuableTag)
 
 	entry.AddComponent(component.Value)
 	value := component.ValueData{

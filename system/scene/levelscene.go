@@ -3,6 +3,7 @@ package scene
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
@@ -42,11 +43,11 @@ func (ls *LevelScene) Setup(world donburi.World) {
 
 		levelData := archetype.GenerateLevel(world)
 
-		if _, ok := archetype.UITag.First(world); !ok {
+		if _, ok := tags.UITag.First(world); !ok {
 			archetype.CreateNewUI(world)
 		}
 
-		playerEntry := archetype.PlayerTag.MustFirst(world)
+		playerEntry := tags.PlayerTag.MustFirst(world)
 		playerPosition := component.Position.Get(playerEntry)
 		startingRoom := levelData.Rooms[0]
 		playerPosition.X, playerPosition.Y = startingRoom.Center()
@@ -58,7 +59,7 @@ func (ls *LevelScene) Setup(world donburi.World) {
 		component.Fov.Get(playerEntry).
 			VisibleTiles.Compute(levelData, playerPosition.X, playerPosition.Y, 8)
 
-		cameraEntry := archetype.CameraTag.MustFirst(world)
+		cameraEntry := tags.CameraTag.MustFirst(world)
 		camera := component.Camera.Get(cameraEntry)
 		camera.MainCamera.Lerp = false
 		camera.MainCamera.LookAt(
@@ -81,16 +82,16 @@ func (ls *LevelScene) Teardown() {
 	}
 
 	go func() {
-		archetype.LevelTag.MustFirst(ls.ecs.World).Remove()
+		tags.LevelTag.MustFirst(ls.ecs.World).Remove()
 
-		for entry := range archetype.MonsterTag.Iter(ls.ecs.World) {
+		for entry := range tags.MonsterTag.Iter(ls.ecs.World) {
 			if logger.DebugOn {
 				logger.DebugLogger.Println("Removing entry: ", entry.String())
 			}
 			entry.Remove()
 		}
 
-		for entry := range archetype.PickupTag.Iter(ls.ecs.World) {
+		for entry := range tags.PickupTag.Iter(ls.ecs.World) {
 			if logger.DebugOn {
 				logger.DebugLogger.Println("Removing entry: ", entry.String())
 			}
@@ -125,86 +126,3 @@ func (ls *LevelScene) configureECS(world donburi.World) {
 	// Add event listeners
 	event.ProgressLevelEvent.Subscribe(ls.ecs.World, progressLevel)
 }
-
-// func copyPlayerInstance(
-// 	oldWorld donburi.World,
-// 	newWorld donburi.World,
-// ) {
-// 	currentPlayerEntry := archetype.PlayerTag.MustFirst(oldWorld)
-// 	currentPlayerHealth := component.Health.Get(currentPlayerEntry)
-// 	currentPlayerEquipment := component.Equipment.Get(currentPlayerEntry)
-
-// 	playerEntry := archetype.PlayerTag.MustFirst(newWorld)
-// 	component.Health.SetValue(playerEntry, *currentPlayerHealth)
-// 	component.Equipment.SetValue(playerEntry, component.EquipmentData{
-// 		Weapon: copyWeapon(newWorld, currentPlayerEquipment.Weapon),
-// 		// Sheild: currentPlayerEquipment.Sheild,
-// 		// Gloves: currentPlayerEquipment.Gloves,
-// 		Armor: copyArmor(newWorld, currentPlayerEquipment.Armor),
-// 		// Boots:  currentPlayerEquipment.Boots,
-// 	})
-
-// }
-
-// func copyWeapon(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
-// 	if entry == nil {
-// 		logger.ErrorLogger.Panic("Entry is nil when copying weapon data")
-// 	}
-// 	name := component.Name.Get(entry).Value
-// 	sprite := component.Sprite.Get(entry).Image
-// 	if sprite == nil {
-// 		logger.ErrorLogger.Panic("Sprite missing when copying weapon data")
-// 	}
-// 	actionText := component.ActionText.Get(entry).Value
-// 	attack := component.Attack.Get(entry)
-// 	if attack == nil {
-// 		logger.ErrorLogger.Panic("Attack data missing when copying weapon data")
-// 	}
-
-// 	newWeaponData := items.WeaponData{
-// 		ItemData: items.ItemData{
-// 			Name:   name,
-// 			Sprite: sprite,
-// 		},
-// 		ActionText:    actionText,
-// 		MinimumDamage: attack.MinimumDamage,
-// 		MaximumDamage: attack.MaximumDamage,
-// 		ToHitBonus:    attack.ToHitBonus,
-// 	}
-
-// 	newWeapon := archetype.CreateNewWeapon(newWorld, newWeaponData)
-// 	if newWeapon == nil {
-// 		logger.ErrorLogger.Panic("Failed to create new weapon when copying weapon data")
-// 	}
-// 	return newWeapon
-// }
-
-// func copyArmor(newWorld donburi.World, entry *donburi.Entry) *donburi.Entry {
-// 	if entry == nil {
-// 		logger.ErrorLogger.Panic("Entry is nil when copying armor data")
-// 	}
-// 	name := component.Name.Get(entry).Value
-// 	sprite := component.Sprite.Get(entry).Image
-// 	if sprite == nil {
-// 		logger.ErrorLogger.Panic("Sprite missing when copying armor data")
-// 	}
-// 	defense := component.Defense.Get(entry)
-// 	if defense == nil {
-// 		logger.ErrorLogger.Panic("Defense data missing when copying armor data")
-// 	}
-
-// 	newArmorData := items.ArmorData{
-// 		ItemData: items.ItemData{
-// 			Name:   name,
-// 			Sprite: sprite,
-// 		},
-// 		Defense:    defense.Defense,
-// 		ArmorClass: defense.ArmorClass,
-// 	}
-
-// 	newArmor := archetype.CreateNewArmor(newWorld, newArmorData)
-// 	if newArmor == nil {
-// 		logger.ErrorLogger.Panic("Failed to create new armor when copying armor data")
-// 	}
-// 	return newArmor
-// }

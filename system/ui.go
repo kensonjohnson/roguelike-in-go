@@ -6,7 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
@@ -69,7 +69,7 @@ func (u *ui) Update(ecs *ecs.ECS) {
 }
 
 func (u *ui) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.UITag.MustFirst(ecs.World)
+	entry := tags.UITag.MustFirst(ecs.World)
 	ui := component.UI.Get(entry)
 
 	// Draw the user message box

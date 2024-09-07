@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi/ecs"
@@ -14,7 +14,7 @@ import (
 const blipSize = 4
 
 func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.LevelTag.MustFirst(ecs.World)
+	entry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(entry)
 
 	// The values of 330 and 210 are based on the size of the minimap image.
@@ -52,7 +52,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 		y := startingYPixel + (position.Y * blipSize)
 
 		if component.Discoverable.Get(entry).SeenByPlayer {
-			if entry.HasComponent(archetype.ItemTag) {
+			if entry.HasComponent(tags.ItemTag) {
 				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 15, G: 10, B: 222, A: 255}, false)
 			} else {
 				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.RGBA{R: 255, G: 0, B: 0, A: 255}, false)
@@ -61,7 +61,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	}
 
 	// Draw the player
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	playerPosition := component.Position.Get(playerEntry)
 	x := startingXPixel + (playerPosition.X * blipSize)
 	y := startingYPixel + (playerPosition.Y * blipSize)

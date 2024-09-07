@@ -2,17 +2,16 @@ package archetype
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/setanarut/kamera/v2"
 	"github.com/yohamta/donburi"
 )
 
-var CameraTag = donburi.NewTag("camera")
-
 func CreateNewCamera(world donburi.World) {
 	entry := world.Entry(world.Create(
-		CameraTag,
+		tags.CameraTag,
 		component.Camera,
 	))
 

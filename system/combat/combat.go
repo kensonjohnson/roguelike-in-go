@@ -3,7 +3,7 @@ package combat
 import (
 	"fmt"
 
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/yohamta/donburi"
@@ -40,7 +40,7 @@ func AttackSystem(world donburi.World, attacker, defender *donburi.Entry) {
 		if defenderHealth.CurrentHealth <= 0 {
 			defenderMessages.DeadMessage = fmt.Sprintf("%s has died!\n", defenderName.Value)
 		}
-		entry := archetype.CameraTag.MustFirst(world)
+		entry := tags.CameraTag.MustFirst(world)
 		camera := component.Camera.Get(entry)
 		camera.MainCamera.AddTrauma(0.2)
 	} else {

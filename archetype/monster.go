@@ -1,6 +1,7 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
@@ -8,8 +9,6 @@ import (
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
-
-var MonsterTag = donburi.NewTag("monster")
 
 func CreateMonster(world donburi.World, level *component.LevelData, room engine.Rect) {
 
@@ -25,7 +24,7 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	}
 
 	monster := world.Entry(world.Create(
-		MonsterTag,
+		tags.MonsterTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
