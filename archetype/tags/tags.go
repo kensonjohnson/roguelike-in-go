@@ -5,6 +5,7 @@ import "github.com/yohamta/donburi"
 var (
 	ArmorTag      = donburi.NewTag("armor")
 	CameraTag     = donburi.NewTag("camera")
+	CoinTag       = donburi.NewTag("coin")
 	ConsumableTag = donburi.NewTag("consumable")
 	ItemTag       = donburi.NewTag("item")
 	LevelTag      = donburi.NewTag("level")

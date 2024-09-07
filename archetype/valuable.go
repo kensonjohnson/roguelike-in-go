@@ -21,16 +21,14 @@ func CreateNewValuable(world donburi.World, valuableData *items.ValuableData) *d
 	return entry
 }
 
-var CoinTag = donburi.NewTag("coin")
-
 func CreateCoins(world donburi.World, valuableData *items.ValuableData) *donburi.Entry {
 	entry := CreateNewValuable(world, valuableData)
 
-	entry.AddComponent(CoinTag)
+	entry.AddComponent(tags.CoinTag)
 
 	return entry
 }
 
 func IsCoin(entry donburi.Entry) bool {
-	return entry.HasComponent(CoinTag)
+	return entry.HasComponent(tags.CoinTag)
 }
