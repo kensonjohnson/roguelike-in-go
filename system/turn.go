@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/system/action"
 	"github.com/yohamta/donburi/ecs"
@@ -33,7 +34,7 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 	if td.TurnState == BeforePlayerAction {
 		td.TurnCounter++
 		// Check if player survived the last cycle of monster turns
-		entry := archetype.PlayerTag.MustFirst(ecs.World)
+		entry := tags.PlayerTag.MustFirst(ecs.World)
 		playerHealth := component.Health.Get(entry)
 		if playerHealth.CurrentHealth <= 0 {
 			td.gameOver()
@@ -41,9 +42,9 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			playerMessages.GameStateMessage = "Game over!"
 		}
 
-		level := component.Level.Get(archetype.LevelTag.MustFirst(ecs.World))
+		level := component.Level.Get(tags.LevelTag.MustFirst(ecs.World))
 		// Remove any enemies that died during the last turn
-		for entry = range archetype.MonsterTag.Iter(ecs.World) {
+		for entry = range tags.MonsterTag.Iter(ecs.World) {
 			health := component.Health.Get(entry)
 			if health.CurrentHealth <= 0 {
 				position := component.Position.Get(entry)
@@ -72,21 +73,38 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 			sprite.OffestY = 0
 		}
 
-		entry = archetype.PlayerTag.MustFirst(ecs.World)
-		playerPosition := component.Position.Get(entry)
-		playerMessages := component.UserMessage.Get(entry)
+		playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+		playerPosition := component.Position.Get(playerEntry)
+		playerMessages := component.UserMessage.Get(playerEntry)
 
-		for entry = range archetype.PickupTag.Iter(ecs.World) {
+		for entry = range tags.PickupTag.Iter(ecs.World) {
 			if !entry.HasComponent(component.Position) {
 				continue
 			}
 			pickupPosition := component.Position.Get(entry)
 
 			if pickupPosition.X == playerPosition.X && pickupPosition.Y == playerPosition.Y {
-				archetype.RemoveItemFromWorld(entry)
-				itemName := component.Name.Get(entry)
-				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-				// TODO: place in player's inventory
+
+				// If pickup is coinage, add to wallet
+				if entry.HasComponent(tags.CoinTag) {
+					component.Wallet.Get(playerEntry).AddAmount(
+						component.Value.Get(entry).Amount,
+					)
+					break
+				}
+
+				// Otherwise, must be item, place in inventory
+				err := component.Inventory.Get(playerEntry).AddItem(entry)
+				if err != nil {
+					playerMessages.WorldInteractionMessage = "Inventory full! Can't pick up anymore items!"
+				} else {
+					archetype.RemoveItemFromWorld(entry)
+					itemName := component.Name.Get(entry)
+					playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
+				}
+
+				// Only one pickup can fill a tile
+				break
 			}
 		}
 
