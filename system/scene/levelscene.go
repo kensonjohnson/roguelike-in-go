@@ -10,6 +10,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/layer"
+	"github.com/setanarut/kamera/v2"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
@@ -61,12 +62,15 @@ func (ls *LevelScene) Setup(world donburi.World) {
 
 		cameraEntry := tags.CameraTag.MustFirst(world)
 		camera := component.Camera.Get(cameraEntry)
-		camera.MainCamera.Lerp = false
-		camera.MainCamera.LookAt(
+
+		// FIX: This is a workaround to the kamera camera keeping a 'memory' of
+		// previous location, even after lerp is turned off.
+		camera.MainCamera = kamera.NewCamera(
 			float64((playerPosition.X*config.TileWidth)+config.TileWidth/2),
 			float64((playerPosition.Y*config.TileHeight)+config.TileHeight/2),
+			config.ScreenWidth*config.TileWidth,
+			(config.ScreenHeight-config.UIHeight)*config.TileHeight,
 		)
-		camera.MainCamera.Lerp = true
 
 		ls.configureECS(world)
 
