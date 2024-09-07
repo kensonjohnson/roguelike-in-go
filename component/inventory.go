@@ -3,6 +3,8 @@ package component
 import (
 	"errors"
 
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
+	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/yohamta/donburi"
 )
 
@@ -14,7 +16,7 @@ type InventoryData struct {
 
 var Inventory = donburi.NewComponentType[InventoryData]()
 
-func (i *InventoryData) New(capacity int) InventoryData {
+func NewInventory(capacity int) InventoryData {
 	return InventoryData{
 		Items:    make([]*donburi.Entry, capacity),
 		capacity: capacity,
@@ -46,6 +48,10 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 		return errors.New("inventory full")
 	}
 
+	if !item.HasComponent(tags.ItemTag) {
+		logger.ErrorLogger.Panic("Entry is not an item: ", item)
+	}
+
 	var targetIndex = -1
 
 	for index, element := range i.Items {
@@ -65,7 +71,7 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 
 func (i *InventoryData) RemoveItem(index int) error {
 	if index >= i.capacity {
-		return errors.New("index out of range in RemoveItem")
+		logger.ErrorLogger.Panic("index out of range in RemoveItem. Recieved: ", index)
 	}
 	i.Items[index] = nil
 	return nil
