@@ -1,6 +1,7 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/items"
@@ -8,20 +9,20 @@ import (
 	"github.com/yohamta/donburi"
 )
 
-var PlayerTag = donburi.NewTag("player")
-
 func CreateNewPlayer(
 	world donburi.World,
 	weapon items.WeaponData,
 	armorId items.ArmorData,
 ) *donburi.Entry {
 	player := world.Entry(world.Create(
-		PlayerTag,
+		tags.PlayerTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
 		component.Fov,
 		component.Equipment,
+		component.Inventory,
+		component.Wallet,
 		component.Health,
 		component.UserMessage,
 		component.Attack,
@@ -59,6 +60,13 @@ func CreateNewPlayer(
 		Armor:  CreateNewArmor(world, items.Armor.PlateArmor),
 	}
 	component.Equipment.SetValue(player, equipment)
+
+	// Setup inventory
+	inventory := component.NewInventory(30)
+	component.Inventory.SetValue(player, inventory)
+
+	wallet := component.WalletData{}
+	component.Wallet.SetValue(player, wallet)
 
 	// Set default messages
 	component.UserMessage.SetValue(
