@@ -14,4 +14,7 @@ func (w *WalletData) AddAmount(amount int) {
 
 func (w *WalletData) SubtractAmount(amount int) {
 	w.Amount -= amount
+	if w.Amount < 0 {
+		w.Amount = 0
+	}
 }
