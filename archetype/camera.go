@@ -35,3 +35,17 @@ func CreateNewCamera(world donburi.World) {
 
 	component.Camera.Set(entry, cameraData)
 }
+
+func ReplaceCamera(world donburi.World, playerX, playerY float64) {
+	entry := tags.CameraTag.MustFirst(world)
+	camera := component.Camera.Get(entry)
+	camera.MainCamera = kamera.NewCamera(
+		playerX, playerY,
+		config.ScreenWidth*config.TileWidth,
+		(config.ScreenHeight-config.UIHeight)*config.TileHeight,
+	)
+	camera.MainCamera.Lerp = true
+	camera.MainCamera.ZoomFactor = 100
+	camera.MainCamera.ShakeOptions.MaxShakeAngle = 0
+	camera.MainCamera.ShakeOptions.Decay = 0.5
+}
