@@ -2,13 +2,13 @@ package scene
 
 import (
 	"image/color"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/yohamta/donburi"
 )
 
@@ -64,16 +64,12 @@ func (s *TitleScene) Ready() bool {
 }
 
 func (s *TitleScene) Teardown() {
-	if logger.DebugOn {
-		logger.DebugLogger.Println("TitleScene teardown")
-	}
+	slog.Debug("TitleScene teardown")
 	s.ready = true
 }
 
 func (s *TitleScene) Setup(world donburi.World) {
-	if logger.DebugOn {
-		logger.DebugLogger.Println("TitleScene setup")
-	}
+	slog.Debug("TitleScene setup")
 	s.ready = true
 }
 

@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"log"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
@@ -50,14 +52,15 @@ func main() {
 		ebiten.SetVsyncEnabled(false)
 		system.Debug.On = true
 		logger.SetDebug(*DebugOn)
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
+
+	log.SetFlags(log.Lshortfile)
 
 	g := &Game{}
 	g.configure()
 
-	if logger.DebugOn {
-		logger.DebugLogger.Println("Starting Game")
-	}
+	slog.Debug("Starting Game")
 
 	if err := ebiten.RunGame(g); err != nil {
 		logger.ErrorLogger.Panic(err)

@@ -2,11 +2,11 @@ package scene
 
 import (
 	"image/color"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
@@ -38,9 +38,7 @@ var SceneManager = &SceneManagerData{
 }
 
 func (sm *SceneManagerData) Setup() {
-	if logger.DebugOn {
-		logger.DebugLogger.Println("SceneManager Setup")
-	}
+	slog.Debug("SceneManager Setup")
 	sm.world = donburi.NewWorld()
 	archetype.CreateNewPlayer(sm.world, items.Weapons.BattleAxe, items.Armor.PlateArmor)
 	archetype.CreateNewCamera(sm.world)
@@ -58,18 +56,14 @@ func (sm *SceneManagerData) Update() {
 	}
 
 	if sm.fadeOut {
-		if logger.DebugOn {
-			logger.DebugLogger.Println("Running Teardown on current scene")
-		}
+		slog.Debug("Running Teardown on current scene")
 		sm.fadeOut = false
 		sm.current.Teardown()
 		return
 	}
 
 	if sm.transitionCount != 0 && sm.next != nil && sm.current.Ready() {
-		if logger.DebugOn {
-			logger.DebugLogger.Println("Running Setup on next scene")
-		}
+		slog.Debug("Running Setup on next scene")
 		sm.current = sm.next
 		sm.next = nil
 		sm.current.Setup(sm.world)
