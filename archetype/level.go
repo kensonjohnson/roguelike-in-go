@@ -1,12 +1,13 @@
 package archetype
 
 import (
+	"log"
+
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
@@ -220,7 +221,7 @@ func addRandomPickupsToRoom(
 
 		err := PlaceItemInWorld(entry, x, y, true)
 		if err != nil {
-			logger.ErrorLogger.Panic("Failed to place consumable in the world")
+			log.Panic("Failed to place consumable in the world")
 		}
 	}
 }

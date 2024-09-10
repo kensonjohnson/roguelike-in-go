@@ -1,10 +1,11 @@
 package component
 
 import (
+	"log"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/yohamta/donburi"
 )
 
@@ -46,7 +47,7 @@ func (l *LevelData) GetIndexFromXY(x int, y int) int {
 // This coordinate is logical tiles, not pixels.
 func (l *LevelData) GetFromXY(x, y int) *MapTile {
 	if len(l.Tiles) == 0 {
-		logger.ErrorLogger.Panic("levelData.Tiles has no length")
+		log.Panic("levelData.Tiles has no length")
 	}
 	return l.Tiles[(y*config.ScreenWidth)+x]
 }

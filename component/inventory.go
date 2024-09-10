@@ -2,9 +2,9 @@ package component
 
 import (
 	"errors"
+	"log"
 
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/yohamta/donburi"
 )
 
@@ -49,7 +49,7 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 	}
 
 	if !item.HasComponent(tags.ItemTag) {
-		logger.ErrorLogger.Panic("Entry is not an item: ", item)
+		log.Panic("Entry is not an item: ", item)
 	}
 
 	var targetIndex = -1
@@ -71,7 +71,7 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 
 func (i *InventoryData) RemoveItem(index int) error {
 	if index >= i.capacity {
-		logger.ErrorLogger.Panic("index out of range in RemoveItem. Recieved: ", index)
+		log.Panic("index out of range in RemoveItem. Recieved: ", index)
 	}
 	i.Items[index] = nil
 	return nil

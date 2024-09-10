@@ -8,7 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/scene"
 )
@@ -51,7 +50,6 @@ func main() {
 	if DebugOn != nil && *DebugOn {
 		ebiten.SetVsyncEnabled(false)
 		system.Debug.On = true
-		logger.SetDebug(*DebugOn)
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
@@ -63,6 +61,6 @@ func main() {
 	slog.Debug("Starting Game")
 
 	if err := ebiten.RunGame(g); err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 }

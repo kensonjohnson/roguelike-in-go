@@ -3,12 +3,12 @@ package assets
 import (
 	"bytes"
 	"embed"
+	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 )
 
 var (
@@ -153,17 +153,17 @@ func init() {
 
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	KenneyMiniFont = mustLoadFont(kenneyMiniFontBytes)
 	kenneyMiniSquaredFontBytes, err := assetsFS.ReadFile("fonts/KenneyMiniSquared.ttf")
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	KenneyMiniSquaredFont = mustLoadFont(kenneyMiniSquaredFontBytes)
 	kenneyPixelFontBytes, err := assetsFS.ReadFile("fonts/KenneyPixel.ttf")
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	KenneyPixelFont = mustLoadFont(kenneyPixelFontBytes)
 	// For some reason, the KenneyPixel shows up as half the size of the other fonts.
@@ -284,11 +284,11 @@ func init() {
 func mustLoadImage(filePath string) *ebiten.Image {
 	imgSource, err := assetsFS.ReadFile(filePath)
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	image, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgSource))
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	return image
 }
@@ -297,7 +297,7 @@ func mustLoadImage(filePath string) *ebiten.Image {
 func mustLoadFont(font []byte) *text.GoTextFace {
 	source, err := text.NewGoTextFaceSource(bytes.NewReader(font))
 	if err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 	return &text.GoTextFace{
 		Source: source,
@@ -307,7 +307,7 @@ func mustLoadFont(font []byte) *text.GoTextFace {
 
 func MustBeValidImage(image *ebiten.Image, name string) *ebiten.Image {
 	if image == nil {
-		logger.ErrorLogger.Panicf("%s asset not loaded!", name)
+		log.Panicf("%s asset not loaded!", name)
 	}
 	return image
 }

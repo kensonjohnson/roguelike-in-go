@@ -1,13 +1,14 @@
 package scene
 
 import (
+	"log/slog"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/layer"
 	"github.com/yohamta/donburi"
@@ -35,9 +36,7 @@ func (ls *LevelScene) Ready() bool {
 func (ls *LevelScene) Setup(world donburi.World) {
 	ls.ready = false
 
-	if logger.DebugOn {
-		logger.DebugLogger.Println("LevelScene setup")
-	}
+	slog.Debug("LevelScene setup")
 
 	go func() {
 
@@ -75,25 +74,17 @@ func (ls *LevelScene) Setup(world donburi.World) {
 
 func (ls *LevelScene) Teardown() {
 	ls.ready = false
-
-	if logger.DebugOn {
-		logger.DebugLogger.Println("LevelScene teardown")
-	}
-
+	slog.Debug("LevelScene teardown")
 	go func() {
 		tags.LevelTag.MustFirst(ls.ecs.World).Remove()
 
 		for entry := range tags.MonsterTag.Iter(ls.ecs.World) {
-			if logger.DebugOn {
-				logger.DebugLogger.Println("Removing entry: ", entry.String())
-			}
+			slog.Debug("Removing entry.", "entry", entry.String())
 			entry.Remove()
 		}
 
 		for entry := range tags.PickupTag.Iter(ls.ecs.World) {
-			if logger.DebugOn {
-				logger.DebugLogger.Println("Removing entry: ", entry.String())
-			}
+			slog.Debug("Removing entry.", "entry", entry.String())
 			entry.Remove()
 		}
 
