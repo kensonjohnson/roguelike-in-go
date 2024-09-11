@@ -3,6 +3,9 @@ package colors
 import "image/color"
 
 var (
+	Transparent    = color.RGBA{}
+	Black          = color.RGBA{0, 0, 0, 255}
+	White          = color.RGBA{255, 255, 255, 255}
 	Blue           = color.RGBA{0, 0, 255, 255}
 	CornflowerBlue = color.RGBA{100, 149, 237, 255}
 	DeepSkyBlue    = color.RGBA{0, 191, 255, 255}
