@@ -13,6 +13,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/system/layer"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
+	"github.com/yohamta/donburi/features/events"
 )
 
 type LevelScene struct {
@@ -22,7 +23,7 @@ type LevelScene struct {
 
 func (ls *LevelScene) Update() {
 	ls.ecs.Update()
-	event.ProgressLevelEvent.ProcessEvents(ls.ecs.World)
+	events.ProcessAllEvents(ls.ecs.World)
 }
 
 func (ls *LevelScene) Draw(screen *ebiten.Image) {
@@ -92,27 +93,37 @@ func (ls *LevelScene) Teardown() {
 	}()
 }
 
-func progressLevel(world donburi.World, eventData event.ProgressLevel) {
-	newLevelScene := &LevelScene{}
-	SceneManager.GoTo(newLevelScene)
-}
-
 func (ls *LevelScene) configureECS(world donburi.World) {
 	ls.ecs = *ecs.NewECS(world)
 	// Add systems
 	ls.ecs.AddSystem(system.Camera.Update)
 	ls.ecs.AddSystem(system.Turn.Update)
 	ls.ecs.AddSystem(system.UI.Update)
+	ls.ecs.AddSystem(system.InventoryUI.Update)
 
 	// Add renderers
 	ls.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
 	ls.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.UI.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	ls.ecs.AddRenderer(layer.UI, system.InventoryUI.Draw)
 	if system.Debug.On {
 		ls.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 	}
 
 	// Add event listeners
 	event.ProgressLevelEvent.Subscribe(ls.ecs.World, progressLevel)
+	event.OpenInventoryEvent.Subscribe(ls.ecs.World, openInventory)
+}
+
+func progressLevel(world donburi.World, eventData event.ProgressLevel) {
+	slog.Debug("Progress Level")
+	newLevelScene := &LevelScene{}
+	SceneManager.GoTo(newLevelScene)
+}
+
+func openInventory(world donburi.World, eventData event.OpenInventory) {
+	slog.Debug("Open Inventory")
+	system.Turn.TurnState = system.UIOpen
+	system.InventoryUI.Open()
 }

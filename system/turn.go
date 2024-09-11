@@ -24,6 +24,7 @@ var Turn = TurnData{
 
 const (
 	BeforePlayerAction = iota
+	UIOpen
 	PlayerTurn
 	MonsterTurn
 	GameOver
@@ -90,6 +91,9 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 					component.Wallet.Get(playerEntry).AddAmount(
 						component.Value.Get(entry).Amount,
 					)
+					archetype.RemoveItemFromWorld(entry)
+					itemName := component.Name.Get(entry)
+					playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
 					break
 				}
 
@@ -111,6 +115,10 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 		level.Redraw = true
 		td.progressTurnState()
 		td.resetCounter()
+	}
+
+	if td.TurnState == UIOpen {
+		// Do some input detection for inventory
 	}
 
 	if td.TurnState == PlayerTurn {

@@ -2,6 +2,7 @@ package action
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
@@ -28,6 +29,9 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		moveY += 1
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+		event.OpenInventoryEvent.Publish(ecs.World, event.OpenInventory{})
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
