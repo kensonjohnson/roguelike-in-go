@@ -1,25 +1,23 @@
 package archetype
 
 import (
+	"log"
+
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/consumables"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/yohamta/donburi"
 )
 
 const levelHeight = config.ScreenHeight - config.UIHeight
 
-var LevelTag = donburi.NewTag("level")
-
 // Creates a new Dungeon
 func GenerateLevel(world donburi.World) *component.LevelData {
 	entry := world.Entry(world.Create(
-		LevelTag,
+		tags.LevelTag,
 		component.Level,
 	))
 
@@ -167,16 +165,12 @@ func min(x, y int) int {
 func seedRooms(world donburi.World, level *component.LevelData) {
 	for index, room := range level.Rooms {
 		if index == 0 {
-			CreateNewPlayer(
-				world,
-				level,
-				room,
-				weapons.BattleAxe,
-				armors.PlateArmor,
-			)
+			playerEntry := tags.PlayerTag.MustFirst(world)
+			playerPosition := component.Position.Get(playerEntry)
+			playerPosition.X, playerPosition.Y = room.Center()
 		} else {
 			CreateMonster(world, level, room)
-			addRandomPickupToRoom(world, room)
+			addRandomPickupsToRoom(world, level, room, 3)
 		}
 	}
 	exitRoomIndex := engine.GetDiceRoll(len(level.Rooms) - 1)
@@ -187,17 +181,64 @@ func seedRooms(world donburi.World, level *component.LevelData) {
 	exitTile.TileType = component.STAIR_DOWN
 }
 
-func addRandomPickupToRoom(world donburi.World, room engine.Rect) {
-	// TODO: add a random chance for an item to appear
-	// TODO: create a random distribution of items
-	// for now, we'll just put a single health potion in each room
+func addRandomPickupsToRoom(
+	world donburi.World,
+	level *component.LevelData,
+	room engine.Rect,
+	generosity int,
+) {
+	d10Roll := engine.GetDiceRoll(10)
+	if d10Roll > generosity {
+		return
+	}
 	width := room.X2 - room.X1 - 2
 	height := room.Y2 - room.Y1 - 2
-	offsetX := engine.GetRandomInt(width)
-	offsetY := engine.GetRandomInt(height)
-	potion := CreateNewConsumable(world, consumables.HealthPotion)
-	err := PlaceItemInWorld(potion, room.X1+offsetX+1, room.Y1+offsetY+1, true)
-	if err != nil {
-		logger.ErrorLogger.Panic("Failed to place consumable in the world")
+	for i := 0; i < d10Roll; i++ {
+
+		offsetX := engine.GetRandomInt(width)
+		offsetY := engine.GetRandomInt(height)
+		x := room.X1 + offsetX + 1
+		y := room.Y1 + offsetY + 1
+
+		tile := level.GetFromXY(x, y)
+		if tile.Blocked {
+			continue
+		}
+
+		spotTaken := false
+		for entry := range tags.PickupTag.Iter(world) {
+			position := component.Position.Get(entry)
+			if position.X == x && position.Y == y {
+				spotTaken = true
+			}
+		}
+
+		if spotTaken {
+			continue
+		}
+
+		entry := createRandomPickup(world)
+
+		err := PlaceItemInWorld(entry, x, y, true)
+		if err != nil {
+			log.Panic("Failed to place consumable in the world")
+		}
 	}
+}
+
+func createRandomPickup(world donburi.World) *donburi.Entry {
+	// This is where we can manipulate the randomness of which item drops
+	switch roll := engine.GetDiceRoll(10); roll {
+	case 1, 4:
+		return CreateNewConsumable(world, items.Consumables.HealthPotion)
+	case 2, 3, 5, 6:
+		return CreateCoins(world, items.Valuables.SmallCoin())
+	case 7, 9, 10:
+		return CreateCoins(world, items.Valuables.CoinStack())
+	case 8:
+		return CreateNewValuable(world, items.Valuables.Alcohol)
+	default:
+		return CreateNewConsumable(world, items.Consumables.HealthPotion)
+	}
+
 }

@@ -1,24 +1,23 @@
 package action
 
 import (
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine/pathing"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine/pathing"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
-	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
 func TakeMonsterAction(ecs *ecs.ECS) {
 	// Grab level data
-	entry := archetype.LevelTag.MustFirst(ecs.World)
+	entry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(entry)
 
 	// Grab player data
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	playerPos := component.Position.Get(playerEntry)
 
-	archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
+	for entry = range tags.MonsterTag.Iter(ecs.World) {
 		position := component.Position.Get(entry)
 		sprite := component.Sprite.Get(entry)
 		monsterVision := component.Fov.Get(entry).VisibleTiles
@@ -49,5 +48,5 @@ func TakeMonsterAction(ecs *ecs.ECS) {
 				}
 			}
 		}
-	})
+	}
 }

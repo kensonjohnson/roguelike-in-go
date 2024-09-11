@@ -1,16 +1,14 @@
 package action
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/system/combat"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
-	"github.com/yohamta/donburi/filter"
 )
 
 func TakePlayerAction(ecs *ecs.ECS) bool {
@@ -32,6 +30,9 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		moveY += 1
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyI) {
+		event.OpenInventoryEvent.Publish(ecs.World, event.OpenInventory{})
+	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		turnTaken = true
 	}
@@ -45,11 +46,11 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 	}
 
 	// Grab current level
-	levelEntry := archetype.LevelTag.MustFirst(ecs.World)
+	levelEntry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(levelEntry)
 
 	// Grab player data
-	playerEntry := archetype.PlayerTag.MustFirst(ecs.World)
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	position := component.Position.Get(playerEntry)
 	sprite := component.Sprite.Get(playerEntry)
 	vision := component.Fov.Get(playerEntry)
@@ -72,33 +73,13 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 		// Update the player's field of view
 		vision.VisibleTiles.Compute(level, position.X, position.Y, 8)
 		// Update any discoverable entities
-		component.Discoverable.Each(ecs.World, func(entry *donburi.Entry) {
+		for entry := range component.Discoverable.Iter(ecs.World) {
 			discoverablePosition := component.Position.Get(entry)
 			if vision.VisibleTiles.IsVisible(discoverablePosition.X, discoverablePosition.Y) {
 				discoverable := component.Discoverable.Get(entry)
 				discoverable.SeenByPlayer = true
 			}
-		})
-
-		query := donburi.NewQuery(
-			filter.Contains(
-				component.ItemId,
-				component.Position,
-				component.Name,
-			))
-
-		query.Each(ecs.World, func(entry *donburi.Entry) {
-			itemPosition := component.Position.Get(entry)
-			if position.X == itemPosition.X && position.Y == itemPosition.Y {
-				// The character has moved on top of a pickup
-				archetype.RemoveItemFromWorld(entry)
-				itemName := component.Name.Get(entry)
-				playerMessages := component.UserMessage.Get(playerEntry)
-				playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-				// TODO: add pickup message to UIs
-				// TODO: place in player's inventory
-			}
-		})
+		}
 
 		if tile.TileType == component.STAIR_DOWN {
 			// Move to the next level
@@ -113,12 +94,12 @@ func TakePlayerAction(ecs *ecs.ECS) bool {
 			Y: position.Y + moveY,
 		}
 		var monsterEntry *donburi.Entry
-		archetype.MonsterTag.Each(ecs.World, func(entry *donburi.Entry) {
+		for entry := range tags.MonsterTag.Iter(ecs.World) {
 			position := component.Position.Get(entry)
 			if position.IsEqual(&enemyPosition) {
 				monsterEntry = entry
 			}
-		})
+		}
 		combat.AttackSystem(ecs.World, playerEntry, monsterEntry)
 	}
 

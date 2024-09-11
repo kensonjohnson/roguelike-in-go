@@ -6,10 +6,10 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
@@ -36,7 +36,7 @@ var UI = &ui{
 
 func (u *ui) Update(ecs *ecs.ECS) {
 	// Get attack messages first
-	u.query.Each(ecs.World, func(entry *donburi.Entry) {
+	for entry := range u.query.Iter(ecs.World) {
 		messages := component.UserMessage.Get(entry)
 		if messages.AttackMessage != "" {
 			u.lastMessages = append(u.lastMessages, messages.AttackMessage)
@@ -46,9 +46,10 @@ func (u *ui) Update(ecs *ecs.ECS) {
 			u.lastMessages = append(u.lastMessages, messages.WorldInteractionMessage)
 			messages.WorldInteractionMessage = ""
 		}
-	})
+	}
+
 	// Then process any deaths, including the player's
-	u.query.Each(ecs.World, func(entry *donburi.Entry) {
+	for entry := range u.query.Iter(ecs.World) {
 		messages := component.UserMessage.Get(entry)
 		if messages.DeadMessage != "" {
 			u.lastMessages = append(u.lastMessages, messages.DeadMessage)
@@ -58,7 +59,7 @@ func (u *ui) Update(ecs *ecs.ECS) {
 			u.lastMessages = append(u.lastMessages, messages.GameStateMessage)
 			messages.GameStateMessage = ""
 		}
-	})
+	}
 
 	if len(u.lastMessages) > 6 {
 		// Save just the last 6 messages
@@ -68,7 +69,7 @@ func (u *ui) Update(ecs *ecs.ECS) {
 }
 
 func (u *ui) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := archetype.UITag.MustFirst(ecs.World)
+	entry := tags.UITag.MustFirst(ecs.World)
 	ui := component.UI.Get(entry)
 
 	// Draw the user message box

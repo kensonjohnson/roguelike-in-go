@@ -1,31 +1,28 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
 
-var PlayerTag = donburi.NewTag("player")
-
 func CreateNewPlayer(
 	world donburi.World,
-	level *component.LevelData,
-	startingRoom engine.Rect,
-	weaponId weapons.WeaponId,
-	armorId armors.ArmorId,
-) {
+	weapon items.WeaponData,
+	armorId items.ArmorData,
+) *donburi.Entry {
 	player := world.Entry(world.Create(
-		PlayerTag,
+		tags.PlayerTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
 		component.Fov,
 		component.Equipment,
+		component.Inventory,
+		component.Wallet,
 		component.Health,
 		component.UserMessage,
 		component.Attack,
@@ -33,17 +30,11 @@ func CreateNewPlayer(
 		component.Defense,
 	))
 
-	// Set starting position
-	startingX, startingY := startingRoom.Center()
-	position := component.PositionData{
-		X: startingX,
-		Y: startingY,
-	}
+	position := component.PositionData{}
 	component.Position.SetValue(player, position)
 
 	// Update player's field of view
 	vision := component.FovData{VisibleTiles: fov.New()}
-	vision.VisibleTiles.Compute(level, startingX, startingY, 8)
 	component.Fov.SetValue(player, vision)
 
 	// Set sprite
@@ -65,10 +56,17 @@ func CreateNewPlayer(
 
 	// Add gear
 	equipment := component.EquipmentData{
-		Weapon: CreateNewWeapon(world, weaponId),
-		Armor:  CreateNewArmor(world, armorId),
+		Weapon: CreateNewWeapon(world, items.Weapons.BattleAxe),
+		Armor:  CreateNewArmor(world, items.Armor.PlateArmor),
 	}
 	component.Equipment.SetValue(player, equipment)
+
+	// Setup inventory
+	inventory := component.NewInventory(30)
+	component.Inventory.SetValue(player, inventory)
+
+	wallet := component.WalletData{}
+	component.Wallet.SetValue(player, wallet)
 
 	// Set default messages
 	component.UserMessage.SetValue(
@@ -96,4 +94,5 @@ func CreateNewPlayer(
 	defense := component.Defense.Get(equipment.Armor)
 	component.Defense.SetValue(player, *defense)
 
+	return player
 }

@@ -1,20 +1,30 @@
 package archetype
 
 import (
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
-	"github.com/kensonjohnson/roguelike-game-go/engine"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
+	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
 )
 
-var MonsterTag = donburi.NewTag("monster")
-
 func CreateMonster(world donburi.World, level *component.LevelData, room engine.Rect) {
+
+	innerRoomWidth := room.X2 - room.X1 - 2
+	innerRoomHeight := room.Y2 - room.Y1 - 2
+	offsetX := engine.GetRandomInt(innerRoomWidth)
+	offsetY := engine.GetRandomInt(innerRoomHeight)
+	startingX := room.X1 + offsetX + 1
+	startingY := room.Y1 + offsetY + 1
+	tile := level.GetFromXY(startingX, startingY)
+	if tile.Blocked {
+		return
+	}
+
 	monster := world.Entry(world.Create(
-		MonsterTag,
+		tags.MonsterTag,
 		component.Position,
 		component.Sprite,
 		component.Name,
@@ -29,7 +39,6 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	))
 
 	// Set position
-	startingX, startingY := room.Center()
 	position := component.PositionData{
 		X: startingX,
 		Y: startingY,
@@ -49,13 +58,13 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	if coinflip == 2 {
 		sprite.Image = assets.Orc
 		name.Value = "Orc"
-		equipment.Armor = CreateNewArmor(world, armors.PaddedArmor)
-		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
+		equipment.Armor = CreateNewArmor(world, items.Armor.PaddedArmor)
+		equipment.Weapon = CreateNewWeapon(world, items.Weapons.ShortSword)
 	} else {
 		sprite.Image = assets.Skelly
 		name.Value = "Skeleton"
-		equipment.Armor = CreateNewArmor(world, armors.Bones)
-		equipment.Weapon = CreateNewWeapon(world, weapons.ShortSword)
+		equipment.Armor = CreateNewArmor(world, items.Armor.Bones)
+		equipment.Weapon = CreateNewWeapon(world, items.Weapons.ShortSword)
 	}
 	component.Sprite.SetValue(monster, sprite)
 	component.Name.SetValue(monster, name)

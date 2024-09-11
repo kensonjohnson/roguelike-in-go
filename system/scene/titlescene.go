@@ -2,12 +2,15 @@ package scene
 
 import (
 	"image/color"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/colors"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/yohamta/donburi"
 )
 
 type TitleScene struct {
@@ -15,15 +18,15 @@ type TitleScene struct {
 	ImageBackground *ebiten.Image
 	PixelWidth      int
 	PixelHeight     int
+	ready           bool
 }
 
 func (s *TitleScene) Update() {
 	s.count++
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		SceneManager.GoTo(CreateFirstLevel())
+		SceneManager.GoTo(&LevelScene{})
 		return
 	}
-
 }
 
 const scale = 4
@@ -40,7 +43,7 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 		screen,
 		message,
 		x, y,
-		color.RGBA{R: 178, G: 182, B: 194, A: 255},
+		colors.DarkGray,
 		text.AlignCenter, text.AlignStart,
 	)
 
@@ -55,6 +58,20 @@ func (s *TitleScene) Draw(screen *ebiten.Image) {
 	x = float64((s.PixelWidth / 2) + 200)
 	y = float64((s.PixelHeight / 2) + 130)
 	drawOrc(screen, x, y)
+}
+
+func (s *TitleScene) Ready() bool {
+	return s.ready
+}
+
+func (s *TitleScene) Teardown() {
+	slog.Debug("TitleScene teardown")
+	s.ready = true
+}
+
+func (s *TitleScene) Setup(world donburi.World) {
+	slog.Debug("TitleScene setup")
+	s.ready = true
 }
 
 func (s *TitleScene) drawTitleBackground(screen *ebiten.Image, count int) {
@@ -74,7 +91,7 @@ func (s *TitleScene) drawTitleBackground(screen *ebiten.Image, count int) {
 }
 
 func drawLogo(screen *ebiten.Image, str string, x, y float64) {
-	drawTextWithShadow(screen, str, x, y, color.RGBA{R: 202, G: 146, B: 74, A: 255}, text.AlignCenter, text.AlignStart)
+	drawTextWithShadow(screen, str, x, y, colors.Peru, text.AlignCenter, text.AlignStart)
 }
 
 func drawCharacter(screen *ebiten.Image, x, y float64) {

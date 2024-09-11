@@ -1,105 +1,129 @@
 package scene
 
 import (
+	"log/slog"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/archetype"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
-	"github.com/kensonjohnson/roguelike-game-go/items/armors"
-	"github.com/kensonjohnson/roguelike-game-go/items/weapons"
-	"github.com/kensonjohnson/roguelike-game-go/layer"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/system"
+	"github.com/kensonjohnson/roguelike-game-go/system/layer"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
+	"github.com/yohamta/donburi/features/events"
 )
 
 type LevelScene struct {
-	ecs ecs.ECS
+	ecs   ecs.ECS
+	ready bool
 }
 
-func (level *LevelScene) Update() {
-	level.ecs.Update()
-	event.ProgressLevelEvent.ProcessEvents(level.ecs.World)
+func (ls *LevelScene) Update() {
+	ls.ecs.Update()
+	events.ProcessAllEvents(ls.ecs.World)
 }
 
-func (level *LevelScene) Draw(screen *ebiten.Image) {
-	level.ecs.Draw(screen)
+func (ls *LevelScene) Draw(screen *ebiten.Image) {
+	ls.ecs.Draw(screen)
 }
 
-func CreateFirstLevel() *LevelScene {
-	level := &LevelScene{}
-	level.configureECS(createWorld())
-	return level
+func (ls *LevelScene) Ready() bool {
+	return ls.ready
 }
 
-func createWorld() donburi.World {
-	world := donburi.NewWorld()
+func (ls *LevelScene) Setup(world donburi.World) {
+	ls.ready = false
 
-	// Create current level
-	archetype.GenerateLevel(world)
+	slog.Debug("LevelScene setup")
 
-	// Create the UI
-	archetype.CreateNewUI(world)
+	go func() {
 
-	// Create the camera
-	archetype.CreateNewCamera(world)
+		levelData := archetype.GenerateLevel(world)
 
-	return world
+		if _, ok := tags.UITag.First(world); !ok {
+			archetype.CreateNewUI(world)
+		}
+
+		playerEntry := tags.PlayerTag.MustFirst(world)
+		playerPosition := component.Position.Get(playerEntry)
+		startingRoom := levelData.Rooms[0]
+		playerPosition.X, playerPosition.Y = startingRoom.Center()
+
+		playerSprite := component.Sprite.Get(playerEntry)
+		playerSprite.OffestX = 0
+		playerSprite.OffestY = 0
+
+		component.Fov.Get(playerEntry).
+			VisibleTiles.Compute(levelData, playerPosition.X, playerPosition.Y, 8)
+
+		// FIX: This is a workaround to the kamera camera keeping a 'memory' of
+		// previous location, even after lerp is turned off.
+		archetype.ReplaceCamera(
+			world,
+			float64((playerPosition.X*config.TileWidth)+config.TileWidth/2),
+			float64((playerPosition.Y*config.TileHeight)+config.TileHeight/2),
+		)
+
+		ls.configureECS(world)
+
+		ls.ready = true
+	}()
 }
 
-func progressLevel(world donburi.World, eventData event.ProgressLevel) {
+func (ls *LevelScene) Teardown() {
+	ls.ready = false
+	slog.Debug("LevelScene teardown")
+	go func() {
+		tags.LevelTag.MustFirst(ls.ecs.World).Remove()
 
-	// Create a new world
-	newWorld := createWorld()
+		for entry := range tags.MonsterTag.Iter(ls.ecs.World) {
+			slog.Debug("Removing entry.", "entry", entry.String())
+			entry.Remove()
+		}
 
-	// Apply the player's data to the new world
-	copyPlayerInstance(world, newWorld)
+		for entry := range tags.PickupTag.Iter(ls.ecs.World) {
+			slog.Debug("Removing entry.", "entry", entry.String())
+			entry.Remove()
+		}
 
-	level := &LevelScene{}
-	level.configureECS(newWorld)
-
-	SceneManager.GoTo(level)
+		ls.ready = true
+	}()
 }
 
-func (l *LevelScene) configureECS(world donburi.World) {
-	l.ecs = *ecs.NewECS(world)
+func (ls *LevelScene) configureECS(world donburi.World) {
+	ls.ecs = *ecs.NewECS(world)
 	// Add systems
-	l.ecs.AddSystem(system.Camera.Update)
-	l.ecs.AddSystem(system.Turn.Update)
-	l.ecs.AddSystem(system.UI.Update)
+	ls.ecs.AddSystem(system.Camera.Update)
+	ls.ecs.AddSystem(system.Turn.Update)
+	ls.ecs.AddSystem(system.UI.Update)
+	ls.ecs.AddSystem(system.InventoryUI.Update)
 
 	// Add renderers
-	l.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
-	l.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
-	l.ecs.AddRenderer(layer.UI, system.UI.Draw)
-	l.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	ls.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
+	ls.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
+	ls.ecs.AddRenderer(layer.UI, system.UI.Draw)
+	ls.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	ls.ecs.AddRenderer(layer.UI, system.InventoryUI.Draw)
 	if system.Debug.On {
-		l.ecs.AddRenderer(layer.UI, system.Debug.Draw)
+		ls.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 	}
 
 	// Add event listeners
-	event.ProgressLevelEvent.Subscribe(l.ecs.World, progressLevel)
+	event.ProgressLevelEvent.Subscribe(ls.ecs.World, progressLevel)
+	event.OpenInventoryEvent.Subscribe(ls.ecs.World, openInventory)
 }
 
-func copyPlayerInstance(
-	oldWorld donburi.World,
-	newWorld donburi.World,
-) {
-	currentPlayerEntry := archetype.PlayerTag.MustFirst(oldWorld)
-	currentPlayerHealth := component.Health.Get(currentPlayerEntry)
-	currentPlayerEquipment := component.Equipment.Get(currentPlayerEntry)
+func progressLevel(world donburi.World, eventData event.ProgressLevel) {
+	slog.Debug("Progress Level")
+	newLevelScene := &LevelScene{}
+	SceneManager.GoTo(newLevelScene)
+}
 
-	weaponId := component.ItemId.Get(currentPlayerEquipment.Weapon)
-	armorId := component.ItemId.Get(currentPlayerEquipment.Armor)
-
-	playerEntry := archetype.PlayerTag.MustFirst(newWorld)
-	component.Health.SetValue(playerEntry, *currentPlayerHealth)
-	component.Equipment.SetValue(playerEntry, component.EquipmentData{
-		Weapon: archetype.CreateNewWeapon(newWorld, weapons.WeaponId(weaponId.Id)),
-		// Sheild: currentPlayerEquipment.Sheild,
-		// Gloves: currentPlayerEquipment.Gloves,
-		Armor: archetype.CreateNewArmor(newWorld, armors.ArmorId(armorId.Id)),
-		// Boots:  currentPlayerEquipment.Boots,
-	})
-
+func openInventory(world donburi.World, eventData event.OpenInventory) {
+	slog.Debug("Open Inventory")
+	system.Turn.TurnState = system.UIOpen
+	system.InventoryUI.Open()
 }

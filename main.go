@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
+	"log"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
-	"github.com/kensonjohnson/roguelike-game-go/config"
-	"github.com/kensonjohnson/roguelike-game-go/internal/logger"
+	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/scene"
 )
@@ -17,6 +18,7 @@ type Game struct {
 
 func (g *Game) configure() {
 	g.sceneManager = scene.SceneManager
+	g.sceneManager.Setup()
 	g.sceneManager.GoTo(&scene.TitleScene{
 		ImageBackground: assets.Floor,
 		PixelWidth:      config.ScreenWidth * config.TileWidth,
@@ -48,17 +50,17 @@ func main() {
 	if DebugOn != nil && *DebugOn {
 		ebiten.SetVsyncEnabled(false)
 		system.Debug.On = true
-		logger.SetDebug(*DebugOn)
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
+
+	log.SetFlags(log.Lshortfile)
 
 	g := &Game{}
 	g.configure()
 
-	if logger.DebugOn {
-		logger.DebugLogger.Println("Starting Game")
-	}
+	slog.Debug("Starting Game")
 
 	if err := ebiten.RunGame(g); err != nil {
-		logger.ErrorLogger.Panic(err)
+		log.Panic(err)
 	}
 }
