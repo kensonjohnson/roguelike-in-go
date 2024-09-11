@@ -13,8 +13,8 @@ import (
 
 type Scene interface {
 	Update()
-	Draw(screen *ebiten.Image)
-	Setup(world donburi.World)
+	Draw(*ebiten.Image)
+	Setup(donburi.World)
 	Teardown()
 	Ready() bool
 }
