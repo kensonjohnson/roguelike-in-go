@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"log"
+	"log/slog"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -26,6 +27,7 @@ var (
 	// UI
 	UIPanel               *ebiten.Image
 	UIPanelWithMinimap    *ebiten.Image
+	UICorner              *ebiten.Image
 	KenneyMiniFont        *text.GoTextFace
 	KenneyMiniSquaredFont *text.GoTextFace
 	KenneyPixelFont       *text.GoTextFace
@@ -135,6 +137,7 @@ var (
 
 // Loads all required assets, panics if any one fails.
 func init() {
+	slog.Debug("Loading Assets...")
 	/*-----------------------
 	--------- Tiles ---------
 	-----------------------*/
@@ -150,6 +153,7 @@ func init() {
 	-----------------------*/
 	UIPanel = mustLoadImage("images/ui/UIPanel.png")
 	UIPanelWithMinimap = mustLoadImage("images/ui/UIPanelWithMinimap.png")
+	UICorner = mustLoadImage("images/ui/UICorner.png")
 
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
