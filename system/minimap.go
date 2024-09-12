@@ -9,35 +9,54 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/colors"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine/shapes"
 	"github.com/yohamta/donburi/ecs"
 )
 
-const blipSize = 4
+type minimap struct {
+	boxSprite *ebiten.Image
+	blipSize  float32
+}
 
-func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
+var Minimap = &minimap{
+	boxSprite: shapes.MakeBox(
+		368, 228, 4,
+		colors.Peru, color.Black,
+	),
+	blipSize: 4.0,
+}
+
+func (m *minimap) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	entry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(entry)
 
 	// The values of 330 and 210 are based on the size of the minimap image.
 	// That image is 340x220 pixels, with a 10 pixel border, and is placed
 	// in the bottom right corner of the screen.
-	startingXPixel := (config.ScreenWidth * config.TileWidth) - 330
-	startingYPixel := (config.ScreenHeight * config.TileWidth) - 210
+	startingXPixel := (config.ScreenWidth * config.TileWidth) - config.TileWidth - 368
+	startingYPixel := config.TileHeight
+
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(float64(startingXPixel), float64(startingYPixel))
+	screen.DrawImage(m.boxSprite, options)
+
+	startingXPixel += 24
+	startingYPixel += 24
 
 	// Draw the walls and floors
 	for _, tile := range level.Tiles {
-		x := startingXPixel + (tile.TileX * blipSize)
-		y := startingYPixel + (tile.TileY * blipSize)
+		x := float32(startingXPixel + (tile.TileX * int(m.blipSize)))
+		y := float32(startingYPixel + (tile.TileY * int(m.blipSize)))
 		if !tile.IsRevealed {
 			continue
 		}
 
 		if tile.TileType == component.WALL {
-			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, colors.Peru, false)
+			vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, colors.Peru, false)
 		} else if tile.TileType == component.STAIR_DOWN {
-			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, colors.Lime, false)
+			vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, colors.Lime, false)
 		} else /* floor */ {
-			vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, colors.LightGray, false)
+			vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, colors.LightGray, false)
 		}
 	}
 
@@ -49,14 +68,14 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 			return
 		}
 
-		x := startingXPixel + (position.X * blipSize)
-		y := startingYPixel + (position.Y * blipSize)
+		x := float32(startingXPixel + (position.X * int(m.blipSize)))
+		y := float32(startingYPixel + (position.Y * int(m.blipSize)))
 
 		if component.Discoverable.Get(entry).SeenByPlayer {
 			if entry.HasComponent(tags.ItemTag) {
-				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, colors.DeepSkyBlue, false)
+				vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, colors.DeepSkyBlue, false)
 			} else {
-				vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, colors.Red, false)
+				vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, colors.Red, false)
 			}
 		}
 	}
@@ -64,7 +83,8 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	// Draw the player
 	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	playerPosition := component.Position.Get(playerEntry)
-	x := startingXPixel + (playerPosition.X * blipSize)
-	y := startingYPixel + (playerPosition.Y * blipSize)
-	vector.DrawFilledRect(screen, float32(x), float32(y), blipSize, blipSize, color.White, false)
+	x := float32(startingXPixel + (playerPosition.X * int(m.blipSize)))
+	y := float32(startingYPixel + (playerPosition.Y * int(m.blipSize)))
+	// TODO: Pick a better color for the player
+	vector.DrawFilledRect(screen, x, y, m.blipSize, m.blipSize, color.White, false)
 }
