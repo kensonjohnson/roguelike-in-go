@@ -14,7 +14,7 @@ const (
 	SimpleDivider dividerVariant = iota
 )
 
-func MakeDivider(h, scale int, border, fill color.Color, fade bool, variant ...int) *ebiten.Image {
+func MakeDivider(h, scale int, border, fill color.Color, fade bool, variant ...dividerVariant) *ebiten.Image {
 	var shape dividerShape
 	if len(variant) <= 0 {
 		shape = simpleDivider
