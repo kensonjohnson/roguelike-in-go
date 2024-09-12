@@ -20,7 +20,9 @@ import (
 type ui struct {
 	query        donburi.Query
 	lastMessages []string
-	uiBox        *ebiten.Image
+	hudBox       *ebiten.Image
+	messageBox   *ebiten.Image
+	divider      *ebiten.Image
 }
 
 var defaultMessages = []string{
@@ -35,10 +37,18 @@ var UI = &ui{
 		component.UserMessage,
 	)),
 	lastMessages: defaultMessages,
-	uiBox: shapes.MakeBox(
-		config.ScreenWidth*config.TileWidth, config.UIHeight*config.TileHeight, 4,
+	hudBox: shapes.MakeBox(
+		200, config.UIHeight*config.TileHeight, 4,
 		colors.Peru, color.Black,
-		shapes.SimpleCorner,
+	),
+	messageBox: shapes.MakeBox(
+		50*config.TileWidth, config.UIHeight*config.TileHeight, 4,
+		colors.Peru, color.Black,
+	),
+	divider: shapes.MakeDivider(
+		config.UIHeight*config.TileHeight-8, 3,
+		colors.Peru, color.Transparent,
+		false,
 	),
 }
 
@@ -77,26 +87,13 @@ func (u *ui) Update(ecs *ecs.ECS) {
 }
 
 func (u *ui) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	entry := tags.UITag.MustFirst(ecs.World)
-	ui := component.UI.Get(entry)
-
-	// Draw the ui box
-	u.drawUIBox(screen)
-
-	// Draw the user message box
-	drawUserMessages(screen, &ui.MessageBox, u.lastMessages)
 
 	// Draw the player HUD
-	drawPlayerHud(screen, &ui.PlayerHUD)
+	u.drawPlayerHud(screen, ecs.World)
 
-}
+	// Draw the user message box
+	u.drawUserMessages(screen, u.lastMessages)
 
-func (u *ui) drawUIBox(screen *ebiten.Image) {
-	options := &ebiten.DrawImageOptions{}
-	options.GeoM.Translate(
-		0, (config.ScreenHeight-config.UIHeight)*config.TileHeight,
-	)
-	screen.DrawImage(u.uiBox, options)
 }
 
 func createTextDrawOptions(x, y int, color color.Color) *text.DrawOptions {
@@ -106,36 +103,30 @@ func createTextDrawOptions(x, y int, color color.Color) *text.DrawOptions {
 	return options
 }
 
-func drawUserMessages(screen *ebiten.Image, messageBox *component.UserMessageBoxData, lastMessages []string) {
+func (u *ui) drawPlayerHud(screen *ebiten.Image, world donburi.World) {
 
-	// Draw the user messages
-	fontX := messageBox.FontX
-	fontY := messageBox.FontY
-	for _, message := range lastMessages {
-		if message != "" {
-			textOptions := &text.DrawOptions{}
-			textOptions.GeoM.Translate(
-				float64(fontX),
-				float64(fontY),
-			)
-			textOptions.ColorScale.ScaleWithColor(color.White)
-			text.Draw(screen, message, assets.KenneyPixelFont, textOptions)
-			fontY += config.FontSize + 2
-		}
-	}
-}
+	spacing := config.TileWidth
 
-func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
+		float64(spacing), float64(spacing),
+	)
+	screen.DrawImage(u.hudBox, options)
+
+	playerEntry := tags.PlayerTag.MustFirst(world)
+	health := component.Health.Get(playerEntry)
+	attack := component.Attack.Get(playerEntry)
+	defense := component.Defense.Get(playerEntry)
 
 	// Draw the player's info
-	fontX := playerHUD.FontX
-	fontY := playerHUD.FontY
+	fontX := spacing + 28
+	fontY := spacing + config.FontSize
 
 	// Health
 	message := fmt.Sprintf(
 		"Health: %d / %d",
-		playerHUD.Health.CurrentHealth,
-		playerHUD.Health.MaxHealth,
+		health.CurrentHealth,
+		health.MaxHealth,
 	)
 	text.Draw(
 		screen,
@@ -146,10 +137,9 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	fontY += config.FontSize + 4
 
 	// Armor
-
 	message = fmt.Sprintf(
 		"Armor Class: %d",
-		playerHUD.Defense.ArmorClass,
+		defense.ArmorClass,
 	)
 	text.Draw(
 		screen,
@@ -161,7 +151,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 
 	message = fmt.Sprintf(
 		"Defense: %d",
-		playerHUD.Defense.Defense,
+		defense.Defense,
 	)
 	text.Draw(
 		screen,
@@ -174,8 +164,8 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 	// Weapon
 	message = fmt.Sprintf(
 		"Damage: %d - %d",
-		playerHUD.Attack.MinimumDamage,
-		playerHUD.Attack.MaximumDamage,
+		attack.MinimumDamage,
+		attack.MaximumDamage,
 	)
 	text.Draw(
 		screen,
@@ -187,7 +177,7 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 
 	message = fmt.Sprintf(
 		"To Hit Bonus: %d",
-		playerHUD.Attack.ToHitBonus,
+		attack.ToHitBonus,
 	)
 	text.Draw(
 		screen,
@@ -195,4 +185,30 @@ func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
 		assets.KenneyPixelFont,
 		createTextDrawOptions(fontX, fontY, color.White),
 	)
+}
+
+func (u *ui) drawUserMessages(screen *ebiten.Image, lastMessages []string) {
+	spacing := 15 * config.TileWidth
+	top := (config.ScreenHeight - config.UIHeight) * config.TileHeight
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
+		float64(spacing), float64(top),
+	)
+	screen.DrawImage(u.messageBox, options)
+
+	// Draw the user messages
+	fontX := spacing + 28
+	fontY := top + 10
+	for _, message := range lastMessages {
+		if message != "" {
+			textOptions := &text.DrawOptions{}
+			textOptions.GeoM.Translate(
+				float64(fontX),
+				float64(fontY),
+			)
+			textOptions.ColorScale.ScaleWithColor(color.White)
+			text.Draw(screen, message, assets.KenneyPixelFont, textOptions)
+			fontY += config.FontSize + 2
+		}
+	}
 }

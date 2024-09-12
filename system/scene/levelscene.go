@@ -43,10 +43,6 @@ func (ls *LevelScene) Setup(world donburi.World) {
 
 		levelData := archetype.GenerateLevel(world)
 
-		if _, ok := tags.UITag.First(world); !ok {
-			archetype.CreateNewUI(world)
-		}
-
 		playerEntry := tags.PlayerTag.MustFirst(world)
 		playerPosition := component.Position.Get(playerEntry)
 		startingRoom := levelData.Rooms[0]
@@ -105,7 +101,7 @@ func (ls *LevelScene) configureECS(world donburi.World) {
 	ls.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
 	ls.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.UI.Draw)
-	ls.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	ls.ecs.AddRenderer(layer.UI, system.Minimap.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.InventoryUI.Draw)
 	if system.Debug.On {
 		ls.ecs.AddRenderer(layer.UI, system.Debug.Draw)
