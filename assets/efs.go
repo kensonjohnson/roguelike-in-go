@@ -25,9 +25,6 @@ var (
 	ChestClosed *ebiten.Image
 
 	// UI
-	UIPanel               *ebiten.Image
-	UIPanelWithMinimap    *ebiten.Image
-	UICorner              *ebiten.Image
 	KenneyMiniFont        *text.GoTextFace
 	KenneyMiniSquaredFont *text.GoTextFace
 	KenneyPixelFont       *text.GoTextFace
@@ -151,10 +148,6 @@ func init() {
 	/*-----------------------
 	---------- UI -----------
 	-----------------------*/
-	UIPanel = mustLoadImage("images/ui/UIPanel.png")
-	UIPanelWithMinimap = mustLoadImage("images/ui/UIPanelWithMinimap.png")
-	UICorner = mustLoadImage("images/ui/UICorner.png")
-
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
 		log.Panic(err)

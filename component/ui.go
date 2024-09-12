@@ -1,7 +1,6 @@
 package component
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi"
 )
 
@@ -14,7 +13,6 @@ type UserMessageBoxData struct {
 	Position PositionData
 	FontX    int
 	FontY    int
-	Sprite   *ebiten.Image
 }
 
 type PlayerHUDData struct {
@@ -24,7 +22,6 @@ type PlayerHUDData struct {
 	Health   *HealthData
 	Attack   *AttackData
 	Defense  *DefenseData
-	Sprite   *ebiten.Image
 }
 
 var UI = donburi.NewComponentType[UIData]()

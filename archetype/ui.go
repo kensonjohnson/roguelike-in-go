@@ -2,7 +2,6 @@ package archetype
 
 import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
-	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi"
@@ -28,7 +27,6 @@ func CreateNewUI(world donburi.World) {
 	}
 	ui.MessageBox.FontX = config.FontSize
 	ui.MessageBox.FontY = messageBoxTopPixel + 10
-	ui.MessageBox.Sprite = assets.UIPanel
 
 	// Configure player HUD
 	playerHUDTopPixel := (config.ScreenHeight * config.TileHeight) - 220
@@ -42,7 +40,6 @@ func CreateNewUI(world donburi.World) {
 	ui.PlayerHUD.Health = component.Health.Get(playerEntry)
 	ui.PlayerHUD.Attack = component.Attack.Get(playerEntry)
 	ui.PlayerHUD.Defense = component.Defense.Get(playerEntry)
-	ui.PlayerHUD.Sprite = assets.UIPanelWithMinimap
 
 	component.UI.SetValue(entry, ui)
 }
