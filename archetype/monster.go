@@ -111,20 +111,19 @@ func RemoveMonster(entry *donburi.Entry, world donburi.World) {
 	equipment := component.Equipment.Get(entry)
 
 	if equipment.Armor != nil {
-		world.Remove(equipment.Armor.Entity())
+		equipment.Armor.Remove()
 	}
-
 	if equipment.Weapon != nil {
-		world.Remove(equipment.Weapon.Entity())
+		equipment.Weapon.Remove()
 	}
 	if equipment.Sheild != nil {
-		world.Remove(equipment.Sheild.Entity())
+		equipment.Sheild.Remove()
 	}
 	if equipment.Gloves != nil {
-		world.Remove(equipment.Gloves.Entity())
+		equipment.Gloves.Remove()
 	}
 	if equipment.Boots != nil {
-		world.Remove(equipment.Boots.Entity())
+		equipment.Boots.Remove()
 	}
-	world.Remove(entry.Entity())
+	entry.Remove()
 }

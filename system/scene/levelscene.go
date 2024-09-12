@@ -73,11 +73,12 @@ func (ls *LevelScene) Teardown() {
 	ls.ready = false
 	slog.Debug("LevelScene teardown")
 	go func() {
+
 		tags.LevelTag.MustFirst(ls.ecs.World).Remove()
 
 		for entry := range tags.MonsterTag.Iter(ls.ecs.World) {
-			slog.Debug("Removing entry.", "entry", entry.String())
-			entry.Remove()
+			slog.Debug("Removing monster entitity: ", "entry: ", entry.String())
+			archetype.RemoveMonster(entry, ls.ecs.World)
 		}
 
 		for entry := range tags.PickupTag.Iter(ls.ecs.World) {

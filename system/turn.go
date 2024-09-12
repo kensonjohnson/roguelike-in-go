@@ -93,7 +93,7 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 					)
 					itemName := component.Name.Get(entry)
 					playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
-					ecs.World.Remove(entry.Entity())
+					entry.Remove()
 					break
 				}
 
