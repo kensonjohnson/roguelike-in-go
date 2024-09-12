@@ -9,7 +9,9 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
+	"github.com/kensonjohnson/roguelike-game-go/internal/colors"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine/shapes"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
@@ -18,6 +20,7 @@ import (
 type ui struct {
 	query        donburi.Query
 	lastMessages []string
+	uiBox        *ebiten.Image
 }
 
 var defaultMessages = []string{
@@ -32,6 +35,11 @@ var UI = &ui{
 		component.UserMessage,
 	)),
 	lastMessages: defaultMessages,
+	uiBox: shapes.MakeBox(
+		config.ScreenWidth*config.TileWidth, config.UIHeight*config.TileHeight, 4,
+		colors.Peru, color.Black,
+		shapes.SimpleCorner,
+	),
 }
 
 func (u *ui) Update(ecs *ecs.ECS) {
@@ -72,12 +80,23 @@ func (u *ui) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	entry := tags.UITag.MustFirst(ecs.World)
 	ui := component.UI.Get(entry)
 
+	// Draw the ui box
+	u.drawUIBox(screen)
+
 	// Draw the user message box
 	drawUserMessages(screen, &ui.MessageBox, u.lastMessages)
 
 	// Draw the player HUD
 	drawPlayerHud(screen, &ui.PlayerHUD)
 
+}
+
+func (u *ui) drawUIBox(screen *ebiten.Image) {
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
+		0, (config.ScreenHeight-config.UIHeight)*config.TileHeight,
+	)
+	screen.DrawImage(u.uiBox, options)
 }
 
 func createTextDrawOptions(x, y int, color color.Color) *text.DrawOptions {
@@ -88,12 +107,6 @@ func createTextDrawOptions(x, y int, color color.Color) *text.DrawOptions {
 }
 
 func drawUserMessages(screen *ebiten.Image, messageBox *component.UserMessageBoxData, lastMessages []string) {
-	options := &ebiten.DrawImageOptions{}
-	options.GeoM.Translate(
-		float64(messageBox.Position.X),
-		float64(messageBox.Position.Y),
-	)
-	screen.DrawImage(messageBox.Sprite, options)
 
 	// Draw the user messages
 	fontX := messageBox.FontX
@@ -113,12 +126,6 @@ func drawUserMessages(screen *ebiten.Image, messageBox *component.UserMessageBox
 }
 
 func drawPlayerHud(screen *ebiten.Image, playerHUD *component.PlayerHUDData) {
-	options := &ebiten.DrawImageOptions{}
-	options.GeoM.Translate(
-		float64(playerHUD.Position.X),
-		float64(playerHUD.Position.Y),
-	)
-	screen.DrawImage(playerHUD.Sprite, options)
 
 	// Draw the player's info
 	fontX := playerHUD.FontX
