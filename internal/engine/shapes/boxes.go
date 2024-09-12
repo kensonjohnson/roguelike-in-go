@@ -12,10 +12,12 @@ type cornerShape [][]int8
 
 const (
 	PointedCorner cornerVariant = iota
-	TransparentPointedCorner
+	PointedCornerTransparent
+	SimpleCorner
+	SimpleCornerTransparent
 )
 
-func MakeBox(w, h, scale int, border, fill color.Color, variant ...int) *ebiten.Image {
+func MakeBox(w, h, scale int, border, fill color.Color, variant ...cornerVariant) *ebiten.Image {
 
 	image := ebiten.NewImage(w, h)
 	corner := makeCornerImage(scale, border, fill, variant...)
@@ -46,7 +48,7 @@ func MakeBox(w, h, scale int, border, fill color.Color, variant ...int) *ebiten.
 	line := ebiten.NewImage(w-(size.X*2), 1)
 	line.Fill(border)
 	for i := 0; i < size.Y; i++ {
-		if i == 4 {
+		if i == scale {
 			line.Fill(fill)
 		}
 		options.GeoM.Reset()
@@ -59,10 +61,10 @@ func MakeBox(w, h, scale int, border, fill color.Color, variant ...int) *ebiten.
 	// Draw vertical lines and fill
 	line = ebiten.NewImage(w, h-(size.Y*2))
 	line.Fill(fill)
-	ends := ebiten.NewImage(4, h-(size.Y*2))
+	ends := ebiten.NewImage(scale, h-(size.Y*2))
 	ends.Fill(border)
 	options.GeoM.Reset()
-	options.GeoM.Translate(float64(w-4), 0)
+	options.GeoM.Translate(float64(w-scale), 0)
 	line.DrawImage(ends, options)
 	options.GeoM.Reset()
 	line.DrawImage(ends, options)
@@ -72,16 +74,20 @@ func MakeBox(w, h, scale int, border, fill color.Color, variant ...int) *ebiten.
 	return image
 }
 
-func makeCornerImage(scale int, border, fill color.Color, variant ...int) *ebiten.Image {
+func makeCornerImage(scale int, border, fill color.Color, variant ...cornerVariant) *ebiten.Image {
 	var shape cornerShape
 	if len(variant) <= 0 {
 		shape = pointedCorner
 	} else {
 		switch variant[0] {
-		case 0:
+		case PointedCorner:
 			shape = pointedCorner
-		case 1:
+		case PointedCornerTransparent:
 			shape = pointedCornerTransparent
+		case SimpleCorner:
+			shape = simpleCorner
+		case SimpleCornerTransparent:
+			shape = simpleCornerTransparent
 		default:
 			shape = pointedCorner
 		}
@@ -137,4 +143,22 @@ var pointedCornerTransparent cornerShape = [][]int8{
 	{-1, -1, 0, 1, 1, 1, 1, 1},
 	{0, 0, 0, 1, 1, 1, 1, 1},
 	{0, 1, 1, 1, 1, 1, 1, 1},
+}
+
+var simpleCorner cornerShape = [][]int8{
+	{0, 0, 0, 0, 0, 0},
+	{0, 1, 1, 1, 1, 0},
+	{0, 1, 0, 0, 0, 0},
+	{0, 1, 0, 1, 1, 1},
+	{0, 1, 0, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1},
+}
+
+var simpleCornerTransparent cornerShape = [][]int8{
+	{0, 0, 0, 0, 0, 0},
+	{0, -1, -1, -1, -1, 0},
+	{0, -1, 0, 0, 0, 0},
+	{0, -1, 0, 1, 1, 1},
+	{0, -1, 0, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1},
 }
