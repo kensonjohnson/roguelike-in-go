@@ -51,7 +51,7 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 				position := component.Position.Get(entry)
 				tile := level.GetFromXY(position.X, position.Y)
 				tile.Blocked = false
-				ecs.World.Remove(entry.Entity())
+				archetype.RemoveMonster(entry, ecs.World)
 			}
 
 		}
@@ -91,9 +91,9 @@ func (td *TurnData) Update(ecs *ecs.ECS) {
 					component.Wallet.Get(playerEntry).AddAmount(
 						component.Value.Get(entry).Amount,
 					)
-					archetype.RemoveItemFromWorld(entry)
 					itemName := component.Name.Get(entry)
 					playerMessages.WorldInteractionMessage = fmt.Sprintf("Picked up %s!", itemName.Value)
+					ecs.World.Remove(entry.Entity())
 					break
 				}
 
