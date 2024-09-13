@@ -6,7 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
-	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/yohamta/donburi/ecs"
 	donburiDebug "github.com/yohamta/donburi/features/debug"
 )
@@ -32,37 +31,42 @@ var Debug = &debug{
 }
 
 func (d *debug) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	width := config.ScreenWidth * config.TileWidth
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %v\nFPS: %v", int(ebiten.ActualTPS()), int(ebiten.ActualFPS())), width-60, 250)
+	const spacing = 14
+	offset := 8
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %v", int(ebiten.ActualTPS())), 8, offset)
 
-	// Draw with known information
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Entities: %v", d.totalEntities), 8, 180)
-	offset := 0
+	offset += spacing
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %v", int(ebiten.ActualFPS())), 8, offset)
+
+	offset += spacing
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Entities: %v", d.totalEntities), 8, offset)
+
+	offset += spacing
 	ebitenutil.DebugPrintAt(
 		screen,
 		fmt.Sprintf("%v %v", "Monster: ", d.monsterCount),
-		8, 194+(offset*14),
+		8, offset,
 	)
-	offset++
 
+	offset += spacing
 	ebitenutil.DebugPrintAt(
 		screen,
 		fmt.Sprintf("%v %v", "Total Items: ", d.itemCount),
-		8, 194+(offset*14),
+		8, offset,
 	)
-	offset++
 
+	offset += spacing
 	ebitenutil.DebugPrintAt(
 		screen,
 		fmt.Sprintf("%v %v", "Pickups: ", d.pickupCount),
-		8, 194+(offset*14),
+		8, offset,
 	)
-	offset++
 
+	offset += spacing
 	ebitenutil.DebugPrintAt(
 		screen,
 		fmt.Sprintf("%v %v", "Uncategorized: ", d.miscCount),
-		8, 194+(offset*14),
+		8, offset,
 	)
 
 	d.frameCount++
