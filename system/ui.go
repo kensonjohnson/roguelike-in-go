@@ -20,9 +20,10 @@ import (
 type ui struct {
 	query        donburi.Query
 	lastMessages []string
-	hudBox       *ebiten.Image
+	healthBox    *ebiten.Image
+	coinBox      *ebiten.Image
 	messageBox   *ebiten.Image
-	divider      *ebiten.Image
+	posX, posY   int
 }
 
 var defaultMessages = []string{
@@ -37,19 +38,15 @@ var UI = &ui{
 		component.UserMessage,
 	)),
 	lastMessages: defaultMessages,
-	hudBox: shapes.MakeBox(
-		200, config.UIHeight*config.TileHeight, 4,
-		colors.Peru, color.Black,
-	),
+	healthBox:    createHealthBox(),
+	coinBox:      createCoinBox(),
 	messageBox: shapes.MakeBox(
 		50*config.TileWidth, config.UIHeight*config.TileHeight, 4,
 		colors.Peru, color.Black,
+		shapes.SimpleCorner,
 	),
-	divider: shapes.MakeDivider(
-		config.UIHeight*config.TileHeight-8, 3,
-		colors.Peru, color.Transparent,
-		false,
-	),
+	posX: 15 * config.TileWidth,
+	posY: (config.ScreenHeight - config.UIHeight) * config.TileHeight,
 }
 
 func (u *ui) Update(ecs *ecs.ECS) {
@@ -105,100 +102,63 @@ func createTextDrawOptions(x, y int, color color.Color) *text.DrawOptions {
 
 func (u *ui) drawPlayerHud(screen *ebiten.Image, world donburi.World) {
 
-	spacing := config.TileWidth
+	// spacing := config.TileWidth
 
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(
-		float64(spacing), float64(spacing),
+		float64(u.posX), float64(u.posY-28),
 	)
-	screen.DrawImage(u.hudBox, options)
+	screen.DrawImage(u.healthBox, options)
+
+	options.GeoM.Translate(float64(u.healthBox.Bounds().Dx()-4), 0)
+	screen.DrawImage(u.coinBox, options)
 
 	playerEntry := tags.PlayerTag.MustFirst(world)
 	health := component.Health.Get(playerEntry)
-	attack := component.Attack.Get(playerEntry)
-	defense := component.Defense.Get(playerEntry)
+	wallet := component.Wallet.Get(playerEntry)
 
 	// Draw the player's info
-	fontX := spacing + 28
-	fontY := spacing + config.FontSize
+	fontX := u.posX + 36
+	fontY := u.posY - 26
+
+	textOptions := createTextDrawOptions(fontX, fontY, color.White)
 
 	// Health
+	// TODO: Color text based on current health
 	message := fmt.Sprintf(
-		"Health: %d / %d",
+		"%d / %d",
 		health.CurrentHealth,
 		health.MaxHealth,
 	)
 	text.Draw(
 		screen,
 		message,
-		assets.KenneyPixelFont,
-		createTextDrawOptions(fontX, fontY, color.White),
+		assets.KenneyMiniSquaredFont,
+		textOptions,
 	)
-	fontY += config.FontSize + 4
 
-	// Armor
-	message = fmt.Sprintf(
-		"Armor Class: %d",
-		defense.ArmorClass,
-	)
+	// Move cursor to next box
+	textOptions.GeoM.Translate(float64(u.healthBox.Bounds().Dx()), 0)
+	message = fmt.Sprintf("%d", wallet.Amount)
 	text.Draw(
 		screen,
 		message,
-		assets.KenneyPixelFont,
-		createTextDrawOptions(fontX, fontY, color.White),
-	)
-	fontY += config.FontSize + 4
-
-	message = fmt.Sprintf(
-		"Defense: %d",
-		defense.Defense,
-	)
-	text.Draw(
-		screen,
-		message,
-		assets.KenneyPixelFont,
-		createTextDrawOptions(fontX, fontY, color.White),
-	)
-	fontY += config.FontSize + 4
-
-	// Weapon
-	message = fmt.Sprintf(
-		"Damage: %d - %d",
-		attack.MinimumDamage,
-		attack.MaximumDamage,
-	)
-	text.Draw(
-		screen,
-		message,
-		assets.KenneyPixelFont,
-		createTextDrawOptions(fontX, fontY, color.White),
-	)
-	fontY += config.FontSize + 4
-
-	message = fmt.Sprintf(
-		"To Hit Bonus: %d",
-		attack.ToHitBonus,
-	)
-	text.Draw(
-		screen,
-		message,
-		assets.KenneyPixelFont,
-		createTextDrawOptions(fontX, fontY, color.White),
+		assets.KenneyMiniSquaredFont,
+		textOptions,
 	)
 }
 
 func (u *ui) drawUserMessages(screen *ebiten.Image, lastMessages []string) {
-	spacing := 15 * config.TileWidth
-	top := (config.ScreenHeight - config.UIHeight) * config.TileHeight
+
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(
-		float64(spacing), float64(top),
+		float64(u.posX), float64(u.posY),
 	)
 	screen.DrawImage(u.messageBox, options)
 
 	// Draw the user messages
-	fontX := spacing + 28
-	fontY := top + 10
+	fontX := u.posX + 28
+	fontY := u.posY + 10
 	for _, message := range lastMessages {
 		if message != "" {
 			textOptions := &text.DrawOptions{}
@@ -211,4 +171,38 @@ func (u *ui) drawUserMessages(screen *ebiten.Image, lastMessages []string) {
 			fontY += config.FontSize + 2
 		}
 	}
+}
+
+func createHealthBox() *ebiten.Image {
+	image := shapes.MakeBox(
+		90+assets.Heart.Bounds().Dx()*2,
+		assets.Heart.Bounds().Dx()*2,
+		4,
+		colors.Peru, color.Black,
+		shapes.BasicCorner,
+	)
+
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Scale(2, 2)
+	options.GeoM.Translate(2, 0)
+	image.DrawImage(assets.Heart, options)
+
+	return image
+}
+
+func createCoinBox() *ebiten.Image {
+	image := shapes.MakeBox(
+		90+assets.WorldSmallCoin.Bounds().Dx()*2,
+		assets.WorldSmallCoin.Bounds().Dx()*2,
+		4,
+		colors.Peru, color.Black,
+		shapes.BasicCorner,
+	)
+
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Scale(2, 2)
+	options.GeoM.Translate(2, 0)
+	image.DrawImage(assets.WorldSmallCoin, options)
+
+	return image
 }
