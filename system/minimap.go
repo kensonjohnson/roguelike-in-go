@@ -20,28 +20,26 @@ type minimap struct {
 
 var Minimap = &minimap{
 	boxSprite: shapes.MakeBox(
-		368, 228, 4,
+		260, 170, 4,
 		colors.Peru, color.Black,
+		shapes.FancyItemCorner,
 	),
-	blipSize: 4.0,
+	blipSize: 3.0,
 }
 
 func (m *minimap) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	entry := tags.LevelTag.MustFirst(ecs.World)
 	level := component.Level.Get(entry)
 
-	// The values of 330 and 210 are based on the size of the minimap image.
-	// That image is 340x220 pixels, with a 10 pixel border, and is placed
-	// in the bottom right corner of the screen.
-	startingXPixel := (config.ScreenWidth * config.TileWidth) - config.TileWidth - 368
+	startingXPixel := (config.ScreenWidth * config.TileWidth) - config.TileWidth - 260
 	startingYPixel := config.TileHeight
 
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(float64(startingXPixel), float64(startingYPixel))
 	screen.DrawImage(m.boxSprite, options)
 
-	startingXPixel += 24
-	startingYPixel += 24
+	startingXPixel += 10
+	startingYPixel += 10
 
 	// Draw the walls and floors
 	for _, tile := range level.Tiles {
