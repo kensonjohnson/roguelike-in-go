@@ -10,6 +10,9 @@ var Wallet = donburi.NewComponentType[WalletData]()
 
 func (w *WalletData) AddAmount(amount int) {
 	w.Amount += amount
+	if w.Amount > 99999 {
+		w.Amount = 99999
+	}
 }
 
 func (w *WalletData) SubtractAmount(amount int) {
