@@ -29,6 +29,9 @@ var (
 	KenneyMiniSquaredFont *text.GoTextFace
 	KenneyPixelFont       *text.GoTextFace
 
+	// Icons
+	Heart *ebiten.Image
+
 	// Characters
 	Player *ebiten.Image
 	Skelly *ebiten.Image
@@ -165,6 +168,12 @@ func init() {
 	KenneyPixelFont = mustLoadFont(kenneyPixelFontBytes)
 	// For some reason, the KenneyPixel shows up as half the size of the other fonts.
 	KenneyPixelFont.Size = float64(config.FontSize) * 1.5
+
+	/*-----------------------
+	--------- Fonts ---------
+	-----------------------*/
+
+	Heart = mustLoadImage("images/icons/heart.png")
 
 	/*-----------------------
 	------ Characters -------
