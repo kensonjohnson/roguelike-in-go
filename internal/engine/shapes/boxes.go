@@ -11,10 +11,14 @@ type cornerVariant int
 type cornerShape [][]int8
 
 const (
-	PointedCorner cornerVariant = iota
+	BasicCorner cornerVariant = iota
+	PointedCorner
 	PointedCornerTransparent
 	SimpleCorner
 	SimpleCornerTransparent
+	SmallPointedCorner
+	SmallPointedCornerTransparent
+	FancyItemCorner
 )
 
 func MakeBox(w, h, scale int, border, fill color.Color, variant ...cornerVariant) *ebiten.Image {
@@ -80,6 +84,8 @@ func makeCornerImage(scale int, border, fill color.Color, variant ...cornerVaria
 		shape = pointedCorner
 	} else {
 		switch variant[0] {
+		case BasicCorner:
+			shape = basicCorner
 		case PointedCorner:
 			shape = pointedCorner
 		case PointedCornerTransparent:
@@ -88,8 +94,14 @@ func makeCornerImage(scale int, border, fill color.Color, variant ...cornerVaria
 			shape = simpleCorner
 		case SimpleCornerTransparent:
 			shape = simpleCornerTransparent
+		case SmallPointedCorner:
+			shape = smallPointedCorner
+		case SmallPointedCornerTransparent:
+			shape = smallPointedCornerTransparent
+		case FancyItemCorner:
+			shape = fancyItemCorner
 		default:
-			shape = pointedCorner
+			shape = basicCorner
 		}
 	}
 
@@ -121,6 +133,10 @@ func makeCornerImage(scale int, border, fill color.Color, variant ...cornerVaria
 
 func degreesToRadians(degrees int) float64 {
 	return float64(degrees) * math.Pi / 180
+}
+
+var basicCorner cornerShape = [][]int8{
+	{0},
 }
 
 var pointedCorner cornerShape = [][]int8{
@@ -159,6 +175,35 @@ var simpleCornerTransparent cornerShape = [][]int8{
 	{0, -1, -1, -1, -1, 0},
 	{0, -1, 0, 0, 0, 0},
 	{0, -1, 0, 1, 1, 1},
+	{0, -1, 0, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1},
+}
+
+var smallPointedCorner cornerShape = [][]int8{
+	{0, 0, 0, 0, 0, -1, 0},
+	{0, 1, 1, 1, 0, -1, 0},
+	{0, 1, 0, 0, 0, 0, 0},
+	{0, 1, 0, 1, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1, 1},
+	{-1, -1, 0, 1, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1, 1},
+}
+
+var smallPointedCornerTransparent cornerShape = [][]int8{
+	{0, 0, 0, 0, 0, -1, 0},
+	{0, -1, -1, -1, 0, -1, 0},
+	{0, -1, 0, 0, 0, 0, 0},
+	{0, -1, 0, 1, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1, 1},
+	{-1, -1, 0, 1, 1, 1, 1},
+	{0, 0, 0, 1, 1, 1, 1},
+}
+
+var fancyItemCorner cornerShape = [][]int8{
+	{-1, -1, -1, -1, 0, 0},
+	{-1, -1, -1, -1, -1, 0},
+	{-1, -1, 0, 0, 0, 0},
+	{-1, -1, 0, 1, 1, 1},
 	{0, -1, 0, 1, 1, 1},
 	{0, 0, 0, 1, 1, 1},
 }
