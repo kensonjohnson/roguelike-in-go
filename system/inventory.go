@@ -6,20 +6,51 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
+	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/internal/colors"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
 	"github.com/kensonjohnson/roguelike-game-go/internal/engine/shapes"
 	"github.com/yohamta/donburi/ecs"
 )
 
+// How long until a pressed key registers a new event
+const keyDelay = 10
+
+// UI setting
+const inset = 20
+const boxSize = 48 + 18 // (item sprite * scale) + (border size * 2)
+const spacing = 10
+const totalBoxSpace = boxSize + spacing
+const rows = 4
+const columns = 6
+
 type inventoryUi struct {
-	open bool
+	open                 bool
+	background           *ebiten.Image
+	posX, poxY           int
+	selector             *ebiten.Image
+	selectorX, selectorY int
+	keyDelayCount        int
 }
 
-var InventoryUI = inventoryUi{open: false}
+var InventoryUI = inventoryUi{
+	open:          false,
+	background:    buildInventorySprite(),
+	posX:          15 * config.TileWidth,
+	poxY:          (((config.ScreenHeight - config.UIHeight - 2) * config.TileHeight) - (inset + (totalBoxSpace * rows) - spacing + inset)),
+	selector:      makeItemBox(color.White),
+	selectorX:     0,
+	selectorY:     0,
+	keyDelayCount: 0,
+}
 
 func (i *inventoryUi) Update(ecs *ecs.ECS) {
 	if !i.open {
+		return
+	}
+	if i.keyDelayCount > 0 {
+		i.keyDelayCount--
 		return
 	}
 
@@ -27,41 +58,80 @@ func (i *inventoryUi) Update(ecs *ecs.ECS) {
 		slog.Debug("Close Inventory")
 		Turn.TurnState = PlayerTurn
 		i.open = false
+		return
 	}
+
+	moveX := 0
+	moveY := 0
+
+	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyUp) {
+		slog.Debug("Pressing Up in Inventory!")
+		moveY = -1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyDown) {
+		slog.Debug("Pressing Down in Inventory!")
+		moveY = 1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		slog.Debug("Pressing Left in Inventory!")
+		moveX = -1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyRight) {
+		slog.Debug("Pressing Right in Inventory!")
+		moveX = 1
+	}
+
+	if moveX != 0 || moveY != 0 {
+		i.keyDelayCount = keyDelay
+	}
+
+	i.selectorX = (i.selectorX + moveX + columns) % columns
+	i.selectorY = (i.selectorY + moveY + rows) % rows
 }
 
 func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	if !i.open {
 		return
 	}
-	image := shapes.MakeBox(
-		(45)*config.TileWidth,
-		(40)*config.TileHeight,
-		4,
-		colors.SlateGray,
-		color.Black,
-		// shapes.PointedCornerTransparent,
-	)
-	// divider := shapes.MakeDivider(
-	// 	(35)*config.TileWidth-8,
-	// 	4,
-	// 	colors.SlateGray,
-	// 	color.Transparent,
-	// 	true,
-	// )
 
 	options := &ebiten.DrawImageOptions{}
 
-	// // Rotate divider and draw it in the box
-	// options.GeoM.Translate(-float64(divider.Bounds().Dx()/2), -float64(divider.Bounds().Dy()/2))
-	// options.GeoM.Rotate(engine.DegreesToRadians(-90))
-	// options.GeoM.Translate(float64(image.Bounds().Dx()/2), float64(image.Bounds().Dy()/3))
-	// image.DrawImage(divider, options)
-
 	// Draw the box
+	options.GeoM.Translate(
+		float64(i.posX),
+		float64(i.poxY),
+	)
+	screen.DrawImage(i.background, options)
+
+	// Draw each item
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+	playerInventory := component.Inventory.Get(playerEntry)
+	for index, entry := range playerInventory.Items {
+		if entry == nil {
+			continue
+		}
+		sprite := component.Sprite.Get(entry).Image
+		column := index % columns
+		row := index / columns
+		options.GeoM.Reset()
+		options.GeoM.Scale(3, 3)
+		options.GeoM.Translate(
+			float64(i.posX+(column*totalBoxSpace)+inset+9),
+			float64(i.poxY+(row*totalBoxSpace)+inset+9),
+		)
+		screen.DrawImage(sprite, options)
+	}
+
+	// Draw selector
 	options.GeoM.Reset()
-	options.GeoM.Translate(float64((config.ScreenWidth*config.TileWidth-image.Bounds().Dx())/2), float64(5*config.TileHeight))
-	screen.DrawImage(image, options)
+	options.GeoM.Translate(
+		float64(i.posX+(i.selectorX*totalBoxSpace)+inset),
+		float64(i.poxY+(i.selectorY*totalBoxSpace)+inset),
+	)
+	screen.DrawImage(i.selector, options)
 }
 
 func (i *inventoryUi) Open() {
@@ -69,4 +139,37 @@ func (i *inventoryUi) Open() {
 }
 func (i *inventoryUi) Close() {
 	i.open = false
+}
+
+func buildInventorySprite() *ebiten.Image {
+
+	image := shapes.MakeBox(
+		inset+(totalBoxSpace*columns)-spacing+inset,
+		inset+(totalBoxSpace*rows)-spacing+inset,
+		4,
+		colors.SlateGray,
+		color.Black,
+		shapes.SmallPointedCorner,
+	)
+
+	itemBox := makeItemBox(colors.CornflowerBlue)
+	options := &ebiten.DrawImageOptions{}
+	for y := 0; y < rows; y++ {
+		options.GeoM.Translate(float64(inset), float64(inset+(y*totalBoxSpace)))
+		for x := 0; x < columns; x++ {
+			image.DrawImage(itemBox, options)
+			options.GeoM.Translate(totalBoxSpace, 0)
+		}
+		options.GeoM.Reset()
+	}
+
+	return image
+}
+
+func makeItemBox(border color.Color) *ebiten.Image {
+	return shapes.MakeBox(
+		boxSize, boxSize, 3,
+		border, color.Black,
+		shapes.SimpleCorner,
+	)
 }
