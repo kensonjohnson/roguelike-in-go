@@ -32,6 +32,8 @@ type inventoryUi struct {
 	selector             *ebiten.Image
 	selectorX, selectorY int
 	keyDelayCount        int
+	inContextMenu        bool
+	contextWindow        *ebiten.Image
 }
 
 var InventoryUI = inventoryUi{
@@ -43,6 +45,12 @@ var InventoryUI = inventoryUi{
 	selectorX:     0,
 	selectorY:     0,
 	keyDelayCount: 0,
+	inContextMenu: false,
+	contextWindow: shapes.MakeBox(
+		boxSize*4, boxSize*2, 4,
+		colors.Peru, colors.LightGray,
+		shapes.BasicCorner,
+	),
 }
 
 func (i *inventoryUi) Update(ecs *ecs.ECS) {
@@ -54,42 +62,12 @@ func (i *inventoryUi) Update(ecs *ecs.ECS) {
 		return
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyI) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		slog.Debug("Close Inventory")
-		Turn.TurnState = PlayerTurn
-		i.open = false
-		return
+	if i.inContextMenu {
+		i.handleContextWindow()
+	} else {
+		i.handleSelectionWindow()
 	}
 
-	moveX := 0
-	moveY := 0
-
-	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyUp) {
-		slog.Debug("Pressing Up in Inventory!")
-		moveY = -1
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyDown) {
-		slog.Debug("Pressing Down in Inventory!")
-		moveY = 1
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		slog.Debug("Pressing Left in Inventory!")
-		moveX = -1
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyRight) {
-		slog.Debug("Pressing Right in Inventory!")
-		moveX = 1
-	}
-
-	if moveX != 0 || moveY != 0 {
-		i.keyDelayCount = keyDelay
-	}
-
-	i.selectorX = (i.selectorX + moveX + columns) % columns
-	i.selectorY = (i.selectorY + moveY + rows) % rows
 }
 
 func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -132,6 +110,76 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 		float64(i.poxY+(i.selectorY*totalBoxSpace)+inset),
 	)
 	screen.DrawImage(i.selector, options)
+
+	// Draw context window
+	if !i.inContextMenu {
+		return
+	}
+
+	// The position is already on the top left corner of the selection box;
+	// We just need to move up by the height of the context window.
+
+	options.GeoM.Translate(0, -boxSize*2)
+	screen.DrawImage(i.contextWindow, options)
+}
+
+func (i *inventoryUi) handleSelectionWindow() {
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyI) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		slog.Debug("Close Inventory")
+		Turn.TurnState = PlayerTurn
+		i.open = false
+		return
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		i.inContextMenu = true
+		slog.Debug("Open context")
+	}
+
+	moveX := 0
+	moveY := 0
+
+	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyUp) {
+		slog.Debug("Pressing Up in Inventory!")
+		moveY = -1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyDown) {
+		slog.Debug("Pressing Down in Inventory!")
+		moveY = 1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		slog.Debug("Pressing Left in Inventory!")
+		moveX = -1
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyRight) {
+		slog.Debug("Pressing Right in Inventory!")
+		moveX = 1
+	}
+
+	if moveX != 0 || moveY != 0 {
+		i.keyDelayCount = keyDelay
+	}
+
+	i.selectorX = (i.selectorX + moveX + columns) % columns
+	i.selectorY = (i.selectorY + moveY + rows) % rows
+}
+
+func (i *inventoryUi) handleContextWindow() {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		slog.Debug("Selection made")
+		i.inContextMenu = false
+		return
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		slog.Debug("Context window closed")
+		i.inContextMenu = false
+		return
+	}
 }
 
 func (i *inventoryUi) Open() {
