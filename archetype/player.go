@@ -62,7 +62,7 @@ func CreateNewPlayer(
 	component.Equipment.SetValue(player, equipment)
 
 	// Setup inventory
-	inventory := component.NewInventory(30)
+	inventory := component.NewInventory(28)
 	component.Inventory.SetValue(player, inventory)
 
 	wallet := component.WalletData{}
