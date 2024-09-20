@@ -107,7 +107,7 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	// Draw each item
 	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 	playerInventory := component.Inventory.Get(playerEntry)
-	for index, entry := range playerInventory.Items {
+	for index, entry := range playerInventory.Iter() {
 		if entry == nil {
 			continue
 		}
@@ -125,7 +125,7 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 
 	// Draw selector
 	selectorPosX := i.posX + (i.selectorX * totalBoxSpace) + inset
-	selectorPosY := i.posY + (i.selectorX * totalBoxSpace) + inset
+	selectorPosY := i.posY + (i.selectorY * totalBoxSpace) + inset
 	options.GeoM.Reset()
 	options.GeoM.Translate(
 		float64(selectorPosX),
@@ -268,42 +268,32 @@ func makeItemBox(border color.Color) *ebiten.Image {
 func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 	x := i.posX + (i.selectorX * totalBoxSpace) + inset
 	y := i.posY + (i.selectorY * totalBoxSpace) + inset
+
 	lineHeight := i.contextWindow.Bounds().Dy() / 4
+
 	const inset = 10
+
 	options := &text.DrawOptions{}
 	options.GeoM.Translate(float64(x+inset), float64(y-i.contextWindow.Bounds().Dy()))
 
-	if i.contextWindowSelection == discard {
-		options.ColorScale.ScaleWithColor(colors.DarkGray)
-	} else {
-		options.ColorScale.ScaleWithColor(color.Black)
-	}
-	text.Draw(screen, "Discard", i.contextFont, options)
+	i.drawContextOption(screen, "Discard", discard, options)
 
 	options.GeoM.Translate(0, float64(lineHeight))
-	options.ColorScale.Reset()
-	if i.contextWindowSelection == info {
-		options.ColorScale.ScaleWithColor(colors.DarkGray)
-	} else {
-		options.ColorScale.ScaleWithColor(color.Black)
-	}
-	text.Draw(screen, "Info", i.contextFont, options)
+	i.drawContextOption(screen, "Info", info, options)
 
 	options.GeoM.Translate(0, float64(lineHeight))
-	options.ColorScale.Reset()
-	if i.contextWindowSelection == use {
-		options.ColorScale.ScaleWithColor(colors.DarkGray)
-	} else {
-		options.ColorScale.ScaleWithColor(color.Black)
-	}
-	text.Draw(screen, "Equip", i.contextFont, options)
+	i.drawContextOption(screen, "Equip", use, options)
 
 	options.GeoM.Translate(0, float64(lineHeight))
-	options.ColorScale.Reset()
-	if i.contextWindowSelection == back {
+	i.drawContextOption(screen, "Back", back, options)
+}
+
+func (i *inventoryUi) drawContextOption(screen *ebiten.Image, label string, selection contextSelection, options *text.DrawOptions) {
+	if i.contextWindowSelection == selection {
 		options.ColorScale.ScaleWithColor(colors.DarkGray)
 	} else {
 		options.ColorScale.ScaleWithColor(color.Black)
 	}
-	text.Draw(screen, "Back", i.contextFont, options)
+	text.Draw(screen, label, i.contextFont, options)
+	options.ColorScale.Reset()
 }
