@@ -43,10 +43,12 @@ type inventoryUi struct {
 }
 
 var InventoryUI = inventoryUi{
-	open:          false,
-	background:    buildInventorySprite(),
-	posX:          15 * config.TileWidth,
-	posY:          (((config.ScreenHeight - config.UIHeight - 2) * config.TileHeight) - (inset + (totalBoxSpace * rows) - spacing + inset)),
+	open:       false,
+	background: buildInventorySprite(),
+	posX:       15 * config.TileWidth,
+	posY: (((config.ScreenHeight - config.UIHeight - 2) *
+		config.TileHeight) - (inset + (totalBoxSpace * rows) -
+		spacing + inset)),
 	selector:      makeItemBox(color.White),
 	selectorX:     0,
 	selectorY:     0,
@@ -148,7 +150,8 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 
 func (i *inventoryUi) handleSelectionWindow() {
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyI) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyI) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		slog.Debug("Close Inventory")
 		Turn.TurnState = PlayerTurn
 		i.open = false
@@ -210,18 +213,17 @@ func (i *inventoryUi) handleContextWindow() {
 		return
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) || inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		i.contextWindowSelection--
-		if i.contextWindowSelection < discard {
-			i.contextWindowSelection = discard
-		}
+	// We use the `back` constant because it is the last in the enum. The magic
+	// +2 in the 'down' keypress is because the enum is zero indexed. Instead of
+	// writing `back - 1 + 1` and `back + 1 + 1`, we simplify.
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		i.contextWindowSelection = (i.contextWindowSelection + back) % (back + 1)
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		i.contextWindowSelection++
-		if i.contextWindowSelection > back {
-			i.contextWindowSelection = back
-		}
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		i.contextWindowSelection = (i.contextWindowSelection + back + 2) % (back + 1)
 	}
 }
 
@@ -274,7 +276,10 @@ func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 	const inset = 10
 
 	options := &text.DrawOptions{}
-	options.GeoM.Translate(float64(x+inset), float64(y-i.contextWindow.Bounds().Dy()))
+	options.GeoM.Translate(
+		float64(x+inset),
+		float64(y-i.contextWindow.Bounds().Dy()),
+	)
 
 	i.drawContextOption(screen, "Discard", discard, options)
 
@@ -288,7 +293,12 @@ func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 	i.drawContextOption(screen, "Back", back, options)
 }
 
-func (i *inventoryUi) drawContextOption(screen *ebiten.Image, label string, selection contextSelection, options *text.DrawOptions) {
+func (i *inventoryUi) drawContextOption(
+	screen *ebiten.Image,
+	label string,
+	selection contextSelection,
+	options *text.DrawOptions,
+) {
 	if i.contextWindowSelection == selection {
 		options.ColorScale.ScaleWithColor(colors.DarkGray)
 	} else {
@@ -296,4 +306,10 @@ func (i *inventoryUi) drawContextOption(screen *ebiten.Image, label string, sele
 	}
 	text.Draw(screen, label, i.contextFont, options)
 	options.ColorScale.Reset()
+}
+
+func (i *inventoryUi) handleSelectionMade() {
+	if i.contextWindowSelection == back {
+		i.inContextMenu = false
+	}
 }
