@@ -11,7 +11,6 @@ import (
 )
 
 type debug struct {
-	On            bool
 	frameCount    int
 	totalEntities int
 	monsterCount  int
@@ -21,7 +20,6 @@ type debug struct {
 }
 
 var Debug = &debug{
-	On:            false,
 	frameCount:    0,
 	totalEntities: 0,
 	monsterCount:  0,
