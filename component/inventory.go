@@ -2,6 +2,7 @@ package component
 
 import (
 	"errors"
+	"iter"
 	"log"
 
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
@@ -9,7 +10,7 @@ import (
 )
 
 type InventoryData struct {
-	Items    []*donburi.Entry
+	items    []*donburi.Entry
 	capacity int
 	holding  int
 }
@@ -18,7 +19,7 @@ var Inventory = donburi.NewComponentType[InventoryData]()
 
 func NewInventory(capacity int) InventoryData {
 	return InventoryData{
-		Items:    make([]*donburi.Entry, capacity),
+		items:    make([]*donburi.Entry, capacity),
 		capacity: capacity,
 		holding:  0,
 	}
@@ -31,8 +32,8 @@ func (i *InventoryData) GetCapacityInfo() (holding, capacity int) {
 func (i *InventoryData) IncreaseCapacityByAmount(amount int) {
 	i.capacity += amount
 	newStorage := make([]*donburi.Entry, i.capacity)
-	copy(newStorage, i.Items)
-	i.Items = newStorage
+	copy(newStorage, i.items)
+	i.items = newStorage
 }
 
 func (i *InventoryData) DecreaseCapacityByAmount(amount int) error {
@@ -41,6 +42,13 @@ func (i *InventoryData) DecreaseCapacityByAmount(amount int) error {
 	}
 
 	return nil
+}
+
+func (i *InventoryData) GetItem(index int) (*donburi.Entry, error) {
+	if index < 0 || index >= i.capacity {
+		return nil, errors.New("Index out of range")
+	}
+	return i.items[index], nil
 }
 
 func (i *InventoryData) AddItem(item *donburi.Entry) error {
@@ -54,7 +62,7 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 
 	var targetIndex = -1
 
-	for index, element := range i.Items {
+	for index, element := range i.items {
 		if element == nil {
 			targetIndex = index
 			break
@@ -65,14 +73,24 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 		return errors.New("failed to find empty index for item")
 	}
 
-	i.Items[targetIndex] = item
+	i.items[targetIndex] = item
 	return nil
 }
 
 func (i *InventoryData) RemoveItem(index int) error {
-	if index >= i.capacity {
+	if index < 0 || index >= i.capacity {
 		log.Panic("index out of range in RemoveItem. Recieved: ", index)
 	}
-	i.Items[index] = nil
+	i.items[index] = nil
 	return nil
+}
+
+func (i *InventoryData) Iter() iter.Seq2[int, *donburi.Entry] {
+	return func(yield func(int, *donburi.Entry) bool) {
+		for index, entry := range i.items {
+			if !yield(index, entry) {
+				return
+			}
+		}
+	}
 }

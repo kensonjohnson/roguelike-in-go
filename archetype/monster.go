@@ -106,3 +106,24 @@ func CreateMonster(world donburi.World, level *component.LevelData, room engine.
 	defense := component.Defense.Get(equipment.Armor)
 	component.Defense.SetValue(monster, *defense)
 }
+
+func RemoveMonster(entry *donburi.Entry, world donburi.World) {
+	equipment := component.Equipment.Get(entry)
+
+	if equipment.Armor != nil {
+		equipment.Armor.Remove()
+	}
+	if equipment.Weapon != nil {
+		equipment.Weapon.Remove()
+	}
+	if equipment.Sheild != nil {
+		equipment.Sheild.Remove()
+	}
+	if equipment.Gloves != nil {
+		equipment.Gloves.Remove()
+	}
+	if equipment.Boots != nil {
+		equipment.Boots.Remove()
+	}
+	entry.Remove()
+}

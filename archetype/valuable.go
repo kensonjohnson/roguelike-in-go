@@ -21,6 +21,10 @@ func CreateNewValuable(world donburi.World, valuableData *items.ValuableData) *d
 	return entry
 }
 
+func IsValuable(entry *donburi.Entry) bool {
+	return entry.HasComponent(tags.ValuableTag)
+}
+
 func CreateCoins(world donburi.World, valuableData *items.ValuableData) *donburi.Entry {
 	entry := CreateNewValuable(world, valuableData)
 

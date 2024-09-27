@@ -25,12 +25,12 @@ var (
 	ChestClosed *ebiten.Image
 
 	// UI
-	UIPanel               *ebiten.Image
-	UIPanelWithMinimap    *ebiten.Image
-	UICorner              *ebiten.Image
 	KenneyMiniFont        *text.GoTextFace
 	KenneyMiniSquaredFont *text.GoTextFace
 	KenneyPixelFont       *text.GoTextFace
+
+	// Icons
+	Heart *ebiten.Image
 
 	// Characters
 	Player *ebiten.Image
@@ -151,10 +151,6 @@ func init() {
 	/*-----------------------
 	---------- UI -----------
 	-----------------------*/
-	UIPanel = mustLoadImage("images/ui/UIPanel.png")
-	UIPanelWithMinimap = mustLoadImage("images/ui/UIPanelWithMinimap.png")
-	UICorner = mustLoadImage("images/ui/UICorner.png")
-
 	kenneyMiniFontBytes, err := assetsFS.ReadFile("fonts/KenneyMini.ttf")
 	if err != nil {
 		log.Panic(err)
@@ -172,6 +168,12 @@ func init() {
 	KenneyPixelFont = mustLoadFont(kenneyPixelFontBytes)
 	// For some reason, the KenneyPixel shows up as half the size of the other fonts.
 	KenneyPixelFont.Size = float64(config.FontSize) * 1.5
+
+	/*-----------------------
+	--------- Fonts ---------
+	-----------------------*/
+
+	Heart = mustLoadImage("images/icons/heart.png")
 
 	/*-----------------------
 	------ Characters -------

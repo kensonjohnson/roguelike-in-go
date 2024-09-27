@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
-	"github.com/kensonjohnson/roguelike-game-go/system"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/system/scene"
 )
 
@@ -49,7 +49,7 @@ func main() {
 	ebiten.SetWindowTitle("Roguelike")
 	if DebugOn != nil && *DebugOn {
 		ebiten.SetVsyncEnabled(false)
-		system.Debug.On = true
+		engine.Debug.TurnOn()
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 

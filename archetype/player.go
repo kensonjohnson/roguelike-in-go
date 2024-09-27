@@ -4,6 +4,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/items"
 	"github.com/norendren/go-fov/fov"
 	"github.com/yohamta/donburi"
@@ -62,8 +63,14 @@ func CreateNewPlayer(
 	component.Equipment.SetValue(player, equipment)
 
 	// Setup inventory
-	inventory := component.NewInventory(30)
+	inventory := component.NewInventory(28)
 	component.Inventory.SetValue(player, inventory)
+	if engine.Debug.On() {
+		inventory.AddItem(CreateNewValuable(world, items.Valuables.Alcohol))
+		inventory.AddItem(CreateNewConsumable(world, items.Consumables.Apple))
+		inventory.AddItem(CreateNewConsumable(world, items.Consumables.HealthPotion))
+		inventory.AddItem(CreateNewConsumable(world, items.Consumables.Bread))
+	}
 
 	wallet := component.WalletData{}
 	component.Wallet.SetValue(player, wallet)

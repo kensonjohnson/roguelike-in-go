@@ -9,6 +9,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/layer"
 	"github.com/yohamta/donburi"
@@ -43,10 +44,6 @@ func (ls *LevelScene) Setup(world donburi.World) {
 
 		levelData := archetype.GenerateLevel(world)
 
-		if _, ok := tags.UITag.First(world); !ok {
-			archetype.CreateNewUI(world)
-		}
-
 		playerEntry := tags.PlayerTag.MustFirst(world)
 		playerPosition := component.Position.Get(playerEntry)
 		startingRoom := levelData.Rooms[0]
@@ -77,11 +74,12 @@ func (ls *LevelScene) Teardown() {
 	ls.ready = false
 	slog.Debug("LevelScene teardown")
 	go func() {
+
 		tags.LevelTag.MustFirst(ls.ecs.World).Remove()
 
 		for entry := range tags.MonsterTag.Iter(ls.ecs.World) {
-			slog.Debug("Removing entry.", "entry", entry.String())
-			entry.Remove()
+			slog.Debug("Removing monster entitity: ", "entry: ", entry.String())
+			archetype.RemoveMonster(entry, ls.ecs.World)
 		}
 
 		for entry := range tags.PickupTag.Iter(ls.ecs.World) {
@@ -105,9 +103,9 @@ func (ls *LevelScene) configureECS(world donburi.World) {
 	ls.ecs.AddRenderer(layer.Background, system.Render.DrawBackground)
 	ls.ecs.AddRenderer(layer.Foreground, system.Render.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.UI.Draw)
-	ls.ecs.AddRenderer(layer.UI, system.DrawMinimap)
+	ls.ecs.AddRenderer(layer.UI, system.Minimap.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.InventoryUI.Draw)
-	if system.Debug.On {
+	if engine.Debug.On() {
 		ls.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 	}
 
