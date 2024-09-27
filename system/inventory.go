@@ -80,13 +80,9 @@ var InventoryUI = inventoryUi{
 		colors.Peru, colors.LightGray,
 		shapes.BasicCorner,
 	),
-	confirmAction: false,
-	inInfoWindow:  false,
-	infoWindow: shapes.MakeBox(
-		200, contextWindowHeight, 4,
-		colors.Peru, colors.LightGray,
-		shapes.BasicCorner,
-	),
+	confirmAction:  false,
+	inInfoWindow:   false,
+	infoWindow:     nil,
 	infoWindowText: &infoWindowText{Name: "Info", Text: "No Description"},
 }
 
@@ -228,6 +224,7 @@ func (i *inventoryUi) handleContextWindow(ecs *ecs.ECS) {
 		i.inConfirmAction = false
 		i.inInfoWindow = false
 		i.inContextMenu = false
+		i.infoWindow = nil
 		return
 	}
 
@@ -388,6 +385,7 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 		if i.inInfoWindow {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 				i.inInfoWindow = false
+				i.infoWindow = nil
 			}
 		} else {
 			slog.Debug("Item info")
@@ -450,58 +448,63 @@ func (i *inventoryUi) drawConfirmWindow(screen *ebiten.Image, x, y int) {
 }
 
 func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
-	// find minimum width needed for title
-	titleWidth := text.Advance(i.infoWindowText.Name, i.contextFont)
-	// find proper width for item description text
-	squaredCharCount := int(math.Sqrt(float64(len(i.infoWindowText.Text))))
-	desiredLineWidth := text.Advance(strings.Repeat("m", squaredCharCount*2), assets.KenneyMiniSquaredFont)
-	// set width according to which length is longer
-	width := math.Max(titleWidth, desiredLineWidth)
-	// find proper height based on found width
-	fields := strings.Fields(i.infoWindowText.Text)
-	lines := make([]string, 0)
-	var currentLine string
+	if i.infoWindow == nil {
+		// find minimum width needed for title
+		titleWidth := text.Advance(i.infoWindowText.Name, i.contextFont)
+		// find proper width for item description text
+		squaredCharCount := int(math.Sqrt(float64(len(i.infoWindowText.Text))))
+		desiredLineWidth := text.Advance(strings.Repeat("m", squaredCharCount*2), assets.KenneyMiniSquaredFont)
+		// set width according to which length is longer
+		width := math.Max(titleWidth, desiredLineWidth)
+		// find proper height based on found width
+		fields := strings.Fields(i.infoWindowText.Text)
+		lines := make([]string, 0)
+		var currentLine string
 
-	for index, string := range fields {
-		if index == 0 {
-			currentLine = string
-			continue
+		for index, string := range fields {
+			if index == 0 {
+				currentLine = string
+				continue
+			}
+			if text.Advance(currentLine+" "+string, assets.KenneyMiniSquaredFont) > float64(width) {
+				lines = append(lines, currentLine)
+				currentLine = string
+			} else {
+				currentLine += " " + string
+			}
 		}
-		if text.Advance(currentLine+" "+string, assets.KenneyMiniSquaredFont) > float64(width) {
-			lines = append(lines, currentLine)
-			currentLine = string
-		} else {
-			currentLine += " " + string
-		}
+		lines = append(lines, currentLine)
+		formattedDescription := strings.Join(lines, "\n")
+		_, descriptionHeight := text.Measure(formattedDescription, assets.KenneyMiniSquaredFont, 25.0)
+		// create text box, with insets for title and back button
+		const inset = 10
+		window := shapes.MakeBox(
+			inset+int(width)+inset,
+			inset+40+int(descriptionHeight)+20+inset,
+			4,
+			colors.Peru, colors.LightGray,
+			shapes.BasicCorner,
+		)
+		// draw title
+		textOptions := &text.DrawOptions{}
+		textOptions.GeoM.Translate(float64(+inset), 0)
+		textOptions.ColorScale.ScaleWithColor(color.Black)
+		text.Draw(window, i.infoWindowText.Name, i.contextFont, textOptions)
+		// draw description
+		textOptions.GeoM.Translate(0, 40.0)
+		textOptions.LineSpacing = 25
+		text.Draw(window, formattedDescription, assets.KenneyMiniSquaredFont, textOptions)
+		// draw back button
+		textOptions.GeoM.Translate(0, descriptionHeight)
+		textOptions.ColorScale.Reset()
+		textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
+		text.Draw(window, "Back", i.contextFont, textOptions)
+
+		i.infoWindow = window
 	}
-	lines = append(lines, currentLine)
-	formattedDescription := strings.Join(lines, "\n")
-	_, descriptionHeight := text.Measure(formattedDescription, assets.KenneyMiniSquaredFont, 25.0)
-	// create text box, with insets for title and back button
-	const inset = 10
-	window := shapes.MakeBox(
-		inset+int(width)+inset,
-		inset+40+int(descriptionHeight)+20+inset,
-		4,
-		colors.Peru, colors.LightGray,
-		shapes.BasicCorner,
-	)
+
 	// draw box
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(window, options)
-	// draw title
-	textOptions := &text.DrawOptions{}
-	textOptions.GeoM.Translate(float64(x+inset), float64(y))
-	textOptions.ColorScale.ScaleWithColor(color.Black)
-	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
-	// draw description
-	textOptions.GeoM.Translate(0, 40.0)
-	textOptions.LineSpacing = 25
-	text.Draw(screen, formattedDescription, assets.KenneyMiniSquaredFont, textOptions)
-	// draw back button
-	textOptions.GeoM.Translate(0, descriptionHeight)
-	textOptions.ColorScale.Reset()
-	textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
-	text.Draw(screen, "Back", i.contextFont, textOptions)
+	screen.DrawImage(i.infoWindow, options)
 }
