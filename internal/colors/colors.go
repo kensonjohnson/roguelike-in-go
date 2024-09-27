@@ -9,6 +9,7 @@ var (
 	Green          = color.RGBA{0, 128, 0, 255}
 	Lime           = color.RGBA{0, 255, 0, 255}
 	Brown          = color.RGBA{165, 42, 42, 255}
+	Smudgy         = color.RGBA{71, 45, 60, 255}
 	Peru           = color.RGBA{205, 133, 63, 255}
 	Gray           = color.RGBA{128, 128, 128, 255}
 	LightGray      = color.RGBA{211, 211, 211, 255}
