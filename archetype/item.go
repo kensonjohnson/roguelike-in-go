@@ -14,6 +14,7 @@ func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry
 		tags.ItemTag,
 		component.Name,
 		component.Sprite,
+		component.Description,
 	))
 
 	name := component.NameData{
@@ -25,6 +26,11 @@ func CreateNewItem(world donburi.World, itemData *items.ItemData) *donburi.Entry
 		Image: itemData.Sprite,
 	}
 	component.Sprite.SetValue(entry, sprite)
+
+	description := component.DescriptionData{
+		Value: itemData.Description,
+	}
+	component.Description.SetValue(entry, description)
 
 	return entry
 }
