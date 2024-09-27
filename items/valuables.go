@@ -17,8 +17,9 @@ type valuables struct {
 var Valuables valuables = valuables{
 	Alcohol: &ValuableData{
 		ItemData: ItemData{
-			Name:   "Alcohol",
-			Sprite: assets.WorldAlcohol,
+			Name:        "Alcohol",
+			Sprite:      assets.WorldAlcohol,
+			Description: "A bottle of alcohol. Should be well aged by now.",
 		},
 		Value: 20,
 	},
