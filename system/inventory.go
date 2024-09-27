@@ -1,12 +1,16 @@
 package system
 
 import (
+	"fmt"
 	"image/color"
+	"log"
 	"log/slog"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/kensonjohnson/roguelike-game-go/archetype"
 	"github.com/kensonjohnson/roguelike-game-go/archetype/tags"
 	"github.com/kensonjohnson/roguelike-game-go/assets"
 	"github.com/kensonjohnson/roguelike-game-go/component"
@@ -27,7 +31,7 @@ const totalBoxSpace = boxSize + spacing
 const rows = 4
 const columns = 6
 const contextWindowWidth = 140
-const contextWindowHeight = 150
+const contextWindowHeight = 200
 
 type inventoryUi struct {
 	open                   bool
@@ -40,16 +44,21 @@ type inventoryUi struct {
 	contextWindow          *ebiten.Image
 	contextFont            *text.GoTextFace
 	contextWindowSelection contextSelection
+	inConfirmAction        bool
+	confirmActionWindow    *ebiten.Image
+	confirmAction          bool
+	inInfoWindow           bool
+	infoWindow             *ebiten.Image
+	infoWindowText         *infoWindowText
 }
 
 var InventoryUI = inventoryUi{
 	open:       false,
 	background: buildInventorySprite(),
 	posX:       15 * config.TileWidth,
-	posY: (((config.ScreenHeight - config.UIHeight - 2) *
-		config.TileHeight) - (inset + (totalBoxSpace * rows) -
-		spacing + inset)),
-	selector:      makeItemBox(color.White),
+	posY: (((config.ScreenHeight - config.UIHeight - 2) * config.TileHeight) -
+		(inset + (totalBoxSpace * rows) - spacing + inset)),
+	selector:      makeItemBox(color.White, color.Transparent),
 	selectorX:     0,
 	selectorY:     0,
 	keyDelayCount: 0,
@@ -64,6 +73,20 @@ var InventoryUI = inventoryUi{
 		Size:   assets.KenneyMiniSquaredFont.Size * 1.5,
 	},
 	contextWindowSelection: back,
+	inConfirmAction:        false,
+	confirmActionWindow: shapes.MakeBox(
+		130, 40, 4,
+		colors.Peru, colors.LightGray,
+		shapes.BasicCorner,
+	),
+	confirmAction: false,
+	inInfoWindow:  false,
+	infoWindow: shapes.MakeBox(
+		200, contextWindowHeight, 4,
+		colors.Peru, colors.LightGray,
+		shapes.BasicCorner,
+	),
+	infoWindowText: &infoWindowText{Name: "Info", Text: "No Description"},
 }
 
 type contextSelection int
@@ -75,6 +98,11 @@ const (
 	back
 )
 
+type infoWindowText struct {
+	Name string
+	Text string
+}
+
 func (i *inventoryUi) Update(ecs *ecs.ECS) {
 	if !i.open {
 		return
@@ -85,7 +113,7 @@ func (i *inventoryUi) Update(ecs *ecs.ECS) {
 	}
 
 	if i.inContextMenu {
-		i.handleContextWindow()
+		i.handleContextWindow(ecs)
 	} else {
 		i.handleSelectionWindow()
 	}
@@ -114,24 +142,20 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 			continue
 		}
 		sprite := component.Sprite.Get(entry).Image
-		column := index % columns
-		row := index / columns
 		options.GeoM.Reset()
 		options.GeoM.Scale(3, 3)
 		options.GeoM.Translate(
-			float64(i.posX+(column*totalBoxSpace)+inset+9),
-			float64(i.posY+(row*totalBoxSpace)+inset+9),
+			float64(i.posX+((index%columns)*totalBoxSpace)+inset+9),
+			float64(i.posY+((index/columns)*totalBoxSpace)+inset+9),
 		)
 		screen.DrawImage(sprite, options)
 	}
 
 	// Draw selector
-	selectorPosX := i.posX + (i.selectorX * totalBoxSpace) + inset
-	selectorPosY := i.posY + (i.selectorY * totalBoxSpace) + inset
 	options.GeoM.Reset()
 	options.GeoM.Translate(
-		float64(selectorPosX),
-		float64(selectorPosY),
+		float64(i.posX+(i.selectorX*totalBoxSpace)+inset),
+		float64(i.posY+(i.selectorY*totalBoxSpace)+inset),
 	)
 	screen.DrawImage(i.selector, options)
 
@@ -196,20 +220,19 @@ func (i *inventoryUi) handleSelectionWindow() {
 	i.selectorY = (i.selectorY + moveY + rows) % rows
 }
 
-func (i *inventoryUi) handleContextWindow() {
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		slog.Debug("Selection made!", "Selection: ", i.contextWindowSelection)
-		// Do some work on selection
-		if i.contextWindowSelection == back {
-			i.inContextMenu = false
-		}
-		return
-	}
-
+func (i *inventoryUi) handleContextWindow(ecs *ecs.ECS) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		slog.Debug("Context window closed")
 		i.contextWindowSelection = back
+		i.inConfirmAction = false
+		i.inInfoWindow = false
 		i.inContextMenu = false
+		return
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+		i.inConfirmAction || i.inInfoWindow {
+		i.handleSelectionMade(ecs)
 		return
 	}
 
@@ -245,7 +268,7 @@ func buildInventorySprite() *ebiten.Image {
 		shapes.SmallPointedCorner,
 	)
 
-	itemBox := makeItemBox(colors.CornflowerBlue)
+	itemBox := makeItemBox(colors.Gray, colors.Smudgy)
 	options := &ebiten.DrawImageOptions{}
 	for y := 0; y < rows; y++ {
 		options.GeoM.Translate(float64(inset), float64(inset+(y*totalBoxSpace)))
@@ -259,10 +282,10 @@ func buildInventorySprite() *ebiten.Image {
 	return image
 }
 
-func makeItemBox(border color.Color) *ebiten.Image {
+func makeItemBox(border, fill color.Color) *ebiten.Image {
 	return shapes.MakeBox(
 		boxSize, boxSize, 3,
-		border, color.Black,
+		border, fill,
 		shapes.SimpleCorner,
 	)
 }
@@ -291,6 +314,22 @@ func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 
 	options.GeoM.Translate(0, float64(lineHeight))
 	i.drawContextOption(screen, "Back", back, options)
+
+	if i.inConfirmAction {
+		i.drawConfirmWindow(
+			screen,
+			x+i.contextWindow.Bounds().Dx(),
+			y-i.contextWindow.Bounds().Dy(),
+		)
+	}
+
+	if i.inInfoWindow {
+		i.drawInfoWindow(
+			screen,
+			x+i.contextWindow.Bounds().Dx(),
+			y-i.contextWindow.Bounds().Dy(),
+		)
+	}
 }
 
 func (i *inventoryUi) drawContextOption(
@@ -308,8 +347,139 @@ func (i *inventoryUi) drawContextOption(
 	options.ColorScale.Reset()
 }
 
-func (i *inventoryUi) handleSelectionMade() {
-	if i.contextWindowSelection == back {
+func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
+
+	switch i.contextWindowSelection {
+	case discard:
+		if i.inConfirmAction {
+
+			if inpututil.IsKeyJustPressed(ebiten.KeyA) ||
+				inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+				i.confirmAction = false
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyD) ||
+				inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+				i.confirmAction = true
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
+				i.confirmAction {
+
+				slog.Debug("Discard item")
+				playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+				playerInventory := component.Inventory.Get(playerEntry)
+				index := i.selectorX + (i.selectorY * columns)
+				playerInventory.RemoveItem(index)
+				// TODO: Send event message to ui
+				i.inConfirmAction = false
+				i.inContextMenu = false
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
+				!i.confirmAction {
+				i.inConfirmAction = false
+			}
+		} else {
+			i.inConfirmAction = true
+			i.confirmAction = false
+			return
+		}
+
+	case info:
+		if i.inInfoWindow {
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+				i.inInfoWindow = false
+			}
+		} else {
+			slog.Debug("Item info")
+			playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+			playerInventory := component.Inventory.Get(playerEntry)
+			itemEntry, err := playerInventory.GetItem(i.selectorX + (i.selectorY * columns))
+			if err != nil {
+				log.Panic(err)
+			}
+			i.infoWindowText.Name = component.Name.Get(itemEntry).Value
+			var description = "No description"
+			if archetype.IsConsumable(itemEntry) {
+				value := component.Heal.Get(itemEntry).HealAmount
+				description = fmt.Sprintf("Heals for %v", value)
+			}
+			if archetype.IsValuable(itemEntry) {
+				itemDescription := component.Description.Get(itemEntry)
+				value := component.Value.Get(itemEntry).Amount
+				description = fmt.Sprintf("%v\nWorth %v gold", itemDescription.Value, value)
+			}
+			i.infoWindowText.Text = description
+			i.inInfoWindow = true
+		}
+
+	case use:
+		slog.Debug("Item action")
+
+	case back:
+		slog.Debug("Close context window")
 		i.inContextMenu = false
 	}
+}
+
+func (i *inventoryUi) drawConfirmWindow(screen *ebiten.Image, x, y int) {
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(i.confirmActionWindow, options)
+
+	const inset = 10
+
+	textOptions := &text.DrawOptions{}
+	textOptions.GeoM.Translate(float64(x+inset), float64(y))
+	if !i.confirmAction {
+		textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
+	} else {
+		textOptions.ColorScale.ScaleWithColor(color.Black)
+	}
+	text.Draw(screen, "No", i.contextFont, textOptions)
+	textOptions.ColorScale.Reset()
+
+	textOptions.GeoM.Translate(50.0, 0)
+	if i.confirmAction {
+		textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
+	} else {
+		textOptions.ColorScale.ScaleWithColor(color.Black)
+	}
+
+	text.Draw(screen, "Yes", i.contextFont, textOptions)
+
+}
+
+func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(i.infoWindow, options)
+
+	const inset = 10
+	textOptions := &text.DrawOptions{}
+	textOptions.GeoM.Translate(float64(x+inset), float64(y))
+	textOptions.ColorScale.ScaleWithColor(color.Black)
+	textOptions.LineSpacing = 25
+	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
+
+	// Word wrapping
+	maxWidth := i.infoWindow.Bounds().Size().X - (inset * 2)
+	lines := make([]string, 0)
+	currentLine := ""
+	fields := strings.Fields(i.infoWindowText.Text)
+
+	for index, str := range fields {
+		if index == 0 {
+			currentLine = str
+			continue
+		}
+		if text.Advance(currentLine+" "+str, assets.KenneyMiniSquaredFont) > float64(maxWidth) {
+			lines = append(lines, currentLine)
+			currentLine = str
+		} else {
+			currentLine += " " + str
+		}
+	}
+	lines = append(lines, currentLine)
+
+	textOptions.GeoM.Translate(0, 40.0)
+	text.Draw(screen, strings.Join(lines, "\n"), assets.KenneyMiniSquaredFont, textOptions)
 }
