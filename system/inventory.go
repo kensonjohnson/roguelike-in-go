@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 	"log/slog"
+	"math"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -405,7 +406,7 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			if archetype.IsValuable(itemEntry) {
 				itemDescription := component.Description.Get(itemEntry)
 				value := component.Value.Get(itemEntry).Amount
-				description = fmt.Sprintf("%v\nWorth %v gold", itemDescription.Value, value)
+				description = fmt.Sprintf("%v Worth %v gold", itemDescription.Value, value)
 			}
 			i.infoWindowText.Text = description
 			i.inInfoWindow = true
@@ -449,37 +450,106 @@ func (i *inventoryUi) drawConfirmWindow(screen *ebiten.Image, x, y int) {
 }
 
 func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
-	options := &ebiten.DrawImageOptions{}
-	options.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(i.infoWindow, options)
-
-	const inset = 10
-	textOptions := &text.DrawOptions{}
-	textOptions.GeoM.Translate(float64(x+inset), float64(y))
-	textOptions.ColorScale.ScaleWithColor(color.Black)
-	textOptions.LineSpacing = 25
-	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
-
-	// Word wrapping
-	maxWidth := i.infoWindow.Bounds().Size().X - (inset * 2)
-	lines := make([]string, 0)
-	currentLine := ""
+	// find minimum width needed for title
+	titleWidth := text.Advance(i.infoWindowText.Name, i.contextFont)
+	// find proper width for item description text
+	squaredCharCount := int(math.Sqrt(float64(len(i.infoWindowText.Text))))
+	desiredLineWidth := text.Advance(strings.Repeat("m", squaredCharCount*2), assets.KenneyMiniSquaredFont)
+	// set width according to which length is longer
+	width := math.Max(titleWidth, desiredLineWidth)
+	// find proper height based on found width
 	fields := strings.Fields(i.infoWindowText.Text)
+	lines := make([]string, 0)
+	var currentLine string
 
-	for index, str := range fields {
+	for index, string := range fields {
 		if index == 0 {
-			currentLine = str
+			currentLine = string
 			continue
 		}
-		if text.Advance(currentLine+" "+str, assets.KenneyMiniSquaredFont) > float64(maxWidth) {
+		if text.Advance(currentLine+" "+string, assets.KenneyMiniSquaredFont) > float64(width) {
 			lines = append(lines, currentLine)
-			currentLine = str
+			currentLine = string
 		} else {
-			currentLine += " " + str
+			currentLine += " " + string
 		}
 	}
 	lines = append(lines, currentLine)
-
+	formattedDescription := strings.Join(lines, "\n")
+	_, descriptionHeight := text.Measure(formattedDescription, assets.KenneyMiniSquaredFont, 25.0)
+	// create text box, with insets for title and back button
+	const inset = 10
+	window := shapes.MakeBox(
+		inset+int(width)+inset,
+		inset+40+int(descriptionHeight)+40+inset,
+		4,
+		colors.Peru, colors.LightGray,
+		shapes.BasicCorner,
+	)
+	// draw box
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(window, options)
+	// draw title
+	textOptions := &text.DrawOptions{}
+	textOptions.GeoM.Translate(float64(x+inset), float64(y))
+	textOptions.ColorScale.ScaleWithColor(color.Black)
+	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
+	// draw description
 	textOptions.GeoM.Translate(0, 40.0)
-	text.Draw(screen, strings.Join(lines, "\n"), assets.KenneyMiniSquaredFont, textOptions)
+	textOptions.LineSpacing = 25
+	text.Draw(screen, formattedDescription, assets.KenneyMiniSquaredFont, textOptions)
+	// draw back button
+	textOptions.GeoM.Translate(0, descriptionHeight+20.0)
+	textOptions.ColorScale.Reset()
+	textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
+	text.Draw(screen, "Back", i.contextFont, textOptions)
 }
+
+// func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
+//
+// 	const inset = 10
+// 	textOptions := &text.DrawOptions{}
+// 	textOptions.GeoM.Translate(float64(x+inset), float64(y))
+// 	textOptions.ColorScale.ScaleWithColor(color.Black)
+// 	textOptions.LineSpacing = 25
+// 	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
+//
+// 	// Word wrapping
+// 	maxWidth := i.infoWindow.Bounds().Size().X - (inset * 2)
+// 	lines := make([]string, 0)
+// 	currentLine := ""
+// 	fields := strings.Fields(i.infoWindowText.Text)
+//
+// 	for index, str := range fields {
+// 		if index == 0 {
+// 			currentLine = str
+// 			continue
+// 		}
+// 		if text.Advance(currentLine+" "+str, assets.KenneyMiniSquaredFont) > float64(maxWidth) {
+// 			lines = append(lines, currentLine)
+// 			currentLine = str
+// 		} else {
+// 			currentLine += " " + str
+// 		}
+// 	}
+// 	lines = append(lines, currentLine)
+// 	formattedDescription := strings.Join(lines, "\n")
+//
+// 	// Dynamically create description box
+// 	width, height := text.Measure(formattedDescription, assets.KenneyMiniSquaredFont, 25.0)
+// 	contextWindow := shapes.MakeBox(
+// 		inset+int(width)+inset,
+// 		inset+int(height)+inset,
+// 		4,
+// 		colors.Peru, color.Black,
+// 		shapes.BasicCorner,
+// 	)
+//
+// 	options := &ebiten.DrawImageOptions{}
+// 	options.GeoM.Translate(float64(x), float64(y))
+// 	screen.DrawImage(contextWindow, options)
+//
+// 	textOptions.GeoM.Translate(0, 40.0)
+// 	text.Draw(screen, strings.Join(lines, "\n"), assets.KenneyMiniSquaredFont, textOptions)
+// }
