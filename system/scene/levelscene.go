@@ -9,6 +9,7 @@ import (
 	"github.com/kensonjohnson/roguelike-game-go/component"
 	"github.com/kensonjohnson/roguelike-game-go/event"
 	"github.com/kensonjohnson/roguelike-game-go/internal/config"
+	"github.com/kensonjohnson/roguelike-game-go/internal/engine"
 	"github.com/kensonjohnson/roguelike-game-go/system"
 	"github.com/kensonjohnson/roguelike-game-go/system/layer"
 	"github.com/yohamta/donburi"
@@ -104,7 +105,7 @@ func (ls *LevelScene) configureECS(world donburi.World) {
 	ls.ecs.AddRenderer(layer.UI, system.UI.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.Minimap.Draw)
 	ls.ecs.AddRenderer(layer.UI, system.InventoryUI.Draw)
-	if system.Debug.On {
+	if engine.Debug.On() {
 		ls.ecs.AddRenderer(layer.UI, system.Debug.Draw)
 	}
 
