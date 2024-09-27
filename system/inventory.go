@@ -481,7 +481,7 @@ func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
 	const inset = 10
 	window := shapes.MakeBox(
 		inset+int(width)+inset,
-		inset+40+int(descriptionHeight)+40+inset,
+		inset+40+int(descriptionHeight)+20+inset,
 		4,
 		colors.Peru, colors.LightGray,
 		shapes.BasicCorner,
@@ -500,56 +500,8 @@ func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
 	textOptions.LineSpacing = 25
 	text.Draw(screen, formattedDescription, assets.KenneyMiniSquaredFont, textOptions)
 	// draw back button
-	textOptions.GeoM.Translate(0, descriptionHeight+20.0)
+	textOptions.GeoM.Translate(0, descriptionHeight)
 	textOptions.ColorScale.Reset()
 	textOptions.ColorScale.ScaleWithColor(colors.DarkGray)
 	text.Draw(screen, "Back", i.contextFont, textOptions)
 }
-
-// func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
-//
-// 	const inset = 10
-// 	textOptions := &text.DrawOptions{}
-// 	textOptions.GeoM.Translate(float64(x+inset), float64(y))
-// 	textOptions.ColorScale.ScaleWithColor(color.Black)
-// 	textOptions.LineSpacing = 25
-// 	text.Draw(screen, i.infoWindowText.Name, i.contextFont, textOptions)
-//
-// 	// Word wrapping
-// 	maxWidth := i.infoWindow.Bounds().Size().X - (inset * 2)
-// 	lines := make([]string, 0)
-// 	currentLine := ""
-// 	fields := strings.Fields(i.infoWindowText.Text)
-//
-// 	for index, str := range fields {
-// 		if index == 0 {
-// 			currentLine = str
-// 			continue
-// 		}
-// 		if text.Advance(currentLine+" "+str, assets.KenneyMiniSquaredFont) > float64(maxWidth) {
-// 			lines = append(lines, currentLine)
-// 			currentLine = str
-// 		} else {
-// 			currentLine += " " + str
-// 		}
-// 	}
-// 	lines = append(lines, currentLine)
-// 	formattedDescription := strings.Join(lines, "\n")
-//
-// 	// Dynamically create description box
-// 	width, height := text.Measure(formattedDescription, assets.KenneyMiniSquaredFont, 25.0)
-// 	contextWindow := shapes.MakeBox(
-// 		inset+int(width)+inset,
-// 		inset+int(height)+inset,
-// 		4,
-// 		colors.Peru, color.Black,
-// 		shapes.BasicCorner,
-// 	)
-//
-// 	options := &ebiten.DrawImageOptions{}
-// 	options.GeoM.Translate(float64(x), float64(y))
-// 	screen.DrawImage(contextWindow, options)
-//
-// 	textOptions.GeoM.Translate(0, 40.0)
-// 	text.Draw(screen, strings.Join(lines, "\n"), assets.KenneyMiniSquaredFont, textOptions)
-// }
