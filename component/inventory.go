@@ -44,6 +44,13 @@ func (i *InventoryData) DecreaseCapacityByAmount(amount int) error {
 	return nil
 }
 
+func (i *InventoryData) GetItem(index int) (*donburi.Entry, error) {
+	if index < 0 || index >= i.capacity {
+		return nil, errors.New("Index out of range")
+	}
+	return i.items[index], nil
+}
+
 func (i *InventoryData) AddItem(item *donburi.Entry) error {
 	if i.holding >= i.capacity {
 		return errors.New("inventory full")
@@ -71,7 +78,7 @@ func (i *InventoryData) AddItem(item *donburi.Entry) error {
 }
 
 func (i *InventoryData) RemoveItem(index int) error {
-	if index >= i.capacity {
+	if index < 0 || index >= i.capacity {
 		log.Panic("index out of range in RemoveItem. Recieved: ", index)
 	}
 	i.items[index] = nil
