@@ -112,7 +112,7 @@ func (i *inventoryUi) Update(ecs *ecs.ECS) {
 	if i.inContextMenu {
 		i.handleContextWindow(ecs)
 	} else {
-		i.handleSelectionWindow()
+		i.handleSelectionWindow(ecs)
 	}
 
 }
@@ -169,7 +169,7 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	i.drawContextWindowOptions(screen)
 }
 
-func (i *inventoryUi) handleSelectionWindow() {
+func (i *inventoryUi) handleSelectionWindow(ecs *ecs.ECS) {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyI) ||
 		inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -180,6 +180,18 @@ func (i *inventoryUi) handleSelectionWindow() {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		// Check if item in slot
+		playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+		playerInventory := component.Inventory.Get(playerEntry)
+		itemEntry, err := playerInventory.GetItem(i.selectorX + (i.selectorY * columns))
+		if err != nil {
+			log.Panic(err)
+		}
+		if itemEntry == nil {
+			return
+		}
+
+		// Item in slot
 		i.contextWindowSelection = back
 		i.inContextMenu = true
 		slog.Debug("Open context")
@@ -307,6 +319,7 @@ func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 	options.GeoM.Translate(0, float64(lineHeight))
 	i.drawContextOption(screen, "Info", info, options)
 
+	// TODO: Dynamically show 'Equip' or 'Use' based on item
 	options.GeoM.Translate(0, float64(lineHeight))
 	i.drawContextOption(screen, "Equip", use, options)
 
@@ -361,7 +374,6 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			}
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
 				i.confirmAction {
-
 				slog.Debug("Discard item")
 				playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 				playerInventory := component.Inventory.Get(playerEntry)
@@ -411,7 +423,63 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 		}
 
 	case use:
-		slog.Debug("Item action")
+		if i.inConfirmAction {
+			if inpututil.IsKeyJustPressed(ebiten.KeyA) ||
+				inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+				i.confirmAction = false
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyD) ||
+				inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+				i.confirmAction = true
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
+				i.confirmAction {
+				slog.Debug("Use item confirmed")
+				// TODO: Implement item usage
+
+				playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+				playerInventory := component.Inventory.Get(playerEntry)
+				index := i.selectorX + (i.selectorY * columns)
+				itemToUse, err := playerInventory.GetItem(index)
+				if err != nil {
+					log.Panic("Error getting item: ", err)
+				}
+
+				if archetype.IsConsumable(itemToUse) {
+					// heal the player
+				}
+
+				if archetype.IsWeapon(itemToUse) {
+					// equip weapon
+				}
+
+				if archetype.IsArmor(itemToUse) {
+					// equip armor
+				}
+
+				// TODO: Send event message to ui
+				i.inConfirmAction = false
+				i.inContextMenu = false
+			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
+				!i.confirmAction {
+				i.inConfirmAction = false
+			}
+		} else {
+			slog.Debug("Item action")
+
+			playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+			playerInventory := component.Inventory.Get(playerEntry)
+			index := i.selectorX + (i.selectorY * columns)
+			itemToUse, err := playerInventory.GetItem(index)
+			if err != nil {
+				log.Panic("Error getting item.", err)
+			}
+			if !archetype.IsValuable(itemToUse) {
+				i.inConfirmAction = true
+				i.confirmAction = false
+			}
+		}
 
 	case back:
 		slog.Debug("Close context window")
