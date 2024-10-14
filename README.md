@@ -24,7 +24,7 @@ You can [try the game here](https://kensonjohnson.github.io/roguelike-in-go/), v
 
 To run the game, you need to have Go installed. You can download it from the [official website](https://golang.org/) or install it using your package manager.
 
-Obviosuly, you also need to clone this repository:
+Obviously, you also need to clone this repository:
 
 ```bash
 git clone git@github.com:kensonjohnson/roguelike-in-go.git
