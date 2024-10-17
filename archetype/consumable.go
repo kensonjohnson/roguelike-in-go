@@ -17,7 +17,7 @@ func CreateNewConsumable(world donburi.World, consumableData items.ConsumableDat
 	// Add heal data
 	entry.AddComponent(component.Heal)
 	heal := component.HealData{
-		HealAmount: consumableData.AmountHeal,
+		Amount: consumableData.AmountHeal,
 	}
 	component.Heal.SetValue(entry, heal)
 
