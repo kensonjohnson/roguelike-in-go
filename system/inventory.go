@@ -166,7 +166,7 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	options.GeoM.Translate(0, -float64(i.contextWindow.Bounds().Dy()))
 	screen.DrawImage(i.contextWindow, options)
 
-	i.drawContextWindowOptions(screen)
+	i.drawContextWindowOptions(ecs, screen)
 }
 
 func (i *inventoryUi) handleSelectionWindow(ecs *ecs.ECS) {
@@ -300,7 +300,7 @@ func makeItemBox(border, fill color.Color) *ebiten.Image {
 	)
 }
 
-func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
+func (i *inventoryUi) drawContextWindowOptions(ecs *ecs.ECS, screen *ebiten.Image) {
 	x := i.posX + (i.selectorX * totalBoxSpace) + inset
 	y := i.posY + (i.selectorY * totalBoxSpace) + inset
 
@@ -319,9 +319,21 @@ func (i *inventoryUi) drawContextWindowOptions(screen *ebiten.Image) {
 	options.GeoM.Translate(0, float64(lineHeight))
 	i.drawContextOption(screen, "Info", info, options)
 
-	// TODO: Dynamically show 'Equip' or 'Use' based on item
+	// Dynamically show 'Equip' or 'Use' based on item
+	playerEntry := tags.PlayerTag.MustFirst(ecs.World)
+	playerInventory := component.Inventory.Get(playerEntry)
+	index := i.selectorX + (i.selectorY * columns)
+	itemToUse, err := playerInventory.GetItem(index)
+	if err != nil {
+		log.Panic("Error getting item: ", err)
+	}
+	label := "Use"
+	if archetype.IsEquipable(itemToUse) {
+		label = "Equip"
+	}
+
 	options.GeoM.Translate(0, float64(lineHeight))
-	i.drawContextOption(screen, "Equip", use, options)
+	i.drawContextOption(screen, label, use, options)
 
 	options.GeoM.Translate(0, float64(lineHeight))
 	i.drawContextOption(screen, "Back", back, options)
@@ -410,7 +422,7 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			i.infoWindowText.Name = component.Name.Get(itemEntry).Value
 			var description = "No description"
 			if archetype.IsConsumable(itemEntry) {
-				value := component.Heal.Get(itemEntry).HealAmount
+				value := component.Heal.Get(itemEntry).Amount
 				description = fmt.Sprintf("Heals for %v", value)
 			}
 			if archetype.IsValuable(itemEntry) {
@@ -435,7 +447,6 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
 				i.confirmAction {
 				slog.Debug("Use item confirmed")
-				// TODO: Implement item usage
 
 				playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 				playerInventory := component.Inventory.Get(playerEntry)
@@ -446,18 +457,20 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 				}
 
 				if archetype.IsConsumable(itemToUse) {
-					// heal the player
+					playerHealth := component.Health.Get(playerEntry)
+					heal := component.Heal.Get(itemToUse)
+					difference := playerHealth.Add(heal.Amount)
+					itemName := component.Name.Get(itemToUse)
+					playerInventory.RemoveItem(index)
+
+					userMessage := component.UserMessage.Get(playerEntry)
+					userMessage.WorldInteractionMessage = fmt.Sprintf("Used %s and recovered %d health.", itemName.Value, difference)
 				}
 
-				if archetype.IsWeapon(itemToUse) {
-					// equip weapon
+				if archetype.IsEquipable(itemToUse) {
+					// equip
 				}
 
-				if archetype.IsArmor(itemToUse) {
-					// equip armor
-				}
-
-				// TODO: Send event message to ui
 				i.inConfirmAction = false
 				i.inContextMenu = false
 			}
@@ -478,6 +491,10 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			if !archetype.IsValuable(itemToUse) {
 				i.inConfirmAction = true
 				i.confirmAction = false
+			} else {
+				itemName := component.Name.Get(itemToUse)
+				userMessage := component.UserMessage.Get(playerEntry)
+				userMessage.WorldInteractionMessage = fmt.Sprintf("Cannot use %s.", itemName.Value)
 			}
 		}
 
