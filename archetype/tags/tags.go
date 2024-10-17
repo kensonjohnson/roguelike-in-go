@@ -7,6 +7,7 @@ var (
 	CameraTag     = donburi.NewTag("camera")
 	CoinTag       = donburi.NewTag("coin")
 	ConsumableTag = donburi.NewTag("consumable")
+	EquipableTag  = donburi.NewTag("equipable")
 	ItemTag       = donburi.NewTag("item")
 	LevelTag      = donburi.NewTag("level")
 	MonsterTag    = donburi.NewTag("monster")
