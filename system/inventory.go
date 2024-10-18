@@ -51,6 +51,7 @@ type inventoryUi struct {
 	inInfoWindow           bool
 	infoWindow             *ebiten.Image
 	infoWindowText         *infoWindowText
+	equipmentWindow        *ebiten.Image
 }
 
 var InventoryUI = inventoryUi{
@@ -80,10 +81,11 @@ var InventoryUI = inventoryUi{
 		colors.Peru, colors.LightGray,
 		shapes.BasicCorner,
 	),
-	confirmAction:  false,
-	inInfoWindow:   false,
-	infoWindow:     nil,
-	infoWindowText: &infoWindowText{Name: "Info", Text: "No Description"},
+	confirmAction:   false,
+	inInfoWindow:    false,
+	infoWindow:      nil,
+	infoWindowText:  &infoWindowText{Name: "Info", Text: "No Description"},
+	equipmentWindow: buildEquipmentBoxSprite(),
 }
 
 type contextSelection int
@@ -148,6 +150,31 @@ func (i *inventoryUi) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 		screen.DrawImage(sprite, options)
 	}
 
+	// Draw the equipment box
+	ebPosX := float64(i.posX) + float64(i.background.Bounds().Dx())
+	ebPosY := float64(i.posY) - totalBoxSpace
+	options.GeoM.Reset()
+	options.GeoM.Translate(ebPosX, ebPosY)
+	screen.DrawImage(i.equipmentWindow, options)
+
+	// Draw equipment
+	playerEquipment := component.Equipment.Get(playerEntry)
+
+	options.GeoM.Reset()
+	options.GeoM.Scale(3, 3)
+	options.GeoM.Translate(ebPosX+inset+9, ebPosY+inset+9)
+	weapon := playerEquipment.Weapon
+	sprite := component.Sprite.Get(weapon).Image
+	screen.DrawImage(sprite, options)
+
+	options.GeoM.Translate(0, totalBoxSpace)
+	armor := playerEquipment.Armor
+	sprite = component.Sprite.Get(armor).Image
+	screen.DrawImage(sprite, options)
+
+	// TODO: Finish drawing other equipment
+
+	// TODO: allow cursor to move into equipment window
 	// Draw selector
 	options.GeoM.Reset()
 	options.GeoM.Translate(
@@ -267,6 +294,7 @@ func (i *inventoryUi) Close() {
 	i.open = false
 }
 
+// Makes the entire box for the inventory on the screen
 func buildInventorySprite() *ebiten.Image {
 
 	image := shapes.MakeBox(
@@ -387,11 +415,23 @@ func (i *inventoryUi) handleSelectionMade(ecs *ecs.ECS) {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) &&
 				i.confirmAction {
 				slog.Debug("Discard item")
+
 				playerEntry := tags.PlayerTag.MustFirst(ecs.World)
 				playerInventory := component.Inventory.Get(playerEntry)
+
 				index := i.selectorX + (i.selectorY * columns)
+
+				itemToDelete, err := playerInventory.GetItem(index)
+				if err != nil {
+					log.Panic("failed to get item", err)
+				}
+
+				itemName := component.Name.Get(itemToDelete).Value
+				userMessage := component.UserMessage.Get(playerEntry)
+				userMessage.WorldInteractionMessage = fmt.Sprintf("Discarded %s.", itemName)
+
 				playerInventory.RemoveItem(index)
-				// TODO: Send event message to ui
+
 				i.inConfirmAction = false
 				i.inContextMenu = false
 			}
@@ -592,4 +632,32 @@ func (i *inventoryUi) drawInfoWindow(screen *ebiten.Image, x, y int) {
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(float64(x), float64(y))
 	screen.DrawImage(i.infoWindow, options)
+}
+
+// Makes the equipment window, with all the little boxes inside of it
+func buildEquipmentBoxSprite() *ebiten.Image {
+
+	const columns = 1
+	const rows = 5
+	image := shapes.MakeBox(
+		inset+(totalBoxSpace*columns)-spacing+inset,
+		inset+(totalBoxSpace*rows)-spacing+inset,
+		4,
+		colors.SlateGray,
+		color.Black,
+		shapes.SmallPointedCorner,
+	)
+
+	itemBox := makeItemBox(colors.Gray, colors.Smudgy)
+	options := &ebiten.DrawImageOptions{}
+	for y := 0; y < rows; y++ {
+		options.GeoM.Translate(float64(inset), float64(inset+(y*totalBoxSpace)))
+		for x := 0; x < columns; x++ {
+			image.DrawImage(itemBox, options)
+			options.GeoM.Translate(totalBoxSpace, 0)
+		}
+		options.GeoM.Reset()
+	}
+
+	return image
 }
